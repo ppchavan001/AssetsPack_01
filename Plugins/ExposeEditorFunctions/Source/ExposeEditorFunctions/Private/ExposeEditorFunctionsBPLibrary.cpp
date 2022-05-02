@@ -46,7 +46,7 @@ FText UExposeEditorFunctionsBPLibrary::GetDisplayClusterExportConfigPathFromBlue
 
             return FText::FromString(ConfigPath);
         }
-        return FText::FromString("No path set for current Blueprint - Export config to set a path.");
+        return FText::FromString("Path is not set for selected Blueprint. Open the Blueprint and Export to a valid location to set Path.");
     }
     
     return FText::FromString("Selected object is not a Display Cluster Blueprint.");
