@@ -38,17 +38,7 @@ public class ExposeEditorFunctions : ModuleRules
 				"Engine",
 				"Slate",
 				"SlateCore",
-				"DisplayCluster",
-				"DisplayClusterEditor",
-				"DisplayClusterProjection",
-				"DisplayClusterPostprocess",
-				"DisplayClusterShaders",
-				"DisplayClusterMessageInterception",
-				"DisplayClusterConfiguration",
-				"DisplayClusterConfigurator",
-				"DisplayClusterStageMonitoring",
-				"DisplayClusterRemoteControlInterceptor",
-				"DisplayClusterMultiUser"
+				"DisplayCluster"
 				// ... add private dependencies that you statically link with here ...	
 			}
 			);
