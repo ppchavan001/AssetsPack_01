@@ -1,6 +1,6 @@
 {
 	"FileVersion": 3,
-	"EngineAssociation": "4.26",
+	"EngineAssociation": "{7DFB53B9-4BE7-10FD-D0F2-F68EDA91CE16}",
 	"Category": "",
 	"Description": "",
 	"Modules": [
@@ -16,7 +16,7 @@
 	"Plugins": [
 		{
 			"Name": "FileSDK",
-			"Enabled": true,
+			"Enabled": false,
 			"MarketplaceURL": "com.epicgames.launcher://ue/marketplace/product/4f737815666c4e7dabf2043fb55a8419"
 		},
 		{
@@ -31,7 +31,8 @@
 			"Name": "nDisplay",
 			"Enabled": true,
 			"SupportedTargetPlatforms": [
-				"Win64"
+				"Win64",
+				"Linux"
 			]
 		},
 		{
