@@ -1,0 +1,155 @@
+{
+	"nDisplay":
+	{
+		"description": "nDisplay configuration",
+		"version": "4.27",
+		"assetPath": "/Game/ExampleConfigs/NDC_XRStage.NDC_XRStage",
+		"misc":
+		{
+			"bFollowLocalPlayerCamera": false,
+			"bExitOnEsc": true
+		},
+		"cluster":
+		{
+			"masterNode":
+			{
+				"id": "node_main",
+				"ports":
+				{
+					"ClusterSync": 41001,
+					"RenderSync": 41002,
+					"ClusterEventsJson": 41003,
+					"ClusterEventsBinary": 41004
+				}
+			},
+			"sync":
+			{
+				"renderSyncPolicy":
+				{
+					"type": "ethernet",
+					"parameters":
+					{
+					}
+				},
+				"inputSyncPolicy":
+				{
+					"type": "ReplicateMaster",
+					"parameters":
+					{
+					}
+				}
+			},
+			"network":
+			{
+				"ConnectRetriesAmount": "10",
+				"ConnectRetryDelay": "1000",
+				"GameStartBarrierTimeout": "30000",
+				"FrameStartBarrierTimeout": "5000",
+				"FrameEndBarrierTimeout": "5000",
+				"RenderSyncBarrierTimeout": "5000"
+			},
+			"nodes":
+			{
+				"node_main":
+				{
+					"host": "192.168.1.1",
+					"sound": true,
+					"fullScreen": true,
+					"window":
+					{
+						"x": 0,
+						"y": 0,
+						"w": 3840,
+						"h": 2160
+					},
+					"postprocess":
+					{
+					},
+					"viewports":
+					{
+						"vp_left":
+						{
+							"camera": "DefaultViewPoint",
+							"bufferRatio": 1,
+							"gPUIndex": -1,
+							"allowCrossGPUTransfer": true,
+							"isShared": false,
+							"region":
+							{
+								"x": 0,
+								"y": 0,
+								"w": 1350,
+								"h": 900
+							},
+							"projectionPolicy":
+							{
+								"type": "Mesh",
+								"parameters":
+								{
+									"mesh_component": "scr_left"
+								}
+							}
+						},
+						"vp_right":
+						{
+							"camera": "DefaultViewPoint",
+							"bufferRatio": 1,
+							"gPUIndex": -1,
+							"allowCrossGPUTransfer": true,
+							"isShared": false,
+							"region":
+							{
+								"x": 0,
+								"y": 900,
+								"w": 1350,
+								"h": 900
+							},
+							"projectionPolicy":
+							{
+								"type": "Mesh",
+								"parameters":
+								{
+									"mesh_component": "scr_right"
+								}
+							}
+						},
+						"vp_floor":
+						{
+							"camera": "DefaultViewPoint",
+							"bufferRatio": 1,
+							"gPUIndex": -1,
+							"allowCrossGPUTransfer": true,
+							"isShared": false,
+							"region":
+							{
+								"x": 1350,
+								"y": 0,
+								"w": 1350,
+								"h": 1350
+							},
+							"projectionPolicy":
+							{
+								"type": "Mesh",
+								"parameters":
+								{
+									"mesh_component": "scr_floor"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"customParameters":
+		{
+			"SampleArg1": "SampleVal1",
+			"SampleArg2": "SampleVal2"
+		},
+		"diagnostics":
+		{
+			"simulateLag": false,
+			"minLagTime": 0,
+			"maxLagTime": 0.5
+		}
+	}
+}

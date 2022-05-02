@@ -1,0 +1,161 @@
+{
+	"nDisplay":
+	{
+		"description": "nDisplay configuration",
+		"version": "4.27",
+		"assetPath": "/Game/ExampleConfigs/NDC_DemoEasyBlend1.NDC_DemoEasyBlend1",
+		"misc":
+		{
+			"bFollowLocalPlayerCamera": false,
+			"bExitOnEsc": true
+		},
+		"cluster":
+		{
+			"masterNode":
+			{
+				"id": "node_main",
+				"ports":
+				{
+					"ClusterSync": 41001,
+					"RenderSync": 41002,
+					"ClusterEventsJson": 41003,
+					"ClusterEventsBinary": 41004
+				}
+			},
+			"sync":
+			{
+				"renderSyncPolicy":
+				{
+					"type": "ethernet",
+					"parameters":
+					{
+					}
+				},
+				"inputSyncPolicy":
+				{
+					"type": "ReplicateMaster",
+					"parameters":
+					{
+					}
+				}
+			},
+			"network":
+			{
+				"ConnectRetriesAmount": "10",
+				"ConnectRetryDelay": "1000",
+				"GameStartBarrierTimeout": "30000",
+				"FrameStartBarrierTimeout": "5000",
+				"FrameEndBarrierTimeout": "5000",
+				"RenderSyncBarrierTimeout": "5000"
+			},
+			"nodes":
+			{
+				"node_main":
+				{
+					"host": "127.0.0.1",
+					"sound": false,
+					"fullScreen": false,
+					"window":
+					{
+						"x": 0,
+						"y": 0,
+						"w": 1920,
+						"h": 360
+					},
+					"postprocess":
+					{
+					},
+					"viewports":
+					{
+						"vp_1":
+						{
+							"camera": "DefaultViewPoint",
+							"bufferRatio": 1,
+							"gPUIndex": -1,
+							"allowCrossGPUTransfer": true,
+							"isShared": false,
+							"region":
+							{
+								"x": 0,
+								"y": 0,
+								"w": 640,
+								"h": 360
+							},
+							"projectionPolicy":
+							{
+								"type": "easyblend",
+								"parameters":
+								{
+									"file": "LocalCalibrationCylinder\\ScalableData.pol",
+									"origin": "easyblend_origin_1",
+									"scale": "0.1"
+								}
+							}
+						},
+						"vp_2":
+						{
+							"camera": "DefaultViewPoint",
+							"bufferRatio": 1,
+							"gPUIndex": -1,
+							"allowCrossGPUTransfer": true,
+							"isShared": false,
+							"region":
+							{
+								"x": 640,
+								"y": 0,
+								"w": 640,
+								"h": 360
+							},
+							"projectionPolicy":
+							{
+								"type": "easyblend",
+								"parameters":
+								{
+									"file": "LocalCalibrationCylinder\\ScalableData.pol_1",
+									"origin": "easyblend_origin_1",
+									"scale": "0.1"
+								}
+							}
+						},
+						"vp_3":
+						{
+							"camera": "DefaultViewPoint",
+							"bufferRatio": 1,
+							"gPUIndex": -1,
+							"allowCrossGPUTransfer": true,
+							"isShared": false,
+							"region":
+							{
+								"x": 1280,
+								"y": 0,
+								"w": 640,
+								"h": 360
+							},
+							"projectionPolicy":
+							{
+								"type": "easyblend",
+								"parameters":
+								{
+									"file": "LocalCalibrationCylinder\\ScalableData.pol_2",
+									"origin": "easyblend_origin_1",
+									"scale": "0.1"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"customParameters":
+		{
+			"SampleArg1": "SampleVal1",
+			"SampleArg2": "SampleVal2"
+		},
+		"diagnostics":
+		{
+			"simulateLag": false,
+			"minLagTime": 0,
+			"maxLagTime": 0.5
+		}
+	}
+}
