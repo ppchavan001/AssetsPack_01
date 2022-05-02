@@ -27,9 +27,11 @@ class UExposeEditorFunctionsBPLibrary : public UBlueprintFunctionLibrary
 {
 	GENERATED_UCLASS_BODY()
 
-#if WITH_EDITOR
 	UFUNCTION(BlueprintCallable, meta = (DisplayName = "Set Lightmap Resolution for Target Mesh", Keywords = "set lightmap resolution"), Category = "Exposed Functions | Lighting")
 		static void SetStaticMeshLightMapResolution(UStaticMeshComponent* TargetMesh, int NewRes);
-#endif
+
+	UFUNCTION(BlueprintCallable, meta = (DisplayName = "Get Display Cluster Export Config Path From Blueprint", Keywords = "Get Display Cluster Export Config Path"), Category = "Exposed Functions | NDisplay | Display Cluster Blueprint")
+		static FText GetDisplayClusterExportConfigPathFromBlueprint(UObject* Object);
+	
 };
 

@@ -3,6 +3,12 @@
 #include "ExposeEditorFunctionsBPLibrary.h"
 #include "ExposeEditorFunctions.h"
 
+#include "../Plugins/Runtime/nDisplay/Source/DisplayClusterConfiguration/Public/DisplayClusterConfigurationStrings.h"
+#include "../Plugins/Runtime/nDisplay/Source/DisplayCluster/Public/Blueprints/DisplayClusterBlueprint.h"
+
+//#include "DisplayClusterConfigurationStrings.h"
+//#include "Blueprints/DisplayClusterBlueprint.h"
+
 UExposeEditorFunctionsBPLibrary::UExposeEditorFunctionsBPLibrary(const FObjectInitializer& ObjectInitializer)
 : Super(ObjectInitializer)
 {
@@ -10,7 +16,6 @@ UExposeEditorFunctionsBPLibrary::UExposeEditorFunctionsBPLibrary(const FObjectIn
 }
 
 
-#if WITH_EDITOR
 
 void UExposeEditorFunctionsBPLibrary::SetStaticMeshLightMapResolution(UStaticMeshComponent* TargetMesh, int NewRes)
 {
@@ -19,5 +24,31 @@ void UExposeEditorFunctionsBPLibrary::SetStaticMeshLightMapResolution(UStaticMes
 	TargetMesh->InvalidateLightingCacheDetailed(true, false);
 }
 
-#endif
+FText UExposeEditorFunctionsBPLibrary::GetDisplayClusterExportConfigPathFromBlueprint(UObject* Object)
+{
+    //const FString CorrectExtension = DisplayClusterConfigurationStrings::file::FileExtJson;
+    if (UDisplayClusterBlueprint* Blueprint = Cast<UDisplayClusterBlueprint>(Object))
+    {
+        FString ConfigPath = Blueprint->GetConfigPath();
+        if (!ConfigPath.IsEmpty())
+        {
+            const FString CorrectExtension = DisplayClusterConfigurationStrings::file::FileExtJson;
+
+            if (FPaths::GetExtension(ConfigPath) != CorrectExtension) 
+            {
+                ConfigPath = FPaths::ChangeExtension(ConfigPath, CorrectExtension);
+            }
+
+            if (FPaths::IsRelative(ConfigPath)) 
+            {
+                ConfigPath = FPaths::ConvertRelativePathToFull(ConfigPath);
+            }
+
+            return FText::FromString(ConfigPath);
+        }
+        return FText::FromString("No path set for current Blueprint - Export config to set a path.");
+    }
+    
+    return FText::FromString("Selected object is not a Display Cluster Blueprint.");
+}
 
