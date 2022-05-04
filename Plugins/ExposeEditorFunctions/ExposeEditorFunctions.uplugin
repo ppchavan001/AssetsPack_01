@@ -1,7 +1,7 @@
 {
 	"FileVersion": 3,
 	"Version": 1,
-	"VersionName": "0.2",
+	"VersionName": "0.25",
 	"FriendlyName": "ExposeEditorFunctions",
 	"Description": "Exposes editor/ blueprint read only properties. Use with caution.",
 	"Category": "Editor",
