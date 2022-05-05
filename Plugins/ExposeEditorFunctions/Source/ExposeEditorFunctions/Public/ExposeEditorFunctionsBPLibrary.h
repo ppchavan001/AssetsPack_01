@@ -38,6 +38,9 @@ class UExposeEditorFunctionsBPLibrary : public UBlueprintFunctionLibrary
 	UFUNCTION(BlueprintCallable, meta = (DisplayName = "Get Display Cluster Config", Keywords = "Get Display Cluster  Config "), Category = "Exposed Functions | NDisplay | Display Cluster Blueprint")
 	static FString GetConfigData(UObject* Object);
 
+	UFUNCTION(BlueprintCallable, meta = (DisplayName = "Get Display Cluster Config", Keywords = "Get Display Cluster  Config "), Category = "Exposed Functions | NDisplay | Display Cluster Blueprint")
+		static bool ExportNDisplayConfigFromDisplayClusterRootActorBlueprint(UObject* Object, const FString& FilePath);
+
 	static FText GetDisplayClusterExportConfigPathFromBlueprintInternal(UObject* Object, bool& ReturningValidPath);
 };
 

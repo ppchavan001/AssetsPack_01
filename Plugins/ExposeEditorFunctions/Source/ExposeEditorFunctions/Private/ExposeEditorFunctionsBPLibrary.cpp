@@ -7,6 +7,7 @@
 #include "Modules/ModuleManager.h"
 #include "IDisplayClusterConfiguration.h"
 #include <DisplayClusterConfigurator/Private/DisplayClusterConfiguratorModule.h>
+#include "DesktopPlatform/Public/DesktopPlatformModule.h"
 
 
 
@@ -27,12 +28,61 @@ void UExposeEditorFunctionsBPLibrary::SetStaticMeshLightMapResolution(UStaticMes
 	TargetMesh->InvalidateLightingCacheDetailed(true, false);
 }
 
+bool UExposeEditorFunctionsBPLibrary::ExportNDisplayConfigFromDisplayClusterRootActorBlueprint(UObject* Object, const FString& FilePath)
+{
+
+	UDisplayClusterBlueprint* Blueprint = Cast<UDisplayClusterBlueprint>(Object);
+
+	if (Blueprint)
+	{
+		Blueprint->PrepareConfigForExport();
+
+		UDisplayClusterConfigurationData* ConfigData = Blueprint->GetConfig();
+
+		IDisplayClusterConfiguration& Module = FModuleManager::GetModuleChecked<IDisplayClusterConfiguration>("DisplayClusterConfiguration");
+
+
+		if (ConfigData)	return Module.SaveConfig(ConfigData, FilePath);
+		
+		
+	}
+
+
+	return false;
+}
+
 FText UExposeEditorFunctionsBPLibrary::GetDisplayClusterExportConfigPathFromBlueprintInternal(UObject* Object, bool& ReturningValidPath)
 {
-	
-	return FText::FromString("Selected object is not a Display Cluster Blueprint.");
+	UE_LOG(LogTemp, Warning, TEXT("-------------------------------------------------------------------------------------------"));
+	//const FString CorrectExtension = DisplayClusterConfigurationStrings::file::FileExtJson;
+	if (UDisplayClusterBlueprint* Blueprint = Cast<UDisplayClusterBlueprint>(Object))
+	{
+		FString ConfigPath = Blueprint->GetConfigPath();
+		if (!ConfigPath.IsEmpty())
+		{
+			const FString CorrectExtension = DisplayClusterConfigurationStrings::file::FileExtJson;
 
+			if (FPaths::GetExtension(ConfigPath) != CorrectExtension)
+			{
+				ConfigPath = FPaths::ChangeExtension(ConfigPath, CorrectExtension);
+			}
+
+			if (FPaths::IsRelative(ConfigPath))
+			{
+				ConfigPath = FPaths::ConvertRelativePathToFull(ConfigPath);
+			}
+			ReturningValidPath = true;
+			return FText::FromString(ConfigPath);
+		}
+		ReturningValidPath = false;
+		return FText::FromString("Path is not set for selected Blueprint. Open the Blueprint and Export to a valid location to set Path.");
+	}
+
+	ReturningValidPath = false;
+	return FText::FromString("Selected object is not a Display Cluster Blueprint.");
 }
+
+
 
 FText UExposeEditorFunctionsBPLibrary::GetDisplayClusterExportConfigPathFromBlueprint(UObject* Object)
 {
@@ -40,43 +90,29 @@ FText UExposeEditorFunctionsBPLibrary::GetDisplayClusterExportConfigPathFromBlue
 	FText text = GetDisplayClusterExportConfigPathFromBlueprintInternal(Object, bReturnedValidPath);
 
 
-	UE_LOG(LogTemp, Warning, TEXT("75"));
-
-
 	if (bReturnedValidPath)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("80"));
 		return text;
 	}
 	else
 	{
-		UDisplayClusterBlueprint* Blueprint = Cast<UDisplayClusterBlueprint>(Object);
-		Blueprint->GetConfig();
-		//auto Data = Blueprint->GetConfig();
-		//UDisplayClusterConfiguratorEditorSubsystem* sub =	GEditor->GetEditorSubsystem<UDisplayClusterConfiguratorEditorSubsystem>();
-		//FDisplayClusterConfiguratorBlueprintEditor* SelectedBlueprintEditor = new FDisplayClusterConfiguratorBlueprintEditor();
-		//SelectedBlueprintEditor = FDisplayClusterConfiguratorUtils::GetBlueprintEditorForObject(Object);
 
-		//
-		//if (SelectedBlueprintEditor)
-		//{
-		//
-		//	if (SelectedBlueprintEditor->CanExportConfig())
-		//	{
-		//		// Get the user's temp directory
-		//		FString UserTempDir = FDesktopPlatformModule::Get()->GetUserTempPath();
-		//		UserTempDir.Append("\\");
-		//		UserTempDir.Append(Object->GetName());
-		//		SelectedBlueprintEditor->SaveToFile(UserTempDir);
-		//
-		//		UE_LOG(LogTemp, Warning, TEXT("101"));
-		//
-		//		return FText::FromString(UserTempDir);
-		//	}
-		//}
-		//
-		UE_LOG(LogTemp, Warning, TEXT("108"));
-		return text;
+
+		// Get the user's temp directory
+		FString TargetPath = FDesktopPlatformModule::Get()->GetUserTempPath();
+		TargetPath.Append(Object->GetName());
+		TargetPath.Append(".ndisplay");
+
+		bool bExported =
+			UExposeEditorFunctionsBPLibrary::ExportNDisplayConfigFromDisplayClusterRootActorBlueprint(Object, TargetPath);
+
+		if (bExported)
+		{
+			return FText::FromString(TargetPath);
+		}
+
+		return FText::FromString("UExposeEditorFunctionsBPLibrary::GetDisplayClusterExportConfigPathFromBlueprint : Error exporting data!");
+
 
 	}
 }

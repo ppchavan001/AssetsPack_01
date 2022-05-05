@@ -1,6 +1,6 @@
 {
 	"FileVersion": 3,
-	"EngineAssociation": "{7DFB53B9-4BE7-10FD-D0F2-F68EDA91CE16}",
+	"EngineAssociation": "{F2C0D7A4-46C7-ECCB-63AB-7484095239F6}",
 	"Category": "",
 	"Description": "",
 	"Modules": [
@@ -10,6 +10,16 @@
 			"LoadingPhase": "Default",
 			"AdditionalDependencies": [
 				"Engine"
+			]
+		}
+	],
+	"Plugins": [
+		{
+			"Name": "nDisplay",
+			"Enabled": true,
+			"SupportedTargetPlatforms": [
+				"Win64",
+				"Linux"
 			]
 		}
 	]
