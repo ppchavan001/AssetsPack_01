@@ -2,15 +2,18 @@
 
 #include "ExposeEditorFunctionsBPLibrary.h"
 #include "ExposeEditorFunctions.h"
+#include <DisplayCluster/Public/Blueprints/DisplayClusterBlueprint.h>
+#include <DisplayClusterConfigurator/Private/DisplayClusterConfiguratorEditorSubsystem.h>
+#include "Modules/ModuleManager.h"
+#include "IDisplayClusterConfiguration.h"
+#include <DisplayClusterConfigurator/Private/DisplayClusterConfiguratorModule.h>
 
-#include "../Plugins/Runtime/nDisplay/Source/DisplayClusterConfiguration/Public/DisplayClusterConfigurationStrings.h"
-#include "../Plugins/Runtime/nDisplay/Source/DisplayCluster/Public/Blueprints/DisplayClusterBlueprint.h"
 
-//#include "DisplayClusterConfigurationStrings.h"
-//#include "Blueprints/DisplayClusterBlueprint.h"
+
+
 
 UExposeEditorFunctionsBPLibrary::UExposeEditorFunctionsBPLibrary(const FObjectInitializer& ObjectInitializer)
-: Super(ObjectInitializer)
+	: Super(ObjectInitializer)
 {
 
 }
@@ -24,31 +27,87 @@ void UExposeEditorFunctionsBPLibrary::SetStaticMeshLightMapResolution(UStaticMes
 	TargetMesh->InvalidateLightingCacheDetailed(true, false);
 }
 
+FText UExposeEditorFunctionsBPLibrary::GetDisplayClusterExportConfigPathFromBlueprintInternal(UObject* Object, bool& ReturningValidPath)
+{
+	
+	return FText::FromString("Selected object is not a Display Cluster Blueprint.");
+
+}
+
 FText UExposeEditorFunctionsBPLibrary::GetDisplayClusterExportConfigPathFromBlueprint(UObject* Object)
 {
-    //const FString CorrectExtension = DisplayClusterConfigurationStrings::file::FileExtJson;
-    if (UDisplayClusterBlueprint* Blueprint = Cast<UDisplayClusterBlueprint>(Object))
-    {
-        FString ConfigPath = Blueprint->GetConfigPath();
-        if (!ConfigPath.IsEmpty())
-        {
-            const FString CorrectExtension = DisplayClusterConfigurationStrings::file::FileExtJson;
+	bool bReturnedValidPath = false;
+	FText text = GetDisplayClusterExportConfigPathFromBlueprintInternal(Object, bReturnedValidPath);
 
-            if (FPaths::GetExtension(ConfigPath) != CorrectExtension) 
-            {
-                ConfigPath = FPaths::ChangeExtension(ConfigPath, CorrectExtension);
-            }
 
-            if (FPaths::IsRelative(ConfigPath)) 
-            {
-                ConfigPath = FPaths::ConvertRelativePathToFull(ConfigPath);
-            }
+	UE_LOG(LogTemp, Warning, TEXT("75"));
 
-            return FText::FromString(ConfigPath);
-        }
-        return FText::FromString("Path is not set for selected Blueprint. Open the Blueprint and Export to a valid location to set Path.");
-    }
-    
-    return FText::FromString("Selected object is not a Display Cluster Blueprint.");
+
+	if (bReturnedValidPath)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("80"));
+		return text;
+	}
+	else
+	{
+		UDisplayClusterBlueprint* Blueprint = Cast<UDisplayClusterBlueprint>(Object);
+		Blueprint->GetConfig();
+		//auto Data = Blueprint->GetConfig();
+		//UDisplayClusterConfiguratorEditorSubsystem* sub =	GEditor->GetEditorSubsystem<UDisplayClusterConfiguratorEditorSubsystem>();
+		//FDisplayClusterConfiguratorBlueprintEditor* SelectedBlueprintEditor = new FDisplayClusterConfiguratorBlueprintEditor();
+		//SelectedBlueprintEditor = FDisplayClusterConfiguratorUtils::GetBlueprintEditorForObject(Object);
+
+		//
+		//if (SelectedBlueprintEditor)
+		//{
+		//
+		//	if (SelectedBlueprintEditor->CanExportConfig())
+		//	{
+		//		// Get the user's temp directory
+		//		FString UserTempDir = FDesktopPlatformModule::Get()->GetUserTempPath();
+		//		UserTempDir.Append("\\");
+		//		UserTempDir.Append(Object->GetName());
+		//		SelectedBlueprintEditor->SaveToFile(UserTempDir);
+		//
+		//		UE_LOG(LogTemp, Warning, TEXT("101"));
+		//
+		//		return FText::FromString(UserTempDir);
+		//	}
+		//}
+		//
+		UE_LOG(LogTemp, Warning, TEXT("108"));
+		return text;
+
+	}
 }
+
+FString UExposeEditorFunctionsBPLibrary::GetConfigData(UObject* Object)
+{
+	UDisplayClusterBlueprint* Blueprint = Cast<UDisplayClusterBlueprint>(Object);
+
+	if (Blueprint)
+	{
+		Blueprint->PrepareConfigForExport();
+
+		UDisplayClusterConfigurationData* ConfigData = Blueprint->GetConfig();
+
+		IDisplayClusterConfiguration& Module = FModuleManager::GetModuleChecked<IDisplayClusterConfiguration>("DisplayClusterConfiguration");
+
+		//Mod.SaveConfig()
+		//IDisplayClusterConfigurator& Mod2 = FModuleManager::GetModuleChecked<IDisplayClusterConfigurator>("DisplayClusterConfigurator");
+
+
+		if (ConfigData)
+		{
+			FString s;
+			Module.ConfigAsString(ConfigData, s);
+			return s;
+		}
+		return FString("Invalid data in the blueprint.");
+	}
+
+	return FString("Invalid blueprint passed.");
+}
+
+
 

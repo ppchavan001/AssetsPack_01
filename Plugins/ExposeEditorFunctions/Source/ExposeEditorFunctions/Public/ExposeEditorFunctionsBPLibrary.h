@@ -22,6 +22,8 @@
 *	For more info on custom blueprint nodes visit documentation:
 *	https://wiki.unrealengine.com/Custom_Blueprint_Node_Creation
 */
+
+
 UCLASS()
 class UExposeEditorFunctionsBPLibrary : public UBlueprintFunctionLibrary
 {
@@ -33,5 +35,9 @@ class UExposeEditorFunctionsBPLibrary : public UBlueprintFunctionLibrary
 	UFUNCTION(BlueprintCallable, meta = (DisplayName = "Get Display Cluster Export Config Path From Blueprint", Keywords = "Get Display Cluster Export Config Path"), Category = "Exposed Functions | NDisplay | Display Cluster Blueprint")
 		static FText GetDisplayClusterExportConfigPathFromBlueprint(UObject* Object);
 	
+	UFUNCTION(BlueprintCallable, meta = (DisplayName = "Get Display Cluster Config", Keywords = "Get Display Cluster  Config "), Category = "Exposed Functions | NDisplay | Display Cluster Blueprint")
+	static FString GetConfigData(UObject* Object);
+
+	static FText GetDisplayClusterExportConfigPathFromBlueprintInternal(UObject* Object, bool& ReturningValidPath);
 };
 
