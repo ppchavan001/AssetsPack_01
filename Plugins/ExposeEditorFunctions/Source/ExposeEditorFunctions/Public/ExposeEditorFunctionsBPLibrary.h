@@ -42,5 +42,8 @@ class UExposeEditorFunctionsBPLibrary : public UBlueprintFunctionLibrary
 		static bool ExportNDisplayConfigFromDisplayClusterRootActorBlueprint(UObject* Object, const FString& FilePath);
 
 	static FText GetDisplayClusterExportConfigPathFromBlueprintInternal(UObject* Object, bool& ReturningValidPath);
+
+	UFUNCTION(BlueprintCallable, meta = (DisplayName = "Open Select Folder Dialog", Keywords = "Open Select Folder Dialog"), Category = "Exposed Functions | File Manager")
+		static FString OpenSelectFolderDialog();
 };
 
