@@ -82,10 +82,8 @@ FText UExposeEditorFunctionsBPLibrary::GetDisplayClusterExportConfigPathFromBlue
 	return FText::FromString("Selected object is not a Display Cluster Blueprint.");
 }
 
-FString UExposeEditorFunctionsBPLibrary::OpenSelectFolderDialog()
+FString UExposeEditorFunctionsBPLibrary::OpenSelectDirectoryDialog(FString DefaultDirectory)
 {
-	
-	FString DefaultDirectory;
 	FString OutputDirectory;
 
 	if (FDesktopPlatformModule::Get()->OpenDirectoryDialog(FSlateApplication::Get().FindBestParentWindowHandleForDialogs(nullptr), ("Select Export Directory"), DefaultDirectory, OutputDirectory))
