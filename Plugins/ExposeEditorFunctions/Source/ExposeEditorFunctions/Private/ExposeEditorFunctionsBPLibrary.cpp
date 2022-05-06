@@ -8,6 +8,7 @@
 #include "IDisplayClusterConfiguration.h"
 #include <DisplayClusterConfigurator/Private/DisplayClusterConfiguratorModule.h>
 #include "DesktopPlatform/Public/DesktopPlatformModule.h"
+#include "Components/ComboBoxString.h"
 
 
 
@@ -93,6 +94,14 @@ FString UExposeEditorFunctionsBPLibrary::OpenSelectDirectoryDialog(FString Defau
 
 
 	return FString();
+}
+
+void UExposeEditorFunctionsBPLibrary::SetComboBoxStringFont(UComboBoxString* ComboBoxToUpdate, FSlateFontInfo NewFont)
+{
+	ComboBoxToUpdate->Font = NewFont;
+	
+	// TODO : Refresh widget
+	//ComboBoxToUpdate->SetSelectedOption(ComboBoxToUpdate->GetSelectedOption());
 }
 
 

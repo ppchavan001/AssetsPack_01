@@ -23,6 +23,7 @@
 *	https://wiki.unrealengine.com/Custom_Blueprint_Node_Creation
 */
 
+class UComboBoxString;
 
 UCLASS()
 class UExposeEditorFunctionsBPLibrary : public UBlueprintFunctionLibrary
@@ -45,5 +46,8 @@ class UExposeEditorFunctionsBPLibrary : public UBlueprintFunctionLibrary
 
 	UFUNCTION(BlueprintCallable, meta = (DisplayName = "Open Select Directory Dialog", Keywords = "Open Select Directory Dialog"), Category = "Exposed Functions | File Manager")
 		static FString OpenSelectDirectoryDialog(FString DefaultDirectory);
+
+	UFUNCTION(BlueprintCallable, meta = (DisplayName = "Set ComboBoxString Font", Keywords = "Set ComboBoxString Font"), Category = "Exposed Functions | Widgets")
+		static void SetComboBoxStringFont(UComboBoxString* ComboBoxToUpdate, FSlateFontInfo NewFont);
 };
 
