@@ -1,6 +1,7 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
 #pragma once
+#define EEFBPL_ENGINE_VERSION_MAJOR 5
 
 #include "Kismet/BlueprintFunctionLibrary.h"
 #include "ExposeEditorFunctionsBPLibrary.generated.h"

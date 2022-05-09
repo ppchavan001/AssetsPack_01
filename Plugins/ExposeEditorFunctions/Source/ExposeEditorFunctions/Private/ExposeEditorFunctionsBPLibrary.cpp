@@ -9,20 +9,23 @@
 #include <DisplayClusterConfigurator/Private/DisplayClusterConfiguratorModule.h>
 #include "DesktopPlatform/Public/DesktopPlatformModule.h"
 #include "Components/ComboBoxString.h"
-#include "../../../../../../../Engine/Intermediate/Build/Win64/UE4Editor/Development/BuildSettings/Definitions.h"
+#include "Logging/LogMacros.h"
 
-#ifdef ENGINE_VERSION_MAJOR
-#if ENGINE_VERSION_MAJOR == 5
 
-	#include "../../../UE 5.0.1 Source/Engine/Source/Editor/UnrealEd/Public/Subsystems/EditorActorSubsystem.h"
-	#include "../../../../../../../Engine/SOURCE/UE 5.0.1 Source/Engine/Source/Editor/UnrealEd/Public/Subsystems/UnrealEditorSubsystem.h"
+#if EEFBPL_ENGINE_VERSION_MAJOR == 5
 
-#endif // ENGINE_VERSION_MAJOR == 5
-#endif
+#include "EditorScriptingHelpers.h"
+#include "Subsystems/UnrealEditorSubsystem.h"
+#include "Subsystems/EditorActorSubsystem.h"
+
+#else
+
 #include "../../../../../../../Engine/Plugins/Editor/EditorScriptingUtilities/Source/EditorScriptingUtilities/Private/EditorScriptingUtils.h"
 #include "EngineUtils.h"
 #include "ActorEditorUtils.h"
 #include "../../../Editor/EditorScriptingUtilities/Source/EditorScriptingUtilities/Public/EditorLevelLibrary.h"
+
+#endif // EEFBPL_ENGINE_VERSION_MAJOR == 5
 
 
 
@@ -56,8 +59,8 @@ bool UExposeEditorFunctionsBPLibrary::ExportNDisplayConfigFromDisplayClusterRoot
 
 
 		if (ConfigData)	return Module.SaveConfig(ConfigData, FilePath);
-		
-		
+
+
 	}
 
 
@@ -111,42 +114,54 @@ FString UExposeEditorFunctionsBPLibrary::OpenSelectDirectoryDialog(FString Defau
 void UExposeEditorFunctionsBPLibrary::SetComboBoxStringFont(UComboBoxString* ComboBoxToUpdate, FSlateFontInfo NewFont)
 {
 	ComboBoxToUpdate->Font = NewFont;
-	
+
 	// TODO : Refresh widget
 	//ComboBoxToUpdate->SetSelectedOption(ComboBoxToUpdate->GetSelectedOption());
 }
 
-#ifdef ENGINE_VERSION_MAJOR
 
-	#if ENGINE_VERSION_MAJOR == 5 
 
-		UWorld* UExposeEditorFunctionsBPLibrary::GetEditorWorld()
-		{
-			//UUnrealEditorSubsystem* UnrealEditorSubsystem = GEditor->GetEditorSubsystem<UUnrealEditorSubsystem>();
+#if EEFBPL_ENGINE_VERSION_MAJOR == 5 
 
-			//return UnrealEditorSubsystem ? UnrealEditorSubsystem->GetEditorWorld() : nullptr;
+UWorld* UExposeEditorFunctionsBPLibrary::GetEditorWorld()
+{
+	UUnrealEditorSubsystem* UnrealEditorSubsystem = GEditor->GetEditorSubsystem<UUnrealEditorSubsystem>();
 
-		}
+	if (!UnrealEditorSubsystem || !EditorScriptingHelpers::CheckIfInEditorAndPIE())
+	{
+		return nullptr;
+	}
 
-		TArray<class AActor*> UExposeEditorFunctionsBPLibrary::GetAllLevelActors()
-		{
-			//UEditorActorSubsystem* EditorActorSubsystem = GEditor->GetEditorSubsystem<UEditorActorSubsystem>();
 
-			//return EditorActorSubsystem ? EditorActorSubsystem->GetAllLevelActors() : TArray<AActor*>();
+	UWorld* World = UnrealEditorSubsystem->GetEditorWorld();
+
+	if (!World)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("%s. Can't spawn the actor because there is no world."));
+		return nullptr;
+	}
 	
-		}
-	#else
+	return World;
+}
 
-		UWorld* UExposeEditorFunctionsBPLibrary::GetEditorWorld()
-		{
-			return UEditorLevelLibrary::GetEditorWorld();
-		}
+TArray<class AActor*> UExposeEditorFunctionsBPLibrary::GetAllLevelActors()
+{
+	UEditorActorSubsystem* EditorActorSubsystem = GEditor->GetEditorSubsystem<UEditorActorSubsystem>();
 
-		TArray<class AActor*> UExposeEditorFunctionsBPLibrary::GetAllLevelActors()
-		{
-			return UEditorLevelLibrary::GetAllLevelActors();
-		}
-	#endif
+	return EditorActorSubsystem ? EditorActorSubsystem->GetAllLevelActors() : TArray<AActor*>();
+}
+#else
+
+UWorld* UExposeEditorFunctionsBPLibrary::GetEditorWorld()
+{
+	return UEditorLevelLibrary::GetEditorWorld();
+}
+
+TArray<class AActor*> UExposeEditorFunctionsBPLibrary::GetAllLevelActors()
+{
+	return UEditorLevelLibrary::GetAllLevelActors();
+}
+
 #endif
 
 
