@@ -20,10 +20,7 @@
 
 #else
 
-#include "../../../../../../../Engine/Plugins/Editor/EditorScriptingUtilities/Source/EditorScriptingUtilities/Private/EditorScriptingUtils.h"
-#include "EngineUtils.h"
-#include "ActorEditorUtils.h"
-#include "../../../Editor/EditorScriptingUtilities/Source/EditorScriptingUtilities/Public/EditorLevelLibrary.h"
+#include "EditorLevelLibrary.h"
 
 #endif // EEFBPL_ENGINE_VERSION_MAJOR == 5
 
