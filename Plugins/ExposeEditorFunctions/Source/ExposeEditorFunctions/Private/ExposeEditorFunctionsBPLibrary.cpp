@@ -9,8 +9,20 @@
 #include <DisplayClusterConfigurator/Private/DisplayClusterConfiguratorModule.h>
 #include "DesktopPlatform/Public/DesktopPlatformModule.h"
 #include "Components/ComboBoxString.h"
+#include "../../../../../../../Engine/Intermediate/Build/Win64/UE4Editor/Development/BuildSettings/Definitions.h"
 
+#ifdef ENGINE_VERSION_MAJOR
+#if ENGINE_VERSION_MAJOR == 5
 
+	#include "../../../UE 5.0.1 Source/Engine/Source/Editor/UnrealEd/Public/Subsystems/EditorActorSubsystem.h"
+	#include "../../../../../../../Engine/SOURCE/UE 5.0.1 Source/Engine/Source/Editor/UnrealEd/Public/Subsystems/UnrealEditorSubsystem.h"
+
+#endif // ENGINE_VERSION_MAJOR == 5
+#endif
+#include "../../../../../../../Engine/Plugins/Editor/EditorScriptingUtilities/Source/EditorScriptingUtilities/Private/EditorScriptingUtils.h"
+#include "EngineUtils.h"
+#include "ActorEditorUtils.h"
+#include "../../../Editor/EditorScriptingUtilities/Source/EditorScriptingUtilities/Public/EditorLevelLibrary.h"
 
 
 
@@ -103,6 +115,39 @@ void UExposeEditorFunctionsBPLibrary::SetComboBoxStringFont(UComboBoxString* Com
 	// TODO : Refresh widget
 	//ComboBoxToUpdate->SetSelectedOption(ComboBoxToUpdate->GetSelectedOption());
 }
+
+#ifdef ENGINE_VERSION_MAJOR
+
+	#if ENGINE_VERSION_MAJOR == 5 
+
+		UWorld* UExposeEditorFunctionsBPLibrary::GetEditorWorld()
+		{
+			//UUnrealEditorSubsystem* UnrealEditorSubsystem = GEditor->GetEditorSubsystem<UUnrealEditorSubsystem>();
+
+			//return UnrealEditorSubsystem ? UnrealEditorSubsystem->GetEditorWorld() : nullptr;
+
+		}
+
+		TArray<class AActor*> UExposeEditorFunctionsBPLibrary::GetAllLevelActors()
+		{
+			//UEditorActorSubsystem* EditorActorSubsystem = GEditor->GetEditorSubsystem<UEditorActorSubsystem>();
+
+			//return EditorActorSubsystem ? EditorActorSubsystem->GetAllLevelActors() : TArray<AActor*>();
+	
+		}
+	#else
+
+		UWorld* UExposeEditorFunctionsBPLibrary::GetEditorWorld()
+		{
+			return UEditorLevelLibrary::GetEditorWorld();
+		}
+
+		TArray<class AActor*> UExposeEditorFunctionsBPLibrary::GetAllLevelActors()
+		{
+			return UEditorLevelLibrary::GetAllLevelActors();
+		}
+	#endif
+#endif
 
 
 

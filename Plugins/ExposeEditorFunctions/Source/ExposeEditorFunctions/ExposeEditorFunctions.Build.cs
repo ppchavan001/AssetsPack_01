@@ -49,7 +49,8 @@ public class ExposeEditorFunctions : ModuleRules
 				"DisplayCluster",
 				"DisplayClusterEditor",
 				 "DisplayClusterConfiguration",
-				"DisplayClusterConfigurator"
+				"DisplayClusterConfigurator",
+				"EditorScriptingUtilities"
 				// ... add private dependencies that you statically link with here ...	
 
 

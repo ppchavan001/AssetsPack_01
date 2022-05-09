@@ -30,6 +30,8 @@ class UExposeEditorFunctionsBPLibrary : public UBlueprintFunctionLibrary
 {
 	GENERATED_UCLASS_BODY()
 
+#if WITH_EDITOR
+
 	UFUNCTION(BlueprintCallable, meta = (DisplayName = "Set Lightmap Resolution for Target Mesh", Keywords = "set lightmap resolution"), Category = "Exposed Functions | Lighting")
 		static void SetStaticMeshLightMapResolution(UStaticMeshComponent* TargetMesh, int NewRes);
 
@@ -49,5 +51,13 @@ class UExposeEditorFunctionsBPLibrary : public UBlueprintFunctionLibrary
 
 	UFUNCTION(BlueprintCallable, meta = (DisplayName = "Set ComboBoxString Font", Keywords = "Set ComboBoxString Font"), Category = "Exposed Functions | Widgets")
 		static void SetComboBoxStringFont(UComboBoxString* ComboBoxToUpdate, FSlateFontInfo NewFont);
+
+	UFUNCTION(BlueprintCallable, Category = "Exposed Functions | Level Utility")
+		static UWorld* GetEditorWorld();
+
+	UFUNCTION(BlueprintCallable, Category = "Exposed Functions | Level Utility")
+		static TArray<class AActor*> GetAllLevelActors();
+
+#endif
 };
 
