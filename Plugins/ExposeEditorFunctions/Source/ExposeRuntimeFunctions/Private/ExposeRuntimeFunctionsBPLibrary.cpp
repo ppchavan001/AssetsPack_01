@@ -9,8 +9,7 @@ UExposeRuntimeFunctionsBPLibrary::UExposeRuntimeFunctionsBPLibrary(const FObject
 
 }
 
-float UExposeRuntimeFunctionsBPLibrary::ExposeRuntimeFunctionsSampleFunction(float Param)
+FKey UExposeRuntimeFunctionsBPLibrary::ExposeRuntimeFunctionsSampleFunction(FName name)
 {
-	return -1;
+	return FKey(name);
 }
-

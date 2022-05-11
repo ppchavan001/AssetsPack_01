@@ -27,6 +27,6 @@ class UExposeRuntimeFunctionsBPLibrary : public UBlueprintFunctionLibrary
 {
 	GENERATED_UCLASS_BODY()
 
-	UFUNCTION(BlueprintCallable, meta = (DisplayName = "Execute Sample function", Keywords = "ExposeRuntimeFunctions sample test testing"), Category = "ExposeRuntimeFunctionsTesting")
-	static float ExposeRuntimeFunctionsSampleFunction(float Param);
+	UFUNCTION(BlueprintPure, meta = (DisplayName = "Get Key From Name", Keywords = "Get Key From Name"), Category = "ExposeRuntimeFunctions | Input")
+	static FKey ExposeRuntimeFunctionsSampleFunction(FName name);
 };
