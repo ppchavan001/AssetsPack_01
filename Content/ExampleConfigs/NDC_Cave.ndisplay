@@ -1,0 +1,277 @@
+{
+	"nDisplay":
+	{
+		"description": "nDisplay configuration",
+		"version": "4.27",
+		"assetPath": "/Game/ExampleConfigs/NDC_Cave.NDC_Cave",
+		"misc":
+		{
+			"bFollowLocalPlayerCamera": false,
+			"bExitOnEsc": true
+		},
+		"cluster":
+		{
+			"masterNode":
+			{
+				"id": "node_left",
+				"ports":
+				{
+					"ClusterSync": 41001,
+					"RenderSync": 41002,
+					"ClusterEventsJson": 41003,
+					"ClusterEventsBinary": 41004
+				}
+			},
+			"sync":
+			{
+				"renderSyncPolicy":
+				{
+					"type": "ethernet",
+					"parameters":
+					{
+					}
+				},
+				"inputSyncPolicy":
+				{
+					"type": "ReplicateMaster",
+					"parameters":
+					{
+					}
+				}
+			},
+			"network":
+			{
+				"ConnectRetriesAmount": "10",
+				"ConnectRetryDelay": "1000",
+				"GameStartBarrierTimeout": "30000",
+				"FrameStartBarrierTimeout": "5000",
+				"FrameEndBarrierTimeout": "5000",
+				"RenderSyncBarrierTimeout": "5000"
+			},
+			"nodes":
+			{
+				"node_left":
+				{
+					"host": "192.168.1.1",
+					"sound": true,
+					"fullScreen": true,
+					"window":
+					{
+						"x": 0,
+						"y": 0,
+						"w": 2560,
+						"h": 1600
+					},
+					"postprocess":
+					{
+					},
+					"viewports":
+					{
+						"vp_left":
+						{
+							"camera": "DefaultViewPoint",
+							"bufferRatio": 1,
+							"gPUIndex": -1,
+							"allowCrossGPUTransfer": true,
+							"isShared": false,
+							"region":
+							{
+								"x": 0,
+								"y": 0,
+								"w": 2400,
+								"h": 1600
+							},
+							"projectionPolicy":
+							{
+								"type": "simple",
+								"parameters":
+								{
+									"screen": "scr_left"
+								}
+							}
+						}
+					}
+				},
+				"node_front":
+				{
+					"host": "192.168.1.2",
+					"sound": false,
+					"fullScreen": true,
+					"window":
+					{
+						"x": 0,
+						"y": 0,
+						"w": 2560,
+						"h": 1600
+					},
+					"postprocess":
+					{
+					},
+					"viewports":
+					{
+						"vp_front":
+						{
+							"camera": "DefaultViewPoint",
+							"bufferRatio": 1,
+							"gPUIndex": -1,
+							"allowCrossGPUTransfer": true,
+							"isShared": false,
+							"region":
+							{
+								"x": 0,
+								"y": 0,
+								"w": 2400,
+								"h": 1600
+							},
+							"projectionPolicy":
+							{
+								"type": "simple",
+								"parameters":
+								{
+									"screen": "scr_front"
+								}
+							}
+						}
+					}
+				},
+				"node_right":
+				{
+					"host": "192.168.1.3",
+					"sound": false,
+					"fullScreen": true,
+					"window":
+					{
+						"x": 0,
+						"y": 0,
+						"w": 2560,
+						"h": 1600
+					},
+					"postprocess":
+					{
+					},
+					"viewports":
+					{
+						"vp_right":
+						{
+							"camera": "DefaultViewPoint",
+							"bufferRatio": 1,
+							"gPUIndex": -1,
+							"allowCrossGPUTransfer": true,
+							"isShared": false,
+							"region":
+							{
+								"x": 0,
+								"y": 0,
+								"w": 2400,
+								"h": 1600
+							},
+							"projectionPolicy":
+							{
+								"type": "simple",
+								"parameters":
+								{
+									"screen": "scr_right"
+								}
+							}
+						}
+					}
+				},
+				"node_ceiling":
+				{
+					"host": "192.168.1.4",
+					"sound": false,
+					"fullScreen": true,
+					"window":
+					{
+						"x": 0,
+						"y": 0,
+						"w": 2560,
+						"h": 1600
+					},
+					"postprocess":
+					{
+					},
+					"viewports":
+					{
+						"vp_ceiling":
+						{
+							"camera": "DefaultViewPoint",
+							"bufferRatio": 1,
+							"gPUIndex": -1,
+							"allowCrossGPUTransfer": true,
+							"isShared": false,
+							"region":
+							{
+								"x": 0,
+								"y": 0,
+								"w": 2560,
+								"h": 1280
+							},
+							"projectionPolicy":
+							{
+								"type": "simple",
+								"parameters":
+								{
+									"screen": "scr_ceiling"
+								}
+							}
+						}
+					}
+				},
+				"node_floor":
+				{
+					"host": "192.168.1.5",
+					"sound": false,
+					"fullScreen": true,
+					"window":
+					{
+						"x": 0,
+						"y": 0,
+						"w": 2560,
+						"h": 1600
+					},
+					"postprocess":
+					{
+					},
+					"viewports":
+					{
+						"vp_floor":
+						{
+							"camera": "DefaultViewPoint",
+							"bufferRatio": 1,
+							"gPUIndex": -1,
+							"allowCrossGPUTransfer": true,
+							"isShared": false,
+							"region":
+							{
+								"x": 0,
+								"y": 0,
+								"w": 1600,
+								"h": 1600
+							},
+							"projectionPolicy":
+							{
+								"type": "simple",
+								"parameters":
+								{
+									"screen": "scr_floor"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"customParameters":
+		{
+			"SampleArg1": "SampleVal1",
+			"SampleArg2": "SampleVal2"
+		},
+		"diagnostics":
+		{
+			"simulateLag": false,
+			"minLagTime": 0,
+			"maxLagTime": 0.5
+		}
+	}
+}

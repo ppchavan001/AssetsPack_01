@@ -1,10 +1,10 @@
 {
 	"FileVersion": 3,
 	"Version": 1,
-	"VersionName": "0.1",
+	"VersionName": "0.25",
 	"FriendlyName": "ExposeEditorFunctions",
 	"Description": "Exposes editor/ blueprint read only properties. Use with caution.",
-	"Category": "Other",
+	"Category": "Editor",
 	"CreatedBy": "ppchavan001",
 	"CreatedByURL": "ppchavan001.github.io",
 	"DocsURL": "",
@@ -14,11 +14,36 @@
 	"IsBetaVersion": true,
 	"IsExperimentalVersion": false,
 	"Installed": false,
+	"SupportedTargetPlatforms": [
+		"Win64"
+	],
 	"Modules": [
 		{
 			"Name": "ExposeEditorFunctions",
-			"Type": "Runtime",
-			"LoadingPhase": "PreLoadingScreen"
+			"Type": "Editor",
+			"LoadingPhase": "Default"
+		}
+	],
+	"Plugins": [
+		{
+			"Name": "nDisplay",
+			"Enabled": true
+		},
+		{
+			"Name": "Switchboard",
+			"Enabled": true
+		},
+		{
+			"Name": "EditorScriptingUtilities",
+			"Enabled": true
+		},
+		{
+			"Name": "SequencerScripting",
+			"Enabled": true
+		},
+		{
+			"Name": "BlueprintFileUtils",
+			"Enabled": true
 		}
 	]
 }

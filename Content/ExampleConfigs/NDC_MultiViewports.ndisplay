@@ -1,0 +1,350 @@
+{
+	"nDisplay":
+	{
+		"description": "nDisplay configuration",
+		"version": "4.27",
+		"assetPath": "/Game/ExampleConfigs/NDC_MultiViewports.NDC_MultiViewports",
+		"misc":
+		{
+			"bFollowLocalPlayerCamera": false,
+			"bExitOnEsc": true
+		},
+		"cluster":
+		{
+			"masterNode":
+			{
+				"id": "node_LT",
+				"ports":
+				{
+					"ClusterSync": 41001,
+					"RenderSync": 41002,
+					"ClusterEventsJson": 41003,
+					"ClusterEventsBinary": 41004
+				}
+			},
+			"sync":
+			{
+				"renderSyncPolicy":
+				{
+					"type": "ethernet",
+					"parameters":
+					{
+					}
+				},
+				"inputSyncPolicy":
+				{
+					"type": "ReplicateMaster",
+					"parameters":
+					{
+					}
+				}
+			},
+			"network":
+			{
+				"ConnectRetriesAmount": "10",
+				"ConnectRetryDelay": "1000",
+				"GameStartBarrierTimeout": "30000",
+				"FrameStartBarrierTimeout": "5000",
+				"FrameEndBarrierTimeout": "5000",
+				"RenderSyncBarrierTimeout": "5000"
+			},
+			"nodes":
+			{
+				"node_LT":
+				{
+					"host": "127.0.0.1",
+					"sound": true,
+					"fullScreen": false,
+					"window":
+					{
+						"x": 0,
+						"y": 0,
+						"w": 640,
+						"h": 480
+					},
+					"postprocess":
+					{
+					},
+					"viewports":
+					{
+						"vp_LT":
+						{
+							"camera": "DefaultViewPoint",
+							"bufferRatio": 1,
+							"gPUIndex": -1,
+							"allowCrossGPUTransfer": true,
+							"isShared": false,
+							"region":
+							{
+								"x": 10,
+								"y": 10,
+								"w": 300,
+								"h": 220
+							},
+							"projectionPolicy":
+							{
+								"type": "simple",
+								"parameters":
+								{
+									"screen": "scr_LT"
+								}
+							}
+						}
+					}
+				},
+				"node_LB":
+				{
+					"host": "127.0.0.1",
+					"sound": false,
+					"fullScreen": false,
+					"window":
+					{
+						"x": 0,
+						"y": 482,
+						"w": 640,
+						"h": 480
+					},
+					"postprocess":
+					{
+					},
+					"viewports":
+					{
+						"vp_LT":
+						{
+							"camera": "DefaultViewPoint",
+							"bufferRatio": 1,
+							"gPUIndex": -1,
+							"allowCrossGPUTransfer": true,
+							"isShared": false,
+							"region":
+							{
+								"x": 10,
+								"y": 10,
+								"w": 300,
+								"h": 220
+							},
+							"projectionPolicy":
+							{
+								"type": "simple",
+								"parameters":
+								{
+									"screen": "scr_LT"
+								}
+							}
+						},
+						"vp_LB":
+						{
+							"camera": "DefaultViewPoint",
+							"bufferRatio": 1,
+							"gPUIndex": -1,
+							"allowCrossGPUTransfer": true,
+							"isShared": false,
+							"region":
+							{
+								"x": 10,
+								"y": 250,
+								"w": 300,
+								"h": 220
+							},
+							"projectionPolicy":
+							{
+								"type": "simple",
+								"parameters":
+								{
+									"screen": "scr_LB"
+								}
+							}
+						}
+					}
+				},
+				"node_RT":
+				{
+					"host": "127.0.0.1",
+					"sound": false,
+					"fullScreen": false,
+					"window":
+					{
+						"x": 642,
+						"y": 0,
+						"w": 640,
+						"h": 480
+					},
+					"postprocess":
+					{
+					},
+					"viewports":
+					{
+						"vp_LB":
+						{
+							"camera": "DefaultViewPoint",
+							"bufferRatio": 1,
+							"gPUIndex": -1,
+							"allowCrossGPUTransfer": true,
+							"isShared": false,
+							"region":
+							{
+								"x": 10,
+								"y": 250,
+								"w": 300,
+								"h": 220
+							},
+							"projectionPolicy":
+							{
+								"type": "simple",
+								"parameters":
+								{
+									"screen": "scr_LB"
+								}
+							}
+						},
+						"vp_RT":
+						{
+							"camera": "DefaultViewPoint",
+							"bufferRatio": 1,
+							"gPUIndex": -1,
+							"allowCrossGPUTransfer": true,
+							"isShared": false,
+							"region":
+							{
+								"x": 330,
+								"y": 10,
+								"w": 300,
+								"h": 220
+							},
+							"projectionPolicy":
+							{
+								"type": "simple",
+								"parameters":
+								{
+									"screen": "scr_RT"
+								}
+							}
+						}
+					}
+				},
+				"node_RB":
+				{
+					"host": "127.0.0.1",
+					"sound": false,
+					"fullScreen": false,
+					"window":
+					{
+						"x": 642,
+						"y": 482,
+						"w": 640,
+						"h": 480
+					},
+					"postprocess":
+					{
+					},
+					"viewports":
+					{
+						"vp_LT":
+						{
+							"camera": "DefaultViewPoint",
+							"bufferRatio": 1,
+							"gPUIndex": -1,
+							"allowCrossGPUTransfer": true,
+							"isShared": false,
+							"region":
+							{
+								"x": 10,
+								"y": 10,
+								"w": 300,
+								"h": 220
+							},
+							"projectionPolicy":
+							{
+								"type": "simple",
+								"parameters":
+								{
+									"screen": "scr_LT"
+								}
+							}
+						},
+						"vp_RB":
+						{
+							"camera": "DefaultViewPoint",
+							"bufferRatio": 1,
+							"gPUIndex": -1,
+							"allowCrossGPUTransfer": true,
+							"isShared": false,
+							"region":
+							{
+								"x": 330,
+								"y": 250,
+								"w": 300,
+								"h": 220
+							},
+							"projectionPolicy":
+							{
+								"type": "simple",
+								"parameters":
+								{
+									"screen": "scr_RB"
+								}
+							}
+						},
+						"vp_LB":
+						{
+							"camera": "DefaultViewPoint",
+							"bufferRatio": 1,
+							"gPUIndex": -1,
+							"allowCrossGPUTransfer": true,
+							"isShared": false,
+							"region":
+							{
+								"x": 10,
+								"y": 250,
+								"w": 300,
+								"h": 220
+							},
+							"projectionPolicy":
+							{
+								"type": "simple",
+								"parameters":
+								{
+									"screen": "scr_LB"
+								}
+							}
+						},
+						"vp_RT":
+						{
+							"camera": "DefaultViewPoint",
+							"bufferRatio": 1,
+							"gPUIndex": -1,
+							"allowCrossGPUTransfer": true,
+							"isShared": false,
+							"region":
+							{
+								"x": 330,
+								"y": 10,
+								"w": 300,
+								"h": 220
+							},
+							"projectionPolicy":
+							{
+								"type": "simple",
+								"parameters":
+								{
+									"screen": "scr_RT"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"customParameters":
+		{
+			"SampleArg1": "SampleVal1",
+			"SampleArg2": "SampleVal2"
+		},
+		"diagnostics":
+		{
+			"simulateLag": false,
+			"minLagTime": 0,
+			"maxLagTime": 0.5
+		}
+	}
+}
