@@ -1,7 +1,7 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
 #pragma once
-#define EEFBPL_ENGINE_VERSION_MAJOR 4
+#define EEFBPL_ENGINE_VERSION_MAJOR 426
 
 #include "Kismet/BlueprintFunctionLibrary.h"
 #include "ExposeEditorFunctionsBPLibrary.generated.h"
@@ -58,6 +58,9 @@ class UExposeEditorFunctionsBPLibrary : public UBlueprintFunctionLibrary
 
 	UFUNCTION(BlueprintCallable, Category = "Exposed Functions | Level Utility")
 		static TArray<class AActor*> GetAllLevelActors();
+
+	UFUNCTION(BlueprintCallable, Category = "Exposed Functions | Input")
+		static FKey GetKeyByName(const FName InName);
 
 #endif
 };
