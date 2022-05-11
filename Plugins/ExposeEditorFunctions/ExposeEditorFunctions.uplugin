@@ -22,7 +22,8 @@
 			"Name": "ExposeEditorFunctions",
 			"Type": "Editor",
 			"LoadingPhase": "Default"
-		}
+		},
+		
 	],
 	"Plugins": [
 		{

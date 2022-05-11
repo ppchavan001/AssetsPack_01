@@ -30,8 +30,7 @@ UCLASS()
 class UExposeEditorFunctionsBPLibrary : public UBlueprintFunctionLibrary
 {
 	GENERATED_UCLASS_BODY()
-
-#if WITH_EDITOR
+public:
 
 	UFUNCTION(BlueprintCallable, meta = (DisplayName = "Set Lightmap Resolution for Target Mesh", Keywords = "set lightmap resolution"), Category = "Exposed Functions | Lighting")
 		static void SetStaticMeshLightMapResolution(UStaticMeshComponent* TargetMesh, int NewRes);
@@ -59,9 +58,7 @@ class UExposeEditorFunctionsBPLibrary : public UBlueprintFunctionLibrary
 	UFUNCTION(BlueprintCallable, Category = "Exposed Functions | Level Utility")
 		static TArray<class AActor*> GetAllLevelActors();
 
-	UFUNCTION(BlueprintCallable, Category = "Exposed Functions | Input")
-		static FKey GetKeyByName(const FName InName);
 
-#endif
+
 };
 

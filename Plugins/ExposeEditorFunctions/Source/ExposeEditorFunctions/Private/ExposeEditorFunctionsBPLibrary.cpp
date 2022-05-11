@@ -281,10 +281,3 @@ FString UExposeEditorFunctionsBPLibrary::GetConfigData(UObject* Object)
 }
 
 #endif
-
-
-FKey UExposeEditorFunctionsBPLibrary::GetKeyByName(const FName InName)
-{
-	return FKey(InName);
-}
-
