@@ -22,7 +22,13 @@
 			"Name": "ExposeEditorFunctions",
 			"Type": "Editor",
 			"LoadingPhase": "Default"
-		}
+		},
+		{
+			"Name": "ExposeRuntimeFunctions",
+			"Type": "Runtime",
+			"LoadingPhase": "Default"
+		},
+		
 	],
 	"Plugins": [
 		{

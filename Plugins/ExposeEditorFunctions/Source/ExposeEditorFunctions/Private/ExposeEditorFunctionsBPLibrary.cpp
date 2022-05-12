@@ -2,7 +2,6 @@
 
 #include "ExposeEditorFunctionsBPLibrary.h"
 #include "ExposeEditorFunctions.h"
-#include <DisplayCluster/Public/Blueprints/DisplayClusterBlueprint.h>
 #include <DisplayClusterConfigurator/Private/DisplayClusterConfiguratorEditorSubsystem.h>
 #include "Modules/ModuleManager.h"
 #include "IDisplayClusterConfiguration.h"
@@ -11,14 +10,22 @@
 #include "Components/ComboBoxString.h"
 #include "Logging/LogMacros.h"
 
+#if EEFBPL_ENGINE_VERSION_MAJOR > 426
 
-#if EEFBPL_ENGINE_VERSION_MAJOR == 5
+#include <DisplayCluster/Public/Blueprints/DisplayClusterBlueprint.h>
+
+#endif	
+
+#if EEFBPL_ENGINE_VERSION_MAJOR >= 500
 
 #include "EditorScriptingHelpers.h"
 #include "Subsystems/UnrealEditorSubsystem.h"
 #include "Subsystems/EditorActorSubsystem.h"
 
-#else
+
+#endif 
+
+#if EEFBPL_ENGINE_VERSION_MAJOR == 427
 
 #include "EditorLevelLibrary.h"
 
@@ -41,6 +48,11 @@ void UExposeEditorFunctionsBPLibrary::SetStaticMeshLightMapResolution(UStaticMes
 	TargetMesh->InvalidateLightingCacheDetailed(true, false);
 }
 
+
+
+
+
+#if EEFBPL_ENGINE_VERSION_MAJOR > 426
 bool UExposeEditorFunctionsBPLibrary::ExportNDisplayConfigFromDisplayClusterRootActorBlueprint(UObject* Object, const FString& FilePath)
 {
 
@@ -95,6 +107,22 @@ FText UExposeEditorFunctionsBPLibrary::GetDisplayClusterExportConfigPathFromBlue
 	return FText::FromString("Selected object is not a Display Cluster Blueprint.");
 }
 
+#else
+
+FText UExposeEditorFunctionsBPLibrary::GetDisplayClusterExportConfigPathFromBlueprintInternal(UObject* Object, bool& ReturningValidPath)
+{
+	return FText::FromString(" Unreal version lower than 4.27 are not supported.");
+}
+
+bool UExposeEditorFunctionsBPLibrary::ExportNDisplayConfigFromDisplayClusterRootActorBlueprint(UObject* Object, const FString& FilePath)
+{
+
+	return false;
+}
+
+#endif
+
+
 FString UExposeEditorFunctionsBPLibrary::OpenSelectDirectoryDialog(FString DefaultDirectory)
 {
 	FString OutputDirectory;
@@ -118,7 +146,7 @@ void UExposeEditorFunctionsBPLibrary::SetComboBoxStringFont(UComboBoxString* Com
 
 
 
-#if EEFBPL_ENGINE_VERSION_MAJOR == 5 
+#if EEFBPL_ENGINE_VERSION_MAJOR > 500 
 
 UWorld* UExposeEditorFunctionsBPLibrary::GetEditorWorld()
 {
@@ -137,7 +165,7 @@ UWorld* UExposeEditorFunctionsBPLibrary::GetEditorWorld()
 		UE_LOG(LogTemp, Warning, TEXT("%s. Can't spawn the actor because there is no world."));
 		return nullptr;
 	}
-	
+
 	return World;
 }
 
@@ -147,8 +175,10 @@ TArray<class AActor*> UExposeEditorFunctionsBPLibrary::GetAllLevelActors()
 
 	return EditorActorSubsystem ? EditorActorSubsystem->GetAllLevelActors() : TArray<AActor*>();
 }
+
 #else
 
+#if EEFBPL_ENGINE_VERSION_MAJOR > 426
 UWorld* UExposeEditorFunctionsBPLibrary::GetEditorWorld()
 {
 	return UEditorLevelLibrary::GetEditorWorld();
@@ -158,10 +188,23 @@ TArray<class AActor*> UExposeEditorFunctionsBPLibrary::GetAllLevelActors()
 {
 	return UEditorLevelLibrary::GetAllLevelActors();
 }
+#else
+UWorld* UExposeEditorFunctionsBPLibrary::GetEditorWorld()
+{
+	return nullptr;
+}
+
+
+TArray<class AActor*> UExposeEditorFunctionsBPLibrary::GetAllLevelActors()
+{
+	return TArray<class AActor*>();
+}
+#endif
 
 #endif
 
 
+#if EEFBPL_ENGINE_VERSION_MAJOR > 426
 
 FText UExposeEditorFunctionsBPLibrary::GetDisplayClusterExportConfigPathFromBlueprint(UObject* Object)
 {
@@ -224,4 +267,17 @@ FString UExposeEditorFunctionsBPLibrary::GetConfigData(UObject* Object)
 	return FString("Invalid blueprint passed.");
 }
 
+#else
 
+FText UExposeEditorFunctionsBPLibrary::GetDisplayClusterExportConfigPathFromBlueprint(UObject* Object)
+{
+	return FText::FromString(" Unreal version lower than 4.27 are not supported.");
+}
+
+
+FString UExposeEditorFunctionsBPLibrary::GetConfigData(UObject* Object)
+{
+	return (" Unreal version lower than 4.27 are not supported.");
+}
+
+#endif

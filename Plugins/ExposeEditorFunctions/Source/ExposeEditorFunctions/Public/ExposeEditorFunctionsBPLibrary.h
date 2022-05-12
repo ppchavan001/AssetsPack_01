@@ -1,7 +1,8 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
 #pragma once
-#define EEFBPL_ENGINE_VERSION_MAJOR 4
+#define EEFBPL_ENGINE_VERSION_MAJOR 427
+
 
 #include "Kismet/BlueprintFunctionLibrary.h"
 #include "ExposeEditorFunctionsBPLibrary.generated.h"
@@ -30,8 +31,7 @@ UCLASS()
 class UExposeEditorFunctionsBPLibrary : public UBlueprintFunctionLibrary
 {
 	GENERATED_UCLASS_BODY()
-
-#if WITH_EDITOR
+public:
 
 	UFUNCTION(BlueprintCallable, meta = (DisplayName = "Set Lightmap Resolution for Target Mesh", Keywords = "set lightmap resolution"), Category = "Exposed Functions | Lighting")
 		static void SetStaticMeshLightMapResolution(UStaticMeshComponent* TargetMesh, int NewRes);
@@ -59,6 +59,7 @@ class UExposeEditorFunctionsBPLibrary : public UBlueprintFunctionLibrary
 	UFUNCTION(BlueprintCallable, Category = "Exposed Functions | Level Utility")
 		static TArray<class AActor*> GetAllLevelActors();
 
-#endif
+
+
 };
 
