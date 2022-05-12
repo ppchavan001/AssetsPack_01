@@ -1,0 +1,8 @@
+enable plugin:
+"editor scripting utilities"
+
+[about]
+V3:
+Working undo/redo
+Level now detects the changes in the world
+filters working properly
