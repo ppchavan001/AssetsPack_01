@@ -3,8 +3,8 @@
 #pragma once
 
 #include "Kismet/BlueprintFunctionLibrary.h"
+#include "InputCore/Classes/InputCoreTypes.h"
 #include "ExposeRuntimeFunctionsBPLibrary.generated.h"
-
 /* 
 *	Function library class.
 *	Each function in it is expected to be static and represents blueprint node that can be called in any blueprint.
@@ -22,6 +22,8 @@
 *	For more info on custom blueprint nodes visit documentation:
 *	https://wiki.unrealengine.com/Custom_Blueprint_Node_Creation
 */
+
+
 UCLASS()
 class UExposeRuntimeFunctionsBPLibrary : public UBlueprintFunctionLibrary
 {
