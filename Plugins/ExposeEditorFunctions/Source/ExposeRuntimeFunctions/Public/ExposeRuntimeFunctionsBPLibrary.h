@@ -31,4 +31,7 @@ class UExposeRuntimeFunctionsBPLibrary : public UBlueprintFunctionLibrary
 
 	UFUNCTION(BlueprintPure, meta = (DisplayName = "Get Key From Name", Keywords = "Get Key From Name"), Category = "ExposeRuntimeFunctions | Input")
 	static FKey ExposeRuntimeFunctionsSampleFunction(FName name);
+
+	UFUNCTION(BlueprintCallable, meta = (DisplayName = "Set UProperty By Name"), Category = "ExposeRuntimeFunctions | General")
+		static void SetFPropertyByName(UObject* Object, FName NameOfThePropertyToUpdate, const FString DataToSet);
 };
