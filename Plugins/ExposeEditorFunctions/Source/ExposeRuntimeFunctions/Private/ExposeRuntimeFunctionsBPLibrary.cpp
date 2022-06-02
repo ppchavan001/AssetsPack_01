@@ -4,7 +4,7 @@
 #include "ExposeRuntimeFunctions.h"
 
 UExposeRuntimeFunctionsBPLibrary::UExposeRuntimeFunctionsBPLibrary(const FObjectInitializer& ObjectInitializer)
-: Super(ObjectInitializer)
+	: Super(ObjectInitializer)
 {
 
 }
@@ -20,13 +20,13 @@ void UExposeRuntimeFunctionsBPLibrary::SetFPropertyByName(UObject* Object, FName
 	if (Object)
 	{
 		UClass* _Class = Object->GetClass();
-		
+
 		FProperty* property = _Class->FindPropertyByName(NameOfThePropertyToUpdate);
-		
+
 		if (property)
 		{
 
-			FBoolProperty* BoolProperty = CastFieldChecked<FBoolProperty>(property);
+			FBoolProperty* BoolProperty = CastField<FBoolProperty>(property);
 
 			if (BoolProperty)
 			{
@@ -36,7 +36,7 @@ void UExposeRuntimeFunctionsBPLibrary::SetFPropertyByName(UObject* Object, FName
 				return;
 			}
 
-			FNameProperty* NameProperty = CastFieldChecked<FNameProperty>(property);
+			FNameProperty* NameProperty = CastField<FNameProperty>(property);
 
 			if (NameProperty)
 			{
@@ -46,7 +46,7 @@ void UExposeRuntimeFunctionsBPLibrary::SetFPropertyByName(UObject* Object, FName
 				return;
 			}
 
-			FStrProperty* StrProperty = CastFieldChecked<FStrProperty>(property);
+			FStrProperty* StrProperty = CastField<FStrProperty>(property);
 			if (StrProperty)
 			{
 				StrProperty->SetPropertyValue(StrProperty->ContainerPtrToValuePtr< void >(Object), DataToSet);
@@ -55,7 +55,7 @@ void UExposeRuntimeFunctionsBPLibrary::SetFPropertyByName(UObject* Object, FName
 			}
 
 
-			FTextProperty* TextProperty = CastFieldChecked<FTextProperty>(property);
+			FTextProperty* TextProperty = CastField<FTextProperty>(property);
 			if (TextProperty)
 			{
 				FText Value = FText::FromString(DataToSet);
@@ -65,14 +65,14 @@ void UExposeRuntimeFunctionsBPLibrary::SetFPropertyByName(UObject* Object, FName
 			}
 
 
-			FNumericProperty* NumericProperty = CastFieldChecked<FNumericProperty>(property);
+
+
+			FNumericProperty* NumericProperty = CastField<FNumericProperty>(property);
 
 			if (NumericProperty)
 			{
 
-
-
-				FFloatProperty* FloatProperty = CastFieldChecked<FFloatProperty			>(NumericProperty);
+				FFloatProperty* FloatProperty = CastField<FFloatProperty>(NumericProperty);
 
 				if (FloatProperty)
 				{
@@ -80,7 +80,7 @@ void UExposeRuntimeFunctionsBPLibrary::SetFPropertyByName(UObject* Object, FName
 					return;
 				}
 
-				FInt64Property* Int64Property = CastFieldChecked<FInt64Property			>(NumericProperty);
+				FInt64Property* Int64Property = CastField<FInt64Property>(NumericProperty);
 
 				if (Int64Property)
 				{
@@ -90,12 +90,12 @@ void UExposeRuntimeFunctionsBPLibrary::SetFPropertyByName(UObject* Object, FName
 				}
 
 
-				FIntProperty* IntProperty = CastFieldChecked<FIntProperty			>(NumericProperty);
+				FIntProperty* IntProperty = CastField<FIntProperty>(NumericProperty);
 
 				if (IntProperty)
 				{
 					IntProperty->SetPropertyValue(IntProperty->ContainerPtrToValuePtr< void >(Object),
-													FCString::Atoi(*DataToSet));
+												  FCString::Atoi(*DataToSet));
 					return;
 				}
 
@@ -105,11 +105,11 @@ void UExposeRuntimeFunctionsBPLibrary::SetFPropertyByName(UObject* Object, FName
 			}
 
 				/*
-		   CastFieldChecked<FEnumProperty>(property)
-		   CastFieldChecked<FArrayProperty>(property)
-		   CastFieldChecked<FSetProperty>(property)
-		   CastFieldChecked<FStructProperty>(property)
-		   CastFieldChecked<FMapProperty>(property)
+		   CastField<FEnumProperty>(property)
+		   CastField<FArrayProperty>(property)
+		   CastField<FSetProperty>(property)
+		   CastField<FStructProperty>(property)
+		   CastField<FMapProperty>(property)
 		   */
 
 		}
