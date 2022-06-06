@@ -5,6 +5,11 @@
 #include "UObject/PropertyAccessUtil.h"
 
 
+UExposeRuntimeFunctionsBPLibrary::UExposeRuntimeFunctionsBPLibrary(const FObjectInitializer& ObjectInitializer)
+	: Super(ObjectInitializer)
+{
+
+}
 
 FKey UExposeRuntimeFunctionsBPLibrary::GetKeyFromName(FName name)
 {
@@ -20,12 +25,12 @@ void UExposeRuntimeFunctionsBPLibrary::SetFPropertyByName(UObject* Object, FName
 
 		FProperty* property = _Class->FindPropertyByName(NameOfThePropertyToUpdate);
 
-		SetFPropertyValue(property, Object, DataToSet);
+		SetFPropertyValueInternal(property, Object, DataToSet);
 	}
 }
 
 
-void UExposeRuntimeFunctionsBPLibrary::SetFPropertyValue(FProperty* property, UObject* Object, const FString DataToSet)
+void UExposeRuntimeFunctionsBPLibrary::SetFPropertyValueInternal(FProperty* property, UObject* Object, const FString DataToSet)
 {
 	// If property is valid for the object
 	// Determine property type
@@ -205,15 +210,17 @@ void UExposeRuntimeFunctionsBPLibrary::SetFPropertyValue(FProperty* property, UO
 			// Update the data in the struct from ChannelData map
 			for (TFieldIterator<FProperty> It(StructProperty->Struct); It; ++It)
 			{
-				SetFPropertyValue(*It, Object, ChannelData[It->GetFName().ToString()]);
+				FString CurrentChannelNameAsString = It->GetFName().ToString();
+				const FString ColorValue = ChannelData[CurrentChannelNameAsString];
+				SetFPropertyValueInternal(*It, Object, ColorValue);
 				UE_LOG(LogTemp, Warning, TEXT("Struct property : %s"), *(It->GetFName().ToString()));
 			}
 
 
 			//FText Value = FText::FromString(DataToSet);
 			//StructProperty->Struct->
-			//	//SetPropertyValue(StructProperty->ContainerPtrToValuePtr< void >(Object), Value);
 
+			//	//SetPropertyValue(StructProperty->ContainerPtrToValuePtr< void >(Object), Value);
 			//return;
 		}
 
@@ -224,14 +231,9 @@ void UExposeRuntimeFunctionsBPLibrary::SetFPropertyValue(FProperty* property, UO
 		//	UE_LOG(LogTemp, Warning, TEXT("Hello"));
 		//}
 
-			/*
-	   CastField<FEnumProperty>(property)
-	   CastField<FArrayProperty>(property)
-	   CastField<FSetProperty>(property)
-	   CastField<FStructProperty>(property)
-	   CastField<FMapProperty>(property)
-	   */
+	   
 
 	}
 }
+
 

@@ -5,6 +5,7 @@
 #include "Kismet/BlueprintFunctionLibrary.h"
 #include "InputCore/Classes/InputCoreTypes.h"
 #include "UObject/UnrealType.h"
+
 #include "ExposeRuntimeFunctionsBPLibrary.generated.h"
 /* 
 *	Function library class.
@@ -24,7 +25,6 @@
 *	https://wiki.unrealengine.com/Custom_Blueprint_Node_Creation
 */
 
-
 UCLASS()
 class UExposeRuntimeFunctionsBPLibrary : public UBlueprintFunctionLibrary
 {
@@ -36,6 +36,5 @@ class UExposeRuntimeFunctionsBPLibrary : public UBlueprintFunctionLibrary
 	UFUNCTION(BlueprintCallable, meta = (DisplayName = "Set Property Value By Name"), Category = "ExposeRuntimeFunctions | General")
 		static void SetFPropertyByName(UObject* Object, FName NameOfThePropertyToUpdate, const FString DataToSet);
 
-	UFUNCTION(BlueprintCallable, meta = (DisplayName = "Set Property Value"), Category = "ExposeRuntimeFunctions | General")
-	static void SetFPropertyValue(FProperty* property, UObject* Object, const FString DataToSet);
+	static void SetFPropertyValueInternal(FProperty* property, UObject* Object, const FString DataToSet);
 };
