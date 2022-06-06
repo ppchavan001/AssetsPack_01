@@ -140,33 +140,31 @@ void UExposeRuntimeFunctionsBPLibrary::SetFPropertyValueInternal(FProperty* prop
 		if (NumericProperty)
 		{
 
-			FFloatProperty* FloatProperty = CastField<FFloatProperty>(NumericProperty);
 
-			if (FloatProperty)
-			{
-				FloatProperty->SetPropertyValue(FloatProperty->ContainerPtrToValuePtr< void >(Object), FCString::Atof(*DataToSet));
-				return;
-			}
+		#define ImplementPropertySetter(Type, PropertyObject, _Data)\
+			{\
+				Type* PropertyObject = CastField<Type>(NumericProperty);\
+				if (PropertyObject)\
+				{\
+					PropertyObject->SetPropertyValue(PropertyObject->ContainerPtrToValuePtr< void >(Object), _Data);\
+					return;\
+				}\
+			}\
 
-			FInt64Property* Int64Property = CastField<FInt64Property>(NumericProperty);
+			uint8 Data;
+			StringToBytes(DataToSet, &Data, 1000);
+			//ImplementPropertySetter(FByteProperty,		BytePropertyObject		, Data)
+			ImplementPropertySetter(FDoubleProperty,	DoublePropertyObject	, FCString::Atod(*DataToSet))
+			ImplementPropertySetter(FFloatProperty,		FloatPropertyObject		, FCString::Atof(*DataToSet))
+			ImplementPropertySetter(FInt64Property,		Int64PropertyObject		, FCString::Atoi64(*DataToSet))
+			ImplementPropertySetter(FUInt32Property,	UInt32PropertyObject	, FCString::Atoi(*DataToSet))
+			ImplementPropertySetter(FInt16Property,		Int16PropertyObject		, FCString::Atoi(*DataToSet))
+			ImplementPropertySetter(FInt8Property,		Int8PropertyObject		, FCString::Atoi(*DataToSet))
+			ImplementPropertySetter(FIntProperty,		IntPropertyObject		, FCString::Atoi(*DataToSet))
+			
+		
 
-			if (Int64Property)
-			{
-				Int64Property->SetPropertyValue(Int64Property->ContainerPtrToValuePtr< void >(Object),
-												FCString::Strtoui64(*DataToSet, nullptr, 10));
-				return;
-			}
-
-
-			FIntProperty* IntProperty = CastField<FIntProperty>(NumericProperty);
-
-			if (IntProperty)
-			{
-				IntProperty->SetPropertyValue(IntProperty->ContainerPtrToValuePtr< void >(Object),
-											  FCString::Atoi(*DataToSet));
-				return;
-			}
-
+			
 
 
 
