@@ -4,6 +4,7 @@
 
 #include "Kismet/BlueprintFunctionLibrary.h"
 #include "InputCore/Classes/InputCoreTypes.h"
+#include "UObject/UnrealType.h"
 #include "ExposeRuntimeFunctionsBPLibrary.generated.h"
 /* 
 *	Function library class.
@@ -32,6 +33,9 @@ class UExposeRuntimeFunctionsBPLibrary : public UBlueprintFunctionLibrary
 	UFUNCTION(BlueprintPure, meta = (DisplayName = "Get Key From Name", Keywords = "Get Key From Name"), Category = "ExposeRuntimeFunctions | Input")
 	static FKey GetKeyFromName(FName name);
 
-	UFUNCTION(BlueprintCallable, meta = (DisplayName = "Set UProperty By Name"), Category = "ExposeRuntimeFunctions | General")
+	UFUNCTION(BlueprintCallable, meta = (DisplayName = "Set Property Value By Name"), Category = "ExposeRuntimeFunctions | General")
 		static void SetFPropertyByName(UObject* Object, FName NameOfThePropertyToUpdate, const FString DataToSet);
+
+	UFUNCTION(BlueprintCallable, meta = (DisplayName = "Set Property Value"), Category = "ExposeRuntimeFunctions | General")
+	static void SetFPropertyValue(FProperty* property, UObject* Object, const FString DataToSet);
 };
