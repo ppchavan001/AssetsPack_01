@@ -3,6 +3,7 @@
 #include "ExposeRuntimeFunctionsBPLibrary.h"
 #include "ExposeRuntimeFunctions.h"
 #include "UObject/PropertyAccessUtil.h"
+#include "UObject/UnrealType.h"
 
 
 UExposeRuntimeFunctionsBPLibrary::UExposeRuntimeFunctionsBPLibrary(const FObjectInitializer& ObjectInitializer)
@@ -127,6 +128,24 @@ void UExposeRuntimeFunctionsBPLibrary::SetFPropertyValueInternal(FProperty* prop
 		}
 
 
+
+		// *************************************************
+		// 
+		// Enum Property
+		// 
+		// *************************************************
+		if (FEnumProperty* EnumProperty = CastField<FEnumProperty>(property))
+		{
+			FNumericProperty* UnderlyingProperty = EnumProperty->GetUnderlyingProperty();
+			
+			if (UnderlyingProperty)
+			{
+				SetFPropertyValueInternal(UnderlyingProperty, InContainer, DataToSet);
+			}
+
+			//e->a
+			return;
+		}
 
 		// *************************************************
 		// 
