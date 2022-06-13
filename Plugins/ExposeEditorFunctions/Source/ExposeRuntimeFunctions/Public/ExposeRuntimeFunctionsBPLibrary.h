@@ -36,5 +36,5 @@ class UExposeRuntimeFunctionsBPLibrary : public UBlueprintFunctionLibrary
 	UFUNCTION(BlueprintCallable, meta = (DisplayName = "Set Property Value By Name"), Category = "ExposeRuntimeFunctions | General")
 		static void SetFPropertyByName(UObject* Object, FName NameOfThePropertyToUpdate, const FString DataToSet);
 
-	static void SetFPropertyValueInternal(FProperty* property, UObject* Object, const FString DataToSet);
+	static void SetFPropertyValueInternal(FProperty* property, void* Object, const FString DataToSet);
 };

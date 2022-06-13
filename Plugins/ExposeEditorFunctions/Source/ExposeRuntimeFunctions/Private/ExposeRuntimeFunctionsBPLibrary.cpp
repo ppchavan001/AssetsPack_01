@@ -19,6 +19,7 @@ FKey UExposeRuntimeFunctionsBPLibrary::GetKeyFromName(FName name)
 
 void UExposeRuntimeFunctionsBPLibrary::SetFPropertyByName(UObject* Object, FName NameOfThePropertyToUpdate, const FString DataToSet)
 {
+
 	if (Object)
 	{
 		UClass* _Class = Object->GetClass();
@@ -30,21 +31,25 @@ void UExposeRuntimeFunctionsBPLibrary::SetFPropertyByName(UObject* Object, FName
 }
 
 
-void UExposeRuntimeFunctionsBPLibrary::SetFPropertyValueInternal(FProperty* property, UObject* Object, const FString DataToSet)
+void UExposeRuntimeFunctionsBPLibrary::SetFPropertyValueInternal(FProperty* property, void* InContainer, const FString DataToSet)
 {
+
+#define Object InContainer
+
 	// If property is valid for the object
 	// Determine property type
 	if (property && Object)
 	{
+
+
+
 		// *************************************************
 		// 
-		// FBool Property
+		// Bool Property
 		// 
 		// *************************************************
 
-		FBoolProperty* BoolProperty = CastField<FBoolProperty>(property);
-
-		if (BoolProperty)
+		if (FBoolProperty* BoolProperty = CastField<FBoolProperty>(property))
 		{
 			FString DataTrimmed = DataToSet.TrimStartAndEnd();
 
@@ -56,17 +61,13 @@ void UExposeRuntimeFunctionsBPLibrary::SetFPropertyValueInternal(FProperty* prop
 
 
 
-
 		// *************************************************
 		// 
-		// FName Property
+		// Name Property
 		// 
 		// *************************************************
 
-
-		FNameProperty* NameProperty = CastField<FNameProperty>(property);
-
-		if (NameProperty)
+		if (FNameProperty* NameProperty = CastField<FNameProperty>(property))
 		{
 			FString DataTrimmed = DataToSet.TrimStartAndEnd();
 
@@ -80,12 +81,11 @@ void UExposeRuntimeFunctionsBPLibrary::SetFPropertyValueInternal(FProperty* prop
 
 		// *************************************************
 		// 
-		// FString Property
+		// String Property
 		// 
 		// *************************************************
 
-		FStrProperty* StrProperty = CastField<FStrProperty>(property);
-		if (StrProperty)
+		if (FStrProperty* StrProperty = CastField<FStrProperty>(property))
 		{
 			FString StringData = DataToSet;
 
@@ -106,11 +106,10 @@ void UExposeRuntimeFunctionsBPLibrary::SetFPropertyValueInternal(FProperty* prop
 
 		// *************************************************
 		// 
-		// FText Property
+		// Text Property
 		// 
 		// *************************************************
-		FTextProperty* TextProperty = CastField<FTextProperty>(property);
-		if (TextProperty)
+		if (FTextProperty* TextProperty = CastField<FTextProperty>(property))
 		{
 
 			FString StringData = DataToSet;
@@ -131,7 +130,55 @@ void UExposeRuntimeFunctionsBPLibrary::SetFPropertyValueInternal(FProperty* prop
 
 		// *************************************************
 		// 
-		// FNumeric Property 
+		// Array Property
+		// 
+		// Array of int, float, bool, etc
+		// 
+		// *************************************************
+		if (FArrayProperty* ArrayProperty = CastField<FArrayProperty>(property))
+		{
+
+			// Build CSV array
+			TArray<FString> DataArray;
+			DataToSet.ParseIntoArray(DataArray, *FString(","), false);
+
+
+			FScriptArrayHelper_InContainer Helper(ArrayProperty, InContainer);
+		
+			// If CSV array is longer than the array property items
+			// add duplicate array property items to equalize the length of two arrays 
+			//while (Helper.Num() != DataArray.Num())
+			//{
+			//	if (Helper.Num() < DataArray.Num())
+			//	{
+			//		//ArrayProperty->AddCppProperty(ArrayProperty->Inner);
+			//		
+			//	}
+			//	
+			//	else if (Helper.Num() > DataArray.Num())
+			//	{
+			//		ArrayProperty->DestroyValue_InContainer(InContainer);
+			//	}
+			//}
+
+			
+			
+
+			// Assign string values from Data Array to Array property
+			volatile auto x = Helper.Num();
+
+			for (int32 DynamicIndex = 0; DynamicIndex < Helper.Num(); ++DynamicIndex)
+			{
+				void* ValuePtr = Helper.GetRawPtr(DynamicIndex);
+
+				SetFPropertyValueInternal(ArrayProperty->Inner, ValuePtr, DataArray[DynamicIndex]);
+
+			}
+		}
+
+		// *************************************************
+		// 
+		// Numeric Property 
 		// int, float, double
 		// 
 		// *************************************************
@@ -151,20 +198,41 @@ void UExposeRuntimeFunctionsBPLibrary::SetFPropertyValueInternal(FProperty* prop
 				}\
 			}\
 
-			uint8 Data;
-			StringToBytes(DataToSet, &Data, 1000);
-			//ImplementPropertySetter(FByteProperty,		BytePropertyObject		, Data)
-			ImplementPropertySetter(FDoubleProperty,	DoublePropertyObject	, FCString::Atod(*DataToSet))
-			ImplementPropertySetter(FFloatProperty,		FloatPropertyObject		, FCString::Atof(*DataToSet))
-			ImplementPropertySetter(FInt64Property,		Int64PropertyObject		, FCString::Atoi64(*DataToSet))
-			ImplementPropertySetter(FUInt32Property,	UInt32PropertyObject	, FCString::Atoi(*DataToSet))
-			ImplementPropertySetter(FInt16Property,		Int16PropertyObject		, FCString::Atoi(*DataToSet))
-			ImplementPropertySetter(FInt8Property,		Int8PropertyObject		, FCString::Atoi(*DataToSet))
-			ImplementPropertySetter(FIntProperty,		IntPropertyObject		, FCString::Atoi(*DataToSet))
-			
-		
 
-			
+		{
+			uint8 Data = DataToSet[0];
+			//StringToBytes(DataToSet, &Data, 1000);
+			//ImplementPropertySetter(FByteProperty,		BytePropertyObject		, Data)
+
+			FByteProperty* PropertyObject = CastField<FByteProperty>(NumericProperty);
+			if (PropertyObject)
+			{
+				//PropertyObject->get
+				//PropertyObject->SetNumericPropertyValueFromString(PropertyObject, &(DataToSet[0]));
+
+				//auto e = PropertyObject->Enum;
+				//UE_LOG(LogTemp, Warning, TEXT("Struct property : %s"), *(e->GetDisplayNameText(0).ToString()));
+
+				//if(ValuePtr)
+				//PropertyObject->SetPropertyValue_InContainer(ValuePtr, Data);
+				PropertyObject->SetPropertyValue(PropertyObject->ContainerPtrToValuePtr< void >(Object), Data);
+				//PropertyObject->SetPropertyValue(ValuePtr, Data);
+				return;
+			}
+		}
+
+
+		ImplementPropertySetter(FDoubleProperty, DoublePropertyObject, FCString::Atod(*DataToSet))
+			ImplementPropertySetter(FFloatProperty, FloatPropertyObject, FCString::Atof(*DataToSet))
+			ImplementPropertySetter(FInt64Property, Int64PropertyObject, FCString::Atoi64(*DataToSet))
+			ImplementPropertySetter(FUInt32Property, UInt32PropertyObject, FCString::Atoi(*DataToSet))
+			ImplementPropertySetter(FInt16Property, Int16PropertyObject, FCString::Atoi(*DataToSet))
+			ImplementPropertySetter(FInt8Property, Int8PropertyObject, FCString::Atoi(*DataToSet))
+			ImplementPropertySetter(FIntProperty, IntPropertyObject, FCString::Atoi(*DataToSet))
+
+
+
+
 
 
 
@@ -208,10 +276,19 @@ void UExposeRuntimeFunctionsBPLibrary::SetFPropertyValueInternal(FProperty* prop
 			// Update the data in the struct from ChannelData map
 			for (TFieldIterator<FProperty> It(StructProperty->Struct); It; ++It)
 			{
+
 				FString CurrentChannelNameAsString = It->GetFName().ToString();
 				const FString ColorValue = ChannelData[CurrentChannelNameAsString];
-				SetFPropertyValueInternal(*It, Object, ColorValue);
-				UE_LOG(LogTemp, Warning, TEXT("Struct property : %s"), *(It->GetFName().ToString()));
+				volatile auto _a = *It;
+				//UE_LOG(LogTemp, Warning, TEXT("Struct property : %s"), *(_a->NamePrivate.ToString()));
+				//SetFPropertyValueInternal(*It, Object, ColorValue);
+				//_a->setpro
+				//const TCHAR* ch = &ColorValue[0];
+				//It->ImportSingleProperty(ch, )
+
+				//It->CopyCompleteValue_InContainer()
+
+
 			}
 
 
@@ -229,7 +306,7 @@ void UExposeRuntimeFunctionsBPLibrary::SetFPropertyValueInternal(FProperty* prop
 		//	UE_LOG(LogTemp, Warning, TEXT("Hello"));
 		//}
 
-	   
+
 
 	}
 }
