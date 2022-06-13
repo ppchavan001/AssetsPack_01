@@ -145,22 +145,11 @@ void UExposeRuntimeFunctionsBPLibrary::SetFPropertyValueInternal(FProperty* prop
 
 			FScriptArrayHelper_InContainer Helper(ArrayProperty, InContainer);
 		
-			// If CSV array is longer than the array property items
-			// add duplicate array property items to equalize the length of two arrays 
-			//while (Helper.Num() != DataArray.Num())
-			//{
-			//	if (Helper.Num() < DataArray.Num())
-			//	{
-			//		//ArrayProperty->AddCppProperty(ArrayProperty->Inner);
-			//		
-			//	}
-			//	
-			//	else if (Helper.Num() > DataArray.Num())
-			//	{
-			//		ArrayProperty->DestroyValue_InContainer(InContainer);
-			//	}
-			//}
-
+			// Clear old values
+			Helper.EmptyValues(DataArray.Num());
+			
+			// Add empty values for assignment
+			Helper.AddValues(DataArray.Num());
 			
 			
 
@@ -171,10 +160,18 @@ void UExposeRuntimeFunctionsBPLibrary::SetFPropertyValueInternal(FProperty* prop
 			{
 				void* ValuePtr = Helper.GetRawPtr(DynamicIndex);
 
-				SetFPropertyValueInternal(ArrayProperty->Inner, ValuePtr, DataArray[DynamicIndex]);
+
+				// Data Cleaning and validation
+				FString Data = DataArray[DynamicIndex];
+				Data.TrimStartAndEndInline();
+				if (Data.Len() < 1)	Data = "0";
+
+				SetFPropertyValueInternal(ArrayProperty->Inner, ValuePtr, Data);
 
 			}
 		}
+
+
 
 		// *************************************************
 		// 
