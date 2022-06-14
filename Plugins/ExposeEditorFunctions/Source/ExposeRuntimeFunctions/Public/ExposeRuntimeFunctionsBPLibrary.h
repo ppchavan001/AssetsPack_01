@@ -34,7 +34,13 @@ class UExposeRuntimeFunctionsBPLibrary : public UBlueprintFunctionLibrary
 	static FKey GetKeyFromName(FName name);
 
 	UFUNCTION(BlueprintCallable, meta = (DisplayName = "Set Property Value By Name"), Category = "ExposeRuntimeFunctions | General")
-		static void SetFPropertyByName(UObject* Object, FName NameOfThePropertyToUpdate, const FString DataToSet);
+	static void SetFPropertyByName(UObject* Object, FName NameOfThePropertyToUpdate, const FString DataToSet);
 
 	static void SetFPropertyValueInternal(FProperty* property, void* Object, const FString DataToSet);
+
+	UFUNCTION(BlueprintCallable, meta = (DisplayName = "Buffer To String"), Category = "ExposeRuntimeFunctions | Type Conversions")
+	static FString BufferToString(const TArray<uint8>& DataBuffer);
+
+	UFUNCTION(BlueprintCallable, meta = (DisplayName = "String To Buffer"), Category = "ExposeRuntimeFunctions | Type Conversions")
+	static void StringToBuffer(const FString& message, TArray<uint8>& DataBuffer);
 };
