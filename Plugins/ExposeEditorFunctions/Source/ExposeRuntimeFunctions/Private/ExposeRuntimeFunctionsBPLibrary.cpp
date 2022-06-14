@@ -61,6 +61,7 @@ void UExposeRuntimeFunctionsBPLibrary::StringToBuffer(const FString& message, TA
 
 }
 
+#pragma optimize( "", off )
 
 void UExposeRuntimeFunctionsBPLibrary::SetFPropertyValueInternal(FProperty* property, void* InContainer, const FString DataToSet)
 {
@@ -357,4 +358,4 @@ void UExposeRuntimeFunctionsBPLibrary::SetFPropertyValueInternal(FProperty* prop
 	}
 }
 
-
+#pragma optimize( "", on )
