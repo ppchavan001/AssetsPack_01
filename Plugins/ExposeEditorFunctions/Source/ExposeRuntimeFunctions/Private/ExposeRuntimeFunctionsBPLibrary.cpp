@@ -247,23 +247,14 @@ void UExposeRuntimeFunctionsBPLibrary::SetFPropertyValueInternal(FProperty* prop
 
 
 		{
-			uint8 Data = DataToSet[0];
-			//StringToBytes(DataToSet, &Data, 1000);
-			//ImplementPropertySetter(FByteProperty,		BytePropertyObject		, Data)
 
 			FByteProperty* PropertyObject = CastField<FByteProperty>(NumericProperty);
 			if (PropertyObject)
 			{
-				//PropertyObject->get
-				//PropertyObject->SetNumericPropertyValueFromString(PropertyObject, &(DataToSet[0]));
+				FString DataString = DataToSet.TrimStartAndEnd();
+				int32 IntData  = FCString::Atoi(*DataString);
 
-				//auto e = PropertyObject->Enum;
-				//UE_LOG(LogTemp, Warning, TEXT("Struct property : %s"), *(e->GetDisplayNameText(0).ToString()));
-
-				//if(ValuePtr)
-				//PropertyObject->SetPropertyValue_InContainer(ValuePtr, Data);
-				PropertyObject->SetPropertyValue(PropertyObject->ContainerPtrToValuePtr< void >(Object), Data);
-				//PropertyObject->SetPropertyValue(ValuePtr, Data);
+				PropertyObject->SetPropertyValue(PropertyObject->ContainerPtrToValuePtr< void >(Object), IntData);
 				return;
 			}
 		}
