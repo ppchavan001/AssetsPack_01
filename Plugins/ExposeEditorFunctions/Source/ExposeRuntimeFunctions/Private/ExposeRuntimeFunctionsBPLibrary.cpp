@@ -242,46 +242,11 @@ void UExposeRuntimeFunctionsBPLibrary::SetFPropertyValueInternal(FProperty* prop
 
 		if (NumericProperty)
 		{
+			auto PropertyValuePtr = (NumericProperty->ContainerPtrToValuePtr< void >(Object));
+			FString DataString = DataToSet.TrimStartAndEnd();
 
-
-		#define ImplementPropertySetter(Type, PropertyObject, _Data)\
-			{\
-				Type* PropertyObject = CastField<Type>(NumericProperty);\
-				if (PropertyObject)\
-				{\
-					PropertyObject->SetPropertyValue(PropertyObject->ContainerPtrToValuePtr< void >(Object), _Data);\
-					return;\
-				}\
-			}\
-
-
-		{
-
-			FByteProperty* PropertyObject = CastField<FByteProperty>(NumericProperty);
-			if (PropertyObject)
-			{
-				FString DataString = DataToSet.TrimStartAndEnd();
-				int32 IntData  = FCString::Atoi(*DataString);
-
-				PropertyObject->SetPropertyValue(PropertyObject->ContainerPtrToValuePtr< void >(Object), IntData);
-				return;
-			}
-		}
-
-
-		ImplementPropertySetter(FDoubleProperty, DoublePropertyObject, FCString::Atod(*DataToSet))
-			ImplementPropertySetter(FFloatProperty, FloatPropertyObject, FCString::Atof(*DataToSet))
-			ImplementPropertySetter(FInt64Property, Int64PropertyObject, FCString::Atoi64(*DataToSet))
-			ImplementPropertySetter(FUInt32Property, UInt32PropertyObject, FCString::Atoi64(*DataToSet))
-			ImplementPropertySetter(FInt16Property, Int16PropertyObject, FCString::Atoi(*DataToSet))
-			ImplementPropertySetter(FInt8Property, Int8PropertyObject, FCString::Atoi(*DataToSet))
-			ImplementPropertySetter(FIntProperty, IntPropertyObject, FCString::Atoi(*DataToSet))
-
-
-
-
-
-
+			if (DataString.Len() == 0) DataString = "0";
+			NumericProperty->SetNumericPropertyValueFromString(PropertyValuePtr, &(DataString[0]));
 
 		}
 
