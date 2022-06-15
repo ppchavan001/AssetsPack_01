@@ -172,27 +172,12 @@ void UExposeRuntimeFunctionsBPLibrary::SetFPropertyValueInternal(FProperty* prop
 			
 			if (UnderlyingProperty)
 			{
-				int32 PropertySizeBytes = UnderlyingProperty->ElementSize;
-				TArray<uint8> ValueBytes;
 				auto PropertyValuePtr = (EnumProperty->ContainerPtrToValuePtr< void >(Object));
-				ValueBytes.SetNum(PropertySizeBytes);
-
 				FString DataString = DataToSet.TrimStartAndEnd();
-				int32 IntData = FCString::Atoi(*DataString);
 
-				auto d = uint8(IntData);
-				for (int i = 0; i < ValueBytes.Num(); ++i) ValueBytes[i] = d;
-				
+				if (DataString.Len() == 0) DataString = "0";
 
-				if (PropertyValuePtr)
-					FMemory::Memcpy(PropertyValuePtr, ValueBytes.GetData(), PropertySizeBytes);
-
-
-
-
-				/*FNumericProperty* UnderlyingProperty = EnumProperty->GetUnderlyingProperty();
-				void* ValueAddr = FoundProperty.GetPropertyAddress<void>(InSourceAddress, InIndex);
-				UnderlyingProperty->SetIntPropertyValue(PropertyValuePtr, InValue);*/
+				UnderlyingProperty->SetNumericPropertyValueFromString(PropertyValuePtr, &(DataString[0]));
 
 			}
 
@@ -287,7 +272,7 @@ void UExposeRuntimeFunctionsBPLibrary::SetFPropertyValueInternal(FProperty* prop
 		ImplementPropertySetter(FDoubleProperty, DoublePropertyObject, FCString::Atod(*DataToSet))
 			ImplementPropertySetter(FFloatProperty, FloatPropertyObject, FCString::Atof(*DataToSet))
 			ImplementPropertySetter(FInt64Property, Int64PropertyObject, FCString::Atoi64(*DataToSet))
-			ImplementPropertySetter(FUInt32Property, UInt32PropertyObject, FCString::Atoi(*DataToSet))
+			ImplementPropertySetter(FUInt32Property, UInt32PropertyObject, FCString::Atoi64(*DataToSet))
 			ImplementPropertySetter(FInt16Property, Int16PropertyObject, FCString::Atoi(*DataToSet))
 			ImplementPropertySetter(FInt8Property, Int8PropertyObject, FCString::Atoi(*DataToSet))
 			ImplementPropertySetter(FIntProperty, IntPropertyObject, FCString::Atoi(*DataToSet))
