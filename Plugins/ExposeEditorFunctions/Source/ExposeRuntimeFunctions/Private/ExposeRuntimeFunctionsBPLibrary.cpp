@@ -177,8 +177,23 @@ void UExposeRuntimeFunctionsBPLibrary::SetFPropertyValueInternal(FProperty* prop
 				auto PropertyValuePtr = (EnumProperty->ContainerPtrToValuePtr< void >(Object));
 				ValueBytes.SetNum(PropertySizeBytes);
 
-				if(PropertyValuePtr)
-				FMemory::Memcpy(PropertyValuePtr, ValueBytes.GetData(), PropertySizeBytes);
+				FString DataString = DataToSet.TrimStartAndEnd();
+				int32 IntData = FCString::Atoi(*DataString);
+
+				auto d = uint8(IntData);
+				for (int i = 0; i < ValueBytes.Num(); ++i) ValueBytes[i] = d;
+				
+
+				if (PropertyValuePtr)
+					FMemory::Memcpy(PropertyValuePtr, ValueBytes.GetData(), PropertySizeBytes);
+
+
+
+
+				/*FNumericProperty* UnderlyingProperty = EnumProperty->GetUnderlyingProperty();
+				void* ValueAddr = FoundProperty.GetPropertyAddress<void>(InSourceAddress, InIndex);
+				UnderlyingProperty->SetIntPropertyValue(PropertyValuePtr, InValue);*/
+
 			}
 
 			return;
