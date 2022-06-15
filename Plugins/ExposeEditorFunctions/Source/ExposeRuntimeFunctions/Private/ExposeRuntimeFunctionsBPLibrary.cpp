@@ -160,6 +160,7 @@ void UExposeRuntimeFunctionsBPLibrary::SetFPropertyValueInternal(FProperty* prop
 
 
 
+
 		// *************************************************
 		// 
 		// Enum Property
@@ -171,12 +172,20 @@ void UExposeRuntimeFunctionsBPLibrary::SetFPropertyValueInternal(FProperty* prop
 			
 			if (UnderlyingProperty)
 			{
-				SetFPropertyValueInternal(UnderlyingProperty, InContainer, DataToSet);
+				int32 PropertySizeBytes = UnderlyingProperty->ElementSize;
+				TArray<uint8> ValueBytes;
+				auto PropertyValuePtr = (EnumProperty->ContainerPtrToValuePtr< void >(Object));
+				ValueBytes.SetNum(PropertySizeBytes);
+
+				if(PropertyValuePtr)
+				FMemory::Memcpy(PropertyValuePtr, ValueBytes.GetData(), PropertySizeBytes);
 			}
 
-			//e->a
 			return;
 		}
+
+
+
 
 		// *************************************************
 		// 
