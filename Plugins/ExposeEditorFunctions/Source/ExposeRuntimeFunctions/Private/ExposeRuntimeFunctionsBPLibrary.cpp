@@ -268,7 +268,7 @@ void UExposeRuntimeFunctionsBPLibrary::SetFPropertyValueInternal(FProperty* prop
 
 
 			// Separate channel data by ":" from color data
-			TMap<FString, FString> ChannelData;
+			TMap<FString, float> ChannelData;
 			for (FString Data : ColorData)
 			{
 				FString Key;
@@ -280,28 +280,19 @@ void UExposeRuntimeFunctionsBPLibrary::SetFPropertyValueInternal(FProperty* prop
 				Value.TrimStartAndEndInline();
 
 
-				ChannelData.Add(Key, Value);
+				ChannelData.Add(Key, FCString::Atof(&(Value[0])));
 			}
 
+			
+			FColor ColorValue;
+			ColorValue.R = ChannelData["R"];
+			ColorValue.G = ChannelData["G"];
+			ColorValue.B = ChannelData["B"];
+			ColorValue.A = ChannelData["A"];
+			StructProperty->CopyCompleteValue(StructProperty->ContainerPtrToValuePtr< void >(Object), &ColorValue);
+			
+			return;
 
-
-			// Update the data in the struct from ChannelData map
-			for (TFieldIterator<FProperty> It(StructProperty->Struct); It; ++It)
-			{
-
-				FString CurrentChannelNameAsString = It->GetFName().ToString();
-				const FString ColorValue = ChannelData[CurrentChannelNameAsString];
-				volatile auto _a = *It;
-				//UE_LOG(LogTemp, Warning, TEXT("Struct property : %s"), *(_a->NamePrivate.ToString()));
-				//SetFPropertyValueInternal(*It, Object, ColorValue);
-				//_a->setpro
-				//const TCHAR* ch = &ColorValue[0];
-				//It->ImportSingleProperty(ch, )
-
-				//It->CopyCompleteValue_InContainer()
-
-
-			}
 
 
 			//FText Value = FText::FromString(DataToSet);
