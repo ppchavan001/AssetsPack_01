@@ -61,7 +61,7 @@ void UExposeRuntimeFunctionsBPLibrary::StringToBuffer(const FString& message, TA
 
 }
 
-#pragma optimize( "", off )
+
 
 void UExposeRuntimeFunctionsBPLibrary::SetFPropertyValueInternal(FProperty* property, void* InContainer, const FString DataToSet)
 {
@@ -103,7 +103,7 @@ void UExposeRuntimeFunctionsBPLibrary::SetFPropertyValueInternal(FProperty* prop
 		{
 			FString DataTrimmed = DataToSet.TrimStartAndEnd();
 
-			FName Value = FName(DataTrimmed);
+			FName Value = FName(*DataTrimmed);
 			NameProperty->SetPropertyValue(NameProperty->ContainerPtrToValuePtr< void >(Object), Value);
 
 			return;
@@ -262,8 +262,8 @@ void UExposeRuntimeFunctionsBPLibrary::SetFPropertyValueInternal(FProperty* prop
 		// vector, color, transform
 		// 
 		// *************************************************
-		
-		
+
+
 		FStructProperty* StructProperty = CastField<FStructProperty>(property);
 		if (StructProperty)
 		{
@@ -298,36 +298,39 @@ void UExposeRuntimeFunctionsBPLibrary::SetFPropertyValueInternal(FProperty* prop
 			}
 
 
-			
+
 			/*-----------------------------------------------------------
 			|															|
 			|	Key Definations	to lookup in loaded strings				|
 			|															|
 			-------------------------------------------------------------*/
 
+			// Update this value defending on the default value of the channel 
+			// ex Location = "0", scale = "1"
+		#define DefaultChannelValue "This value should never be used!"
 
-			// Return FString for specied channel
-			#define AssignChannelValue(Key) ChannelData.Contains(Key) && ChannelData[Key].Len() > 0 ? ChannelData[Key] : DefaultChannelValue
+		// Return FString for specied channel
+		#define AssignChannelValue(Key) ChannelData.Contains(Key) && ChannelData[Key].Len() > 0 ? ChannelData[Key] : DefaultChannelValue
 
 
-			#define ColorR	"R" 
-			#define ColorG 	"G"
-			#define ColorB 	"B"
-			#define ColorA 	"A"
+		#define ColorR	"R" 
+		#define ColorG 	"G"
+		#define ColorB 	"B"
+		#define ColorA 	"A"
 
-			#define LocationX "LocX"
-			#define LocationY "LocY"
-			#define LocationZ "LocZ"
+		#define LocationX "LocX"
+		#define LocationY "LocY"
+		#define LocationZ "LocZ"
 
-			#define RotationX "RotX" 
-			#define RotationY "RotY" 
-			#define RotationZ "RotZ"
-			#define RotationW "RotW"
+		#define RotationX "RotX" 
+		#define RotationY "RotY" 
+		#define RotationZ "RotZ"
+		#define RotationW "RotW"
 
-			#define ScaleX "ScaleX"
-			#define ScaleY "ScaleY"
-			#define ScaleZ "ScaleZ"
-			
+		#define ScaleX "ScaleX"
+		#define ScaleY "ScaleY"
+		#define ScaleZ "ScaleZ"
+
 
 		#define ImplementLocation FVector Location; \
 			Location.X = FCString::Atof(&(AssignChannelValue(LocationX))[0]);\
@@ -339,35 +342,34 @@ void UExposeRuntimeFunctionsBPLibrary::SetFPropertyValueInternal(FProperty* prop
 			Rotation.Y = FCString::Atof(&(AssignChannelValue(RotationY))[0]);\
 			Rotation.Z = FCString::Atof(&(AssignChannelValue(RotationZ))[0]);\
 			Rotation.W = FCString::Atof(&(AssignChannelValue(RotationW))[0]);
-					
+
 			// ---------------------
 			// Setup End
 			// ---------------------
-			
-			
-			
-			
-			
-			
-			// Color(0-255) Struct
+
+
+
+			// Vecotor i.e location, scale, etc
 			if (StuctTypeName == "Vector")
 			{
-				#define DefaultChannelValue "0"
+			#define DefaultChannelValue "0"
 				ImplementLocation;
-			
+
 				StructProperty->CopyCompleteValue(StructProperty->ContainerPtrToValuePtr< void >(Object), &Location);
 
 				return;
 
 			}
 
-			// Color(0-255) Struct
+
+
+			// Rotation
 			if (StuctTypeName == "Rotator")
 			{
-
 			#define DefaultChannelValue "0"
+
 				ImplementRotator;
-				
+
 				StructProperty->CopyCompleteValue(StructProperty->ContainerPtrToValuePtr< void >(Object), &Rotation);
 
 				return;
@@ -387,6 +389,7 @@ void UExposeRuntimeFunctionsBPLibrary::SetFPropertyValueInternal(FProperty* prop
 				ColorValue.G = FCString::Atoi(&(AssignChannelValue(ColorG))[0]);
 				ColorValue.B = FCString::Atoi(&(AssignChannelValue(ColorB))[0]);
 				ColorValue.A = FCString::Atoi(&(AssignChannelValue(ColorA))[0]);
+
 				StructProperty->CopyCompleteValue(StructProperty->ContainerPtrToValuePtr< void >(Object), &ColorValue);
 
 				return;
@@ -396,7 +399,7 @@ void UExposeRuntimeFunctionsBPLibrary::SetFPropertyValueInternal(FProperty* prop
 			// Transform
 			if (StuctTypeName == "Transform")
 			{
-				
+
 			#define DefaultChannelValue "0"
 
 				ImplementLocation;
@@ -411,11 +414,11 @@ void UExposeRuntimeFunctionsBPLibrary::SetFPropertyValueInternal(FProperty* prop
 				Scale.Y = FCString::Atof(&(AssignChannelValue(ScaleY))[0]);
 				Scale.Z = FCString::Atof(&(AssignChannelValue(ScaleZ))[0]);
 
-				
-				
+
+
 				FTransform Transform;
 				Transform.SetComponents(Rotation, Location, Scale);
-				
+
 				StructProperty->CopyCompleteValue(StructProperty->ContainerPtrToValuePtr< void >(Object), &Transform);
 
 				return;
@@ -428,4 +431,4 @@ void UExposeRuntimeFunctionsBPLibrary::SetFPropertyValueInternal(FProperty* prop
 	}
 }
 
-#pragma optimize( "", on )
+
