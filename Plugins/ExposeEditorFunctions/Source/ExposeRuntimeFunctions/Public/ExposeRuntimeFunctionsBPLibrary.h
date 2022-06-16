@@ -33,7 +33,37 @@ class UExposeRuntimeFunctionsBPLibrary : public UBlueprintFunctionLibrary
 	UFUNCTION(BlueprintPure, meta = (DisplayName = "Get Key From Name", Keywords = "Get Key From Name"), Category = "ExposeRuntimeFunctions | Input")
 	static FKey GetKeyFromName(FName name);
 
-	UFUNCTION(BlueprintCallable, meta = (DisplayName = "Set Property Value By Name"), Category = "ExposeRuntimeFunctions | General")
+	/*
+		Finds the property by name on the specified object and updates the value. 
+		
+		Supported property types : 
+		BoolProperty		: valid values -> "true" or "false", 
+		NameProperty		: valid values ->  any string will be converted to name, 
+		StrProperty			: valid values ->  any string  with content surrounded by double quotes("content") input = " " Content_" " var =" Content_",
+		TextProperty		: valid values -> Any string will be converted to text,
+		EnumProperty		: valid values -> 0 to (255 or max Enum size which ever is lower), 
+		ArrayProperty		: array of all supported types : valid values -> Comma separated values of the type, 
+		NumericProperty		: all numeric types : ex float, int, double, byte
+		StructProperty		: 
+			Color					: comma separated keys ex. R:0, G: 25, B:127, A:255
+			Vector(location, scale)	: comma separated keys ex. LocX: 125, LocY: 778, LocZ : -220
+			Rotator					: comma separated keys ex. RotX : -75, RotY: 76, RotZ: -650
+			Transform				: comma separated keys ex. LocX: 400,  RotZ: -100,   ScaleX: 12.2, ScaleY : -54, ScaleZ: 70 
+		
+
+
+		Types that are not supported:
+		MapProperty,
+		SetProperty,
+		ObjectPropertyBase,
+		DelegateProperty,
+		InterfaceProperty,
+		MulticastDelegateProperty,
+		NetPropertyHook
+
+
+	*/
+	UFUNCTION(BlueprintCallable, Category = "ExposeRuntimeFunctions | General", meta = (DisplayName = "Set Property Value By Name"))
 	static void SetFPropertyByName(UObject* Object, FName NameOfThePropertyToUpdate, const FString DataToSet);
 
 	static void SetFPropertyValueInternal(FProperty* property, void* Object, const FString DataToSet);
