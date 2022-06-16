@@ -38,6 +38,10 @@ class UExposeRuntimeFunctionsBPLibrary : public UBlueprintFunctionLibrary
 
 	static void SetFPropertyValueInternal(FProperty* property, void* Object, const FString DataToSet);
 
+	UFUNCTION(BlueprintCallable, meta = (DisplayName = "Get Property Class Name"), Category = "ExposeRuntimeFunctions | General")
+	static FString GetFPropertyClassName(UObject* Object, FName PropertyName);
+
+
 	UFUNCTION(BlueprintCallable, meta = (DisplayName = "Buffer To String"), Category = "ExposeRuntimeFunctions | Type Conversions")
 	static FString BufferToString(const TArray<uint8>& DataBuffer);
 

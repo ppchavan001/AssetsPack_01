@@ -431,4 +431,23 @@ void UExposeRuntimeFunctionsBPLibrary::SetFPropertyValueInternal(FProperty* prop
 	}
 }
 
+#pragma optimize( "", off )
+
+FString UExposeRuntimeFunctionsBPLibrary::GetFPropertyClassName(UObject* Object, FName PropertyName)
+{
+	if (Object)
+	{
+		UClass* _Class = Object->GetClass();
+
+		FProperty* property = _Class->FindPropertyByName(PropertyName);
+
+		if (property) return property->GetClass()->GetName();
+
+		return FString("Invalid Property name!");
+
+	}
+	return FString("Invalid Object!");
+}
+
+#pragma optimize( "", on )
 
