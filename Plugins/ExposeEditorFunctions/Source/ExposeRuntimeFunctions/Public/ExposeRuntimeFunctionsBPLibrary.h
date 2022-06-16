@@ -4,6 +4,8 @@
 
 #include "Kismet/BlueprintFunctionLibrary.h"
 #include "InputCore/Classes/InputCoreTypes.h"
+#include "UObject/UnrealType.h"
+
 #include "ExposeRuntimeFunctionsBPLibrary.generated.h"
 /* 
 *	Function library class.
@@ -23,15 +25,26 @@
 *	https://wiki.unrealengine.com/Custom_Blueprint_Node_Creation
 */
 
-
 UCLASS()
 class UExposeRuntimeFunctionsBPLibrary : public UBlueprintFunctionLibrary
 {
 	GENERATED_UCLASS_BODY()
 
 	UFUNCTION(BlueprintPure, meta = (DisplayName = "Get Key From Name", Keywords = "Get Key From Name"), Category = "ExposeRuntimeFunctions | Input")
-	static FKey ExposeRuntimeFunctionsSampleFunction(FName name);
+	static FKey GetKeyFromName(FName name);
 
-	UFUNCTION(BlueprintCallable, meta = (DisplayName = "Set UProperty By Name"), Category = "ExposeRuntimeFunctions | General")
-		static void SetFPropertyByName(UObject* Object, FName NameOfThePropertyToUpdate, const FString DataToSet);
+	UFUNCTION(BlueprintCallable, meta = (DisplayName = "Set Property Value By Name"), Category = "ExposeRuntimeFunctions | General")
+	static void SetFPropertyByName(UObject* Object, FName NameOfThePropertyToUpdate, const FString DataToSet);
+
+	static void SetFPropertyValueInternal(FProperty* property, void* Object, const FString DataToSet);
+
+	UFUNCTION(BlueprintCallable, meta = (DisplayName = "Get Property Class Name"), Category = "ExposeRuntimeFunctions | General")
+	static FString GetFPropertyClassName(UObject* Object, FName PropertyName);
+
+
+	UFUNCTION(BlueprintCallable, meta = (DisplayName = "Buffer To String"), Category = "ExposeRuntimeFunctions | Type Conversions")
+	static FString BufferToString(const TArray<uint8>& DataBuffer);
+
+	UFUNCTION(BlueprintCallable, meta = (DisplayName = "String To Buffer"), Category = "ExposeRuntimeFunctions | Type Conversions")
+	static void StringToBuffer(const FString& message, TArray<uint8>& DataBuffer);
 };

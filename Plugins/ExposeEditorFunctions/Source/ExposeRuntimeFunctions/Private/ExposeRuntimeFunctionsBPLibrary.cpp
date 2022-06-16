@@ -2,14 +2,18 @@
 
 #include "ExposeRuntimeFunctionsBPLibrary.h"
 #include "ExposeRuntimeFunctions.h"
+#include "UObject/PropertyAccessUtil.h"
+#include "UObject/UnrealType.h"
+
+#include <string>
 
 UExposeRuntimeFunctionsBPLibrary::UExposeRuntimeFunctionsBPLibrary(const FObjectInitializer& ObjectInitializer)
-: Super(ObjectInitializer)
+	: Super(ObjectInitializer)
 {
 
 }
 
-FKey UExposeRuntimeFunctionsBPLibrary::ExposeRuntimeFunctionsSampleFunction(FName name)
+FKey UExposeRuntimeFunctionsBPLibrary::GetKeyFromName(FName name)
 {
 	return FKey(name);
 
@@ -17,35 +21,432 @@ FKey UExposeRuntimeFunctionsBPLibrary::ExposeRuntimeFunctionsSampleFunction(FNam
 
 void UExposeRuntimeFunctionsBPLibrary::SetFPropertyByName(UObject* Object, FName NameOfThePropertyToUpdate, const FString DataToSet)
 {
+
 	if (Object)
 	{
 		UClass* _Class = Object->GetClass();
-		
+
 		FProperty* property = _Class->FindPropertyByName(NameOfThePropertyToUpdate);
-		
-		if (property)
+
+		SetFPropertyValueInternal(property, Object, DataToSet);
+	}
+}
+
+
+FString UExposeRuntimeFunctionsBPLibrary::BufferToString(const TArray<uint8>& DataBuffer)
+{
+
+	if (DataBuffer[DataBuffer.Num() - 1] == 0x00)
+	{
+		return UTF8_TO_TCHAR(DataBuffer.GetData());
+	}
+
+	TArray<uint8> tempBuffer;
+	tempBuffer.SetNum(DataBuffer.Num() + 1);
+	FMemory::Memcpy(tempBuffer.GetData(), DataBuffer.GetData(), DataBuffer.Num());
+	tempBuffer[tempBuffer.Num() - 1] = 0x00;
+
+	return UTF8_TO_TCHAR(tempBuffer.GetData());
+}
+
+
+void UExposeRuntimeFunctionsBPLibrary::StringToBuffer(const FString& message, TArray<uint8>& DataBuffer)
+{
+	std::string _str = TCHAR_TO_UTF8(*message);
+
+	DataBuffer.SetNum(_str.size() + 1);
+	DataBuffer[DataBuffer.Num() - 1] = 0x00;
+
+	FMemory::Memcpy(DataBuffer.GetData(), _str.c_str(), _str.size());
+
+}
+
+
+
+void UExposeRuntimeFunctionsBPLibrary::SetFPropertyValueInternal(FProperty* property, void* InContainer, const FString DataToSet)
+{
+
+#define Object InContainer
+
+	// If property is valid for the object
+	// Determine property type
+	if (property && Object)
+	{
+
+
+
+		// *************************************************
+		// 
+		// Bool Property
+		// 
+		// *************************************************
+
+		if (FBoolProperty* BoolProperty = CastField<FBoolProperty>(property))
+		{
+			FString DataTrimmed = DataToSet.TrimStartAndEnd();
+
+			bool bValue = DataTrimmed.Compare("true", ESearchCase::IgnoreCase) == 0;
+			BoolProperty->SetPropertyValue(BoolProperty->ContainerPtrToValuePtr< void >(Object), bValue);
+
+			return;
+		}
+
+
+
+		// *************************************************
+		// 
+		// Name Property
+		// 
+		// *************************************************
+
+		if (FNameProperty* NameProperty = CastField<FNameProperty>(property))
+		{
+			FString DataTrimmed = DataToSet.TrimStartAndEnd();
+
+			FName Value = FName(*DataTrimmed);
+			NameProperty->SetPropertyValue(NameProperty->ContainerPtrToValuePtr< void >(Object), Value);
+
+			return;
+		}
+
+
+
+		// *************************************************
+		// 
+		// String Property
+		// 
+		// *************************************************
+
+		if (FStrProperty* StrProperty = CastField<FStrProperty>(property))
+		{
+			FString StringData = DataToSet;
+
+
+			// Remove unwanted chars outside of " " 
+			StringData.Split("\"", NULL, &StringData);
+			StringData.Split("\"", &StringData, NULL);
+
+
+			StrProperty->SetPropertyValue(StrProperty->ContainerPtrToValuePtr< void >(Object), StringData);
+
+			return;
+		}
+
+
+
+
+
+		// *************************************************
+		// 
+		// Text Property
+		// 
+		// *************************************************
+		if (FTextProperty* TextProperty = CastField<FTextProperty>(property))
 		{
 
-			FBoolProperty* BoolProperty = CastFieldChecked<FBoolProperty>(property);
+			FString StringData = DataToSet;
 
-			if (BoolProperty)
+
+			// Remove unwanted chars outside of " " 
+			StringData.Split("\"", NULL, &StringData);
+			StringData.Split("\"", &StringData, NULL);
+
+
+			FText Value = FText::FromString(StringData);
+			TextProperty->SetPropertyValue(TextProperty->ContainerPtrToValuePtr< void >(Object), Value);
+
+			return;
+		}
+
+
+
+
+		// *************************************************
+		// 
+		// Enum Property
+		// 
+		// *************************************************
+		if (FEnumProperty* EnumProperty = CastField<FEnumProperty>(property))
+		{
+			FNumericProperty* UnderlyingProperty = EnumProperty->GetUnderlyingProperty();
+
+			if (UnderlyingProperty)
 			{
-				bool bValue = DataToSet.Compare("true", ESearchCase::IgnoreCase) == 0;
-				BoolProperty->SetPropertyValue(BoolProperty->ContainerPtrToValuePtr< void >(Object), bValue);
+				auto PropertyValuePtr = (EnumProperty->ContainerPtrToValuePtr< void >(Object));
+				FString DataString = DataToSet.TrimStartAndEnd();
+
+				if (DataString.Len() == 0) DataString = "0";
+
+				UnderlyingProperty->SetNumericPropertyValueFromString(PropertyValuePtr, &(DataString[0]));
+
+			}
+
+			return;
+		}
+
+
+
+
+		// *************************************************
+		// 
+		// Array Property
+		// 
+		// Array of int, float, bool, etc
+		// 
+		// *************************************************
+		if (FArrayProperty* ArrayProperty = CastField<FArrayProperty>(property))
+		{
+
+			// Build CSV array
+			TArray<FString> DataArray;
+			DataToSet.ParseIntoArray(DataArray, *FString(","), false);
+
+
+			FScriptArrayHelper_InContainer Helper(ArrayProperty, InContainer);
+
+			// Clear old values
+			Helper.EmptyValues(DataArray.Num());
+
+			// Add empty values for assignment
+			Helper.AddValues(DataArray.Num());
+
+
+
+			// Assign string values from Data Array to Array property
+			volatile auto x = Helper.Num();
+
+			for (int32 DynamicIndex = 0; DynamicIndex < Helper.Num(); ++DynamicIndex)
+			{
+				void* ValuePtr = Helper.GetRawPtr(DynamicIndex);
+
+
+				// Data Cleaning and validation
+				FString Data = DataArray[DynamicIndex];
+				Data.TrimStartAndEndInline();
+				if (Data.Len() < 1)	Data = "0";
+
+				SetFPropertyValueInternal(ArrayProperty->Inner, ValuePtr, Data);
+
+			}
+
+			return;
+		}
+
+
+
+		// *************************************************
+		// 
+		// Numeric Property 
+		// int, float, double
+		// 
+		// *************************************************
+		FNumericProperty* NumericProperty = CastField<FNumericProperty>(property);
+
+		if (NumericProperty)
+		{
+			auto PropertyValuePtr = (NumericProperty->ContainerPtrToValuePtr< void >(Object));
+			FString DataString = DataToSet.TrimStartAndEnd();
+
+			if (DataString.Len() == 0) DataString = "0";
+			NumericProperty->SetNumericPropertyValueFromString(PropertyValuePtr, &(DataString[0]));
+
+			return;
+		}
+
+
+
+
+		// *************************************************
+		// 
+		// FStruct Property 
+		// vector, color, transform
+		// 
+		// *************************************************
+
+
+		FStructProperty* StructProperty = CastField<FStructProperty>(property);
+		if (StructProperty)
+		{
+			// ---------------------
+			// Setup Start
+			// ---------------------
+
+			FString StuctTypeName = FString(StructProperty->Struct->GetName());
+
+
+			// Get CSV data from string
+			TArray<FString> KeyValPairArray;
+			DataToSet.ParseIntoArray(KeyValPairArray, *FString(","), false);
+
+
+			// Separate channel data by ":" from CSV data
+			TMap<FString, FString> ChannelData;
+			for (FString Data : KeyValPairArray)
+			{
+				FString Key;
+				FString Value;
+
+				Data.Split(":", &Key, &Value);
+
+				Key.TrimStartAndEndInline();
+				Value.TrimStartAndEndInline();
+
+
+				// If key is present then add it as a channel
+				if (Key.Len() > 0)	ChannelData.Add(Key, Value);
+
+			}
+
+
+
+			/*-----------------------------------------------------------
+			|															|
+			|	Key Definations	to lookup in loaded strings				|
+			|															|
+			-------------------------------------------------------------*/
+
+			// Update this value defending on the default value of the channel 
+			// ex Location = "0", scale = "1"
+		#define DefaultChannelValue "This value should never be used!"
+
+		// Return FString for specied channel
+		#define AssignChannelValue(Key) ChannelData.Contains(Key) && ChannelData[Key].Len() > 0 ? ChannelData[Key] : DefaultChannelValue
+
+
+		#define ColorR	"R" 
+		#define ColorG 	"G"
+		#define ColorB 	"B"
+		#define ColorA 	"A"
+
+		#define LocationX "LocX"
+		#define LocationY "LocY"
+		#define LocationZ "LocZ"
+
+		#define RotationX "RotX" 
+		#define RotationY "RotY" 
+		#define RotationZ "RotZ"
+		#define RotationW "RotW"
+
+		#define ScaleX "ScaleX"
+		#define ScaleY "ScaleY"
+		#define ScaleZ "ScaleZ"
+
+
+		#define ImplementLocation FVector Location; \
+			Location.X = FCString::Atof(&(AssignChannelValue(LocationX))[0]);\
+			Location.Y = FCString::Atof(&(AssignChannelValue(LocationY))[0]);\
+			Location.Z = FCString::Atof(&(AssignChannelValue(LocationZ))[0]);
+
+		#define ImplementRotator FQuat Rotation;\
+			Rotation.X = FCString::Atof(&(AssignChannelValue(RotationX))[0]);\
+			Rotation.Y = FCString::Atof(&(AssignChannelValue(RotationY))[0]);\
+			Rotation.Z = FCString::Atof(&(AssignChannelValue(RotationZ))[0]);\
+			Rotation.W = FCString::Atof(&(AssignChannelValue(RotationW))[0]);
+
+			// ---------------------
+			// Setup End
+			// ---------------------
+
+
+
+			// Vecotor i.e location, scale, etc
+			if (StuctTypeName == "Vector")
+			{
+			#define DefaultChannelValue "0"
+				ImplementLocation;
+
+				StructProperty->CopyCompleteValue(StructProperty->ContainerPtrToValuePtr< void >(Object), &Location);
+
+				return;
+
+			}
+
+
+
+			// Rotation
+			if (StuctTypeName == "Rotator")
+			{
+			#define DefaultChannelValue "0"
+
+				ImplementRotator;
+
+				StructProperty->CopyCompleteValue(StructProperty->ContainerPtrToValuePtr< void >(Object), &Rotation);
+
+				return;
+
+			}
+
+
+			// Color(0-255) Struct
+			if (StuctTypeName == "Color")
+			{
+
+			#define DefaultChannelValue "255"
+
+
+				FColor ColorValue;
+				ColorValue.R = FCString::Atoi(&(AssignChannelValue(ColorR))[0]);
+				ColorValue.G = FCString::Atoi(&(AssignChannelValue(ColorG))[0]);
+				ColorValue.B = FCString::Atoi(&(AssignChannelValue(ColorB))[0]);
+				ColorValue.A = FCString::Atoi(&(AssignChannelValue(ColorA))[0]);
+
+				StructProperty->CopyCompleteValue(StructProperty->ContainerPtrToValuePtr< void >(Object), &ColorValue);
+
+				return;
+
+			}
+
+			// Transform
+			if (StuctTypeName == "Transform")
+			{
+
+			#define DefaultChannelValue "0"
+
+				ImplementLocation;
+				ImplementRotator;
+
+
+
+			#define DefaultChannelValue "1"
+
+				FVector Scale;
+				Scale.X = FCString::Atof(&(AssignChannelValue(ScaleX))[0]);
+				Scale.Y = FCString::Atof(&(AssignChannelValue(ScaleY))[0]);
+				Scale.Z = FCString::Atof(&(AssignChannelValue(ScaleZ))[0]);
+
+
+
+				FTransform Transform;
+				Transform.SetComponents(Rotation, Location, Scale);
+
+				StructProperty->CopyCompleteValue(StructProperty->ContainerPtrToValuePtr< void >(Object), &Transform);
 
 				return;
 			}
 
-		   /*Cast<FArrayProperty*>(property)
-		   Cast<FEnumProperty*>(property)
-		   Cast<FMapProperty*>(property)
-		   Cast<FNameProperty*>(property)
-		   Cast<FNumericProperty*>(property)
-		   Cast<FSetProperty*>(property)
-		   Cast<FStrProperty*>(property)
-		   Cast<FStructProperty*>(property)
-		   Cast<FTextProperty*>(property)*/
-
+			return;
 		}
+
+
 	}
 }
+
+
+FString UExposeRuntimeFunctionsBPLibrary::GetFPropertyClassName(UObject* Object, FName PropertyName)
+{
+	if (Object)
+	{
+		UClass* _Class = Object->GetClass();
+
+		FProperty* property = _Class->FindPropertyByName(PropertyName);
+
+		if (property) return property->GetClass()->GetName();
+
+		return FString("Invalid Property name!");
+
+	}
+	return FString("Invalid Object!");
+}
+
+
+
