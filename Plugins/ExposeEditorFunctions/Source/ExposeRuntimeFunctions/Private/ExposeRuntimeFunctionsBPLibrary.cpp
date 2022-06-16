@@ -169,7 +169,7 @@ void UExposeRuntimeFunctionsBPLibrary::SetFPropertyValueInternal(FProperty* prop
 		if (FEnumProperty* EnumProperty = CastField<FEnumProperty>(property))
 		{
 			FNumericProperty* UnderlyingProperty = EnumProperty->GetUnderlyingProperty();
-			
+
 			if (UnderlyingProperty)
 			{
 				auto PropertyValuePtr = (EnumProperty->ContainerPtrToValuePtr< void >(Object));
@@ -203,14 +203,14 @@ void UExposeRuntimeFunctionsBPLibrary::SetFPropertyValueInternal(FProperty* prop
 
 
 			FScriptArrayHelper_InContainer Helper(ArrayProperty, InContainer);
-		
+
 			// Clear old values
 			Helper.EmptyValues(DataArray.Num());
-			
+
 			// Add empty values for assignment
 			Helper.AddValues(DataArray.Num());
-			
-			
+
+
 
 			// Assign string values from Data Array to Array property
 			volatile auto x = Helper.Num();
@@ -228,6 +228,8 @@ void UExposeRuntimeFunctionsBPLibrary::SetFPropertyValueInternal(FProperty* prop
 				SetFPropertyValueInternal(ArrayProperty->Inner, ValuePtr, Data);
 
 			}
+
+			return;
 		}
 
 
@@ -248,6 +250,7 @@ void UExposeRuntimeFunctionsBPLibrary::SetFPropertyValueInternal(FProperty* prop
 			if (DataString.Len() == 0) DataString = "0";
 			NumericProperty->SetNumericPropertyValueFromString(PropertyValuePtr, &(DataString[0]));
 
+			return;
 		}
 
 
@@ -259,17 +262,26 @@ void UExposeRuntimeFunctionsBPLibrary::SetFPropertyValueInternal(FProperty* prop
 		// vector, color, transform
 		// 
 		// *************************************************
+		
+		
 		FStructProperty* StructProperty = CastField<FStructProperty>(property);
 		if (StructProperty)
 		{
-			// Get Color data from string
-			TArray<FString> ColorData;
-			DataToSet.ParseIntoArray(ColorData, *FString(","), false);
+			// ---------------------
+			// Setup Start
+			// ---------------------
+
+			FString StuctTypeName = FString(StructProperty->Struct->GetName());
 
 
-			// Separate channel data by ":" from color data
-			TMap<FString, float> ChannelData;
-			for (FString Data : ColorData)
+			// Get CSV data from string
+			TArray<FString> KeyValPairArray;
+			DataToSet.ParseIntoArray(KeyValPairArray, *FString(","), false);
+
+
+			// Separate channel data by ":" from CSV data
+			TMap<FString, FString> ChannelData;
+			for (FString Data : KeyValPairArray)
 			{
 				FString Key;
 				FString Value;
@@ -280,35 +292,137 @@ void UExposeRuntimeFunctionsBPLibrary::SetFPropertyValueInternal(FProperty* prop
 				Value.TrimStartAndEndInline();
 
 
-				ChannelData.Add(Key, FCString::Atof(&(Value[0])));
+				// If key is present then add it as a channel
+				if (Key.Len() > 0)	ChannelData.Add(Key, Value);
+
 			}
 
+
 			
-			FColor ColorValue;
-			ColorValue.R = ChannelData["R"];
-			ColorValue.G = ChannelData["G"];
-			ColorValue.B = ChannelData["B"];
-			ColorValue.A = ChannelData["A"];
-			StructProperty->CopyCompleteValue(StructProperty->ContainerPtrToValuePtr< void >(Object), &ColorValue);
+			/*-----------------------------------------------------------
+			|															|
+			|	Key Definations	to lookup in loaded strings				|
+			|															|
+			-------------------------------------------------------------*/
+
+
+			// Return FString for specied channel
+			#define AssignChannelValue(Key) ChannelData.Contains(Key) && ChannelData[Key].Len() > 0 ? ChannelData[Key] : DefaultChannelValue
+
+
+			#define ColorR	"R" 
+			#define ColorG 	"G"
+			#define ColorB 	"B"
+			#define ColorA 	"A"
+
+			#define LocationX "LocX"
+			#define LocationY "LocY"
+			#define LocationZ "LocZ"
+
+			#define RotationX "RotX" 
+			#define RotationY "RotY" 
+			#define RotationZ "RotZ"
+			#define RotationW "RotW"
+
+			#define ScaleX "ScaleX"
+			#define ScaleY "ScaleY"
+			#define ScaleZ "ScaleZ"
 			
+
+		#define ImplementLocation FVector Location; \
+			Location.X = FCString::Atof(&(AssignChannelValue(LocationX))[0]);\
+			Location.Y = FCString::Atof(&(AssignChannelValue(LocationY))[0]);\
+			Location.Z = FCString::Atof(&(AssignChannelValue(LocationZ))[0]);
+
+		#define ImplementRotator FQuat Rotation;\
+			Rotation.X = FCString::Atof(&(AssignChannelValue(RotationX))[0]);\
+			Rotation.Y = FCString::Atof(&(AssignChannelValue(RotationY))[0]);\
+			Rotation.Z = FCString::Atof(&(AssignChannelValue(RotationZ))[0]);\
+			Rotation.W = FCString::Atof(&(AssignChannelValue(RotationW))[0]);
+					
+			// ---------------------
+			// Setup End
+			// ---------------------
+			
+			
+			
+			
+			
+			
+			// Color(0-255) Struct
+			if (StuctTypeName == "Vector")
+			{
+				#define DefaultChannelValue "0"
+				ImplementLocation;
+			
+				StructProperty->CopyCompleteValue(StructProperty->ContainerPtrToValuePtr< void >(Object), &Location);
+
+				return;
+
+			}
+
+			// Color(0-255) Struct
+			if (StuctTypeName == "Rotator")
+			{
+
+			#define DefaultChannelValue "0"
+				ImplementRotator;
+				
+				StructProperty->CopyCompleteValue(StructProperty->ContainerPtrToValuePtr< void >(Object), &Rotation);
+
+				return;
+
+			}
+
+
+			// Color(0-255) Struct
+			if (StuctTypeName == "Color")
+			{
+
+			#define DefaultChannelValue "255"
+
+
+				FColor ColorValue;
+				ColorValue.R = FCString::Atoi(&(AssignChannelValue(ColorR))[0]);
+				ColorValue.G = FCString::Atoi(&(AssignChannelValue(ColorG))[0]);
+				ColorValue.B = FCString::Atoi(&(AssignChannelValue(ColorB))[0]);
+				ColorValue.A = FCString::Atoi(&(AssignChannelValue(ColorA))[0]);
+				StructProperty->CopyCompleteValue(StructProperty->ContainerPtrToValuePtr< void >(Object), &ColorValue);
+
+				return;
+
+			}
+
+			// Transform
+			if (StuctTypeName == "Transform")
+			{
+				
+			#define DefaultChannelValue "0"
+
+				ImplementLocation;
+				ImplementRotator;
+
+
+
+			#define DefaultChannelValue "1"
+
+				FVector Scale;
+				Scale.X = FCString::Atof(&(AssignChannelValue(ScaleX))[0]);
+				Scale.Y = FCString::Atof(&(AssignChannelValue(ScaleY))[0]);
+				Scale.Z = FCString::Atof(&(AssignChannelValue(ScaleZ))[0]);
+
+				
+				
+				FTransform Transform;
+				Transform.SetComponents(Rotation, Location, Scale);
+				
+				StructProperty->CopyCompleteValue(StructProperty->ContainerPtrToValuePtr< void >(Object), &Transform);
+
+				return;
+			}
+
 			return;
-
-
-
-			//FText Value = FText::FromString(DataToSet);
-			//StructProperty->Struct->
-
-			//	//SetPropertyValue(StructProperty->ContainerPtrToValuePtr< void >(Object), Value);
-			//return;
 		}
-
-		//const EPropertyAccessResultFlags AccessResult = EPropertyAccessResultFlags::Success;//PropertyAccessUtil::SetPropertyValue_Object(ObjectProp, Object, ValueProp, ValuePtr, INDEX_NONE, PropertyAccessUtil::EditorReadOnlyFlags, ChangeNotifyMode);
-		//if (AccessResult != EPropertyAccessResultFlags::Success)
-		//{
-
-		//	UE_LOG(LogTemp, Warning, TEXT("Hello"));
-		//}
-
 
 
 	}
