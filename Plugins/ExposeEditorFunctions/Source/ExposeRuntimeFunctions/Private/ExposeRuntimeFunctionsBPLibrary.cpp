@@ -77,7 +77,7 @@ void UExposeRuntimeFunctionsBPLibrary::SetFPropertyValueInternal(FProperty* prop
 
 		// *************************************************
 		// 
-		// Bool Property
+		// BoolProperty		: valid values -> "true" or "false"
 		// 
 		// *************************************************
 
@@ -95,7 +95,7 @@ void UExposeRuntimeFunctionsBPLibrary::SetFPropertyValueInternal(FProperty* prop
 
 		// *************************************************
 		// 
-		// Name Property
+		// NameProperty	: valid values ->  any string will be converted to name
 		// 
 		// *************************************************
 
@@ -113,21 +113,13 @@ void UExposeRuntimeFunctionsBPLibrary::SetFPropertyValueInternal(FProperty* prop
 
 		// *************************************************
 		// 
-		// String Property
+		// StrProperty	: valid values ->  any string
 		// 
 		// *************************************************
 
 		if (FStrProperty* StrProperty = CastField<FStrProperty>(property))
 		{
-			FString StringData = DataToSet;
-
-
-			// Remove unwanted chars outside of " " 
-			StringData.Split("\"", NULL, &StringData);
-			StringData.Split("\"", &StringData, NULL);
-
-
-			StrProperty->SetPropertyValue(StrProperty->ContainerPtrToValuePtr< void >(Object), StringData);
+			StrProperty->SetPropertyValue(StrProperty->ContainerPtrToValuePtr< void >(Object), DataToSet);
 
 			return;
 		}
@@ -138,21 +130,12 @@ void UExposeRuntimeFunctionsBPLibrary::SetFPropertyValueInternal(FProperty* prop
 
 		// *************************************************
 		// 
-		// Text Property
+		// TextProperty		: valid values -> Any string will be converted to text
 		// 
 		// *************************************************
 		if (FTextProperty* TextProperty = CastField<FTextProperty>(property))
 		{
-
-			FString StringData = DataToSet;
-
-
-			// Remove unwanted chars outside of " " 
-			StringData.Split("\"", NULL, &StringData);
-			StringData.Split("\"", &StringData, NULL);
-
-
-			FText Value = FText::FromString(StringData);
+			FText Value = FText::FromString(DataToSet);
 			TextProperty->SetPropertyValue(TextProperty->ContainerPtrToValuePtr< void >(Object), Value);
 
 			return;
@@ -163,7 +146,7 @@ void UExposeRuntimeFunctionsBPLibrary::SetFPropertyValueInternal(FProperty* prop
 
 		// *************************************************
 		// 
-		// Enum Property
+		// EnumProperty		: valid values -> 0 to (255 or max Enum size which ever is lower), 
 		// 
 		// *************************************************
 		if (FEnumProperty* EnumProperty = CastField<FEnumProperty>(property))
@@ -192,6 +175,7 @@ void UExposeRuntimeFunctionsBPLibrary::SetFPropertyValueInternal(FProperty* prop
 		// Array Property
 		// 
 		// Array of int, float, bool, etc
+		// : valid values -> Comma separated values of the supported type
 		// 
 		// *************************************************
 		if (FArrayProperty* ArrayProperty = CastField<FArrayProperty>(property))
@@ -240,9 +224,8 @@ void UExposeRuntimeFunctionsBPLibrary::SetFPropertyValueInternal(FProperty* prop
 		// int, float, double
 		// 
 		// *************************************************
-		FNumericProperty* NumericProperty = CastField<FNumericProperty>(property);
 
-		if (NumericProperty)
+		if (FNumericProperty* NumericProperty = CastField<FNumericProperty>(property))
 		{
 			auto PropertyValuePtr = (NumericProperty->ContainerPtrToValuePtr< void >(Object));
 			FString DataString = DataToSet.TrimStartAndEnd();
@@ -260,6 +243,13 @@ void UExposeRuntimeFunctionsBPLibrary::SetFPropertyValueInternal(FProperty* prop
 		// 
 		// FStruct Property 
 		// vector, color, transform
+		// : 
+		//	Color					: comma separated keys ex. R:0, G: 25, B:127, A:255 or CSV in same order
+		//	Vector(location, scale)	: comma separated keys ex. LocX: 125, LocY: 778, LocZ : -220 or CSV in same order
+		//	Rotator					: comma separated keys ex. RotX : -75, RotY: 76, RotZ: -650 or CSV in same order
+		//	Transform				: comma separated keys ex. LocX: 400,  RotZ: -100,   ScaleX: 12.2, ScaleY : -54, ScaleZ: 70 
+		//								or CSV in Loc(x,y,z), Rotation(x,y,z), Scale(x,y,z)
+		//
 		// 
 		// *************************************************
 
@@ -301,15 +291,15 @@ void UExposeRuntimeFunctionsBPLibrary::SetFPropertyValueInternal(FProperty* prop
 
 			/*-----------------------------------------------------------
 			|															|
-			|	Key Definations	to lookup in loaded strings				|
+			|	Key Definitions	to lookup in loaded strings				|
 			|															|
 			-------------------------------------------------------------*/
 
 			// Update this value defending on the default value of the channel 
 			// ex Location = "0", scale = "1"
-		#define DefaultChannelValue "This value should never be used!"
+		#define DefaultChannelValue "This value should never be used! Replace with default value for the channel"
 
-		// Return FString for specied channel
+		// Return FString for specified channel
 		#define AssignChannelValue(Key) ChannelData.Contains(Key) && ChannelData[Key].Len() > 0 ? ChannelData[Key] : DefaultChannelValue
 
 
@@ -349,7 +339,7 @@ void UExposeRuntimeFunctionsBPLibrary::SetFPropertyValueInternal(FProperty* prop
 
 
 
-			// Vecotor i.e location, scale, etc
+			// Vector i.e location, scale, etc
 			if (StuctTypeName == "Vector")
 			{
 			#define DefaultChannelValue "0"
