@@ -265,13 +265,13 @@ void UExposeRuntimeFunctionsBPLibrary::SetFPropertyValueInternal(FProperty* prop
 
 
 			// Get CSV data from string
-			TArray<FString> KeyValPairArray;
-			DataToSet.ParseIntoArray(KeyValPairArray, *FString(","), false);
+			TArray<FString> CSVArray;
+			DataToSet.ParseIntoArray(CSVArray, *FString(","), false);
 
 
 			// Separate channel data by ":" from CSV data
 			TMap<FString, FString> ChannelData;
-			for (FString Data : KeyValPairArray)
+			for (FString Data : CSVArray)
 			{
 				FString Key;
 				FString Value;
@@ -289,21 +289,30 @@ void UExposeRuntimeFunctionsBPLibrary::SetFPropertyValueInternal(FProperty* prop
 
 
 
-			/*-----------------------------------------------------------
-			|															|
-			|	Key Definitions	to lookup in loaded strings				|
-			|															|
-			-------------------------------------------------------------*/
+		/*-----------------------------------------------------------
+		|															|
+		|	Key Definitions	to lookup in loaded strings				|
+		|															|
+		-------------------------------------------------------------*/
 
-			// Update this value defending on the default value of the channel 
-			// ex Location = "0", scale = "1"
+
+
+		// Update this value defending on the default value of the channel 
+		// ex Location = "0", scale = "1"
 		#define DefaultChannelValue "This value should never be used! Replace with default value for the channel"
 
 		// Return FString for specified channel
-		#define AssignChannelValue(Key) ChannelData.Contains(Key) && ChannelData[Key].Len() > 0 ? ChannelData[Key] : DefaultChannelValue
+		// If key is defined 
+		//		return value for key
+		// else 
+		//	if index is valid
+		//		return Value at index 
+		//	else 
+		//		return default value for channel
+		#define AssignChannelValue(Key, Index) (ChannelData.Contains(Key) && ChannelData[Key].Len() > 0) ? ChannelData[Key] : ((CSVArray.Num() > Index && !(CSVArray[Index].Contains(":"))) ? CSVArray[Index] : DefaultChannelValue)
 
 
-		#define ColorR	"R" 
+		#define ColorR	"R"
 		#define ColorG 	"G"
 		#define ColorB 	"B"
 		#define ColorA 	"A"
@@ -312,8 +321,9 @@ void UExposeRuntimeFunctionsBPLibrary::SetFPropertyValueInternal(FProperty* prop
 		#define LocationY "LocY"
 		#define LocationZ "LocZ"
 
-		#define RotationX "RotX" 
-		#define RotationY "RotY" 
+
+		#define RotationX "RotX"
+		#define RotationY "RotY"
 		#define RotationZ "RotZ"
 		#define RotationW "RotW"
 
@@ -321,29 +331,34 @@ void UExposeRuntimeFunctionsBPLibrary::SetFPropertyValueInternal(FProperty* prop
 		#define ScaleY "ScaleY"
 		#define ScaleZ "ScaleZ"
 
+		#define ImplementLocation(LocationXIndex, LocationYIndex, LocationZIndex) \
+			FVector Location;\
+			Location.X = FCString::Atof(&(AssignChannelValue(LocationX, LocationXIndex))[0]);\
+			Location.Y = FCString::Atof(&(AssignChannelValue(LocationY, LocationYIndex))[0]);\
+			Location.Z = FCString::Atof(&(AssignChannelValue(LocationZ, LocationZIndex))[0]);
 
-		#define ImplementLocation FVector Location; \
-			Location.X = FCString::Atof(&(AssignChannelValue(LocationX))[0]);\
-			Location.Y = FCString::Atof(&(AssignChannelValue(LocationY))[0]);\
-			Location.Z = FCString::Atof(&(AssignChannelValue(LocationZ))[0]);
+		#define ImplementRotator(RotationXIndex, RotationYIndex, RotationZIndex, RotationWIndex) \
+			FQuat Rotation;\
+			Rotation.X = FCString::Atof(&(AssignChannelValue(RotationX, RotationXIndex))[0]);\
+			Rotation.Y = FCString::Atof(&(AssignChannelValue(RotationY, RotationYIndex))[0]);\
+			Rotation.Z = FCString::Atof(&(AssignChannelValue(RotationZ, RotationZIndex))[0]);\
+			Rotation.W = FCString::Atof(&(AssignChannelValue(RotationW, RotationWIndex))[0]);
 
-		#define ImplementRotator FQuat Rotation;\
-			Rotation.X = FCString::Atof(&(AssignChannelValue(RotationX))[0]);\
-			Rotation.Y = FCString::Atof(&(AssignChannelValue(RotationY))[0]);\
-			Rotation.Z = FCString::Atof(&(AssignChannelValue(RotationZ))[0]);\
-			Rotation.W = FCString::Atof(&(AssignChannelValue(RotationW))[0]);
+
+		//Reset warning for macros with multiple values
+		#pragma warning (default: 4003) 
 
 			// ---------------------
 			// Setup End
 			// ---------------------
 
 
-
 			// Vector i.e location, scale, etc
 			if (StuctTypeName == "Vector")
 			{
 			#define DefaultChannelValue "0"
-				ImplementLocation;
+
+				ImplementLocation(0, 1, 2);
 
 				StructProperty->CopyCompleteValue(StructProperty->ContainerPtrToValuePtr< void >(Object), &Location);
 
@@ -358,7 +373,7 @@ void UExposeRuntimeFunctionsBPLibrary::SetFPropertyValueInternal(FProperty* prop
 			{
 			#define DefaultChannelValue "0"
 
-				ImplementRotator;
+				ImplementRotator(0, 1, 2, 3);
 
 				StructProperty->CopyCompleteValue(StructProperty->ContainerPtrToValuePtr< void >(Object), &Rotation);
 
@@ -375,10 +390,10 @@ void UExposeRuntimeFunctionsBPLibrary::SetFPropertyValueInternal(FProperty* prop
 
 
 				FColor ColorValue;
-				ColorValue.R = FCString::Atoi(&(AssignChannelValue(ColorR))[0]);
-				ColorValue.G = FCString::Atoi(&(AssignChannelValue(ColorG))[0]);
-				ColorValue.B = FCString::Atoi(&(AssignChannelValue(ColorB))[0]);
-				ColorValue.A = FCString::Atoi(&(AssignChannelValue(ColorA))[0]);
+				ColorValue.R = FCString::Atoi(&(AssignChannelValue(ColorR, 0))[0]);
+				ColorValue.G = FCString::Atoi(&(AssignChannelValue(ColorG, 1))[0]);
+				ColorValue.B = FCString::Atoi(&(AssignChannelValue(ColorB, 2))[0]);
+				ColorValue.A = FCString::Atoi(&(AssignChannelValue(ColorA, 3))[0]);
 
 				StructProperty->CopyCompleteValue(StructProperty->ContainerPtrToValuePtr< void >(Object), &ColorValue);
 
@@ -392,17 +407,17 @@ void UExposeRuntimeFunctionsBPLibrary::SetFPropertyValueInternal(FProperty* prop
 
 			#define DefaultChannelValue "0"
 
-				ImplementLocation;
-				ImplementRotator;
+				ImplementLocation(0, 1, 2);
+				ImplementRotator(3, 4, 5, 9);
 
 
 
 			#define DefaultChannelValue "1"
 
 				FVector Scale;
-				Scale.X = FCString::Atof(&(AssignChannelValue(ScaleX))[0]);
-				Scale.Y = FCString::Atof(&(AssignChannelValue(ScaleY))[0]);
-				Scale.Z = FCString::Atof(&(AssignChannelValue(ScaleZ))[0]);
+				Scale.X = FCString::Atof(&(AssignChannelValue(ScaleX, 6))[0]);
+				Scale.Y = FCString::Atof(&(AssignChannelValue(ScaleY, 7))[0]);
+				Scale.Z = FCString::Atof(&(AssignChannelValue(ScaleZ, 8))[0]);
 
 
 
