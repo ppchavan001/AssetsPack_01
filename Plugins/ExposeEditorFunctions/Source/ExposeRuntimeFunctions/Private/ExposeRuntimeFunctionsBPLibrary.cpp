@@ -6,6 +6,7 @@
 #include "UObject/UnrealType.h"
 
 #include <string>
+#include "Logging/LogMacros.h"
 
 UExposeRuntimeFunctionsBPLibrary::UExposeRuntimeFunctionsBPLibrary(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
@@ -119,6 +120,97 @@ float UExposeRuntimeFunctionsBPLibrary::GetMaxZVal(const TArray<FVector>& Vertic
 	}
 
 	return maxZ;
+}
+
+void UExposeRuntimeFunctionsBPLibrary::GeneratePFMDataOnly(const FString& File, const FVector& StartLocation, const FRotator& StartRotation, const AActor* PFMOrigin, const int TilesHorizontal, const int TilesVertical, const float ColumnAngle, const float TileSizeHorizontal, const float TileSizeVertical, const int TilePixelsHorizontal, const int TilePixelsVertical, const bool AddMargin, const TArray<bool>& TilesValidityFlags, TArray<FVector>& PFMDataOut)
+{
+	// Check all input data
+	if (File.IsEmpty() || !PFMOrigin || TilesHorizontal < 1 || TilesVertical < 1 || TileSizeHorizontal < 1.f || TileSizeVertical < 1.f || TilePixelsHorizontal < 2 || TilePixelsVertical < 2 || TilesValidityFlags.Num() != TilesHorizontal * TilesVertical)
+	{
+		UE_LOG(LogTemp, Error, TEXT("Wrong input data"));
+	}
+
+	// Explicit XYZ set to NAN instead of FVector(NAN, NAN, NAN) allows to avoid any FVector internal NAN checks
+	FVector NanVector;
+	NanVector.X = NanVector.Y = NanVector.Z = NAN;
+
+	// Texture XY size
+	const int TexSizeX = TilesHorizontal * TilePixelsHorizontal;
+	const int TexSizeY = TilesVertical * TilePixelsVertical;
+
+	// Prepare array for output data
+	PFMDataOut.Reserve(TexSizeX * TexSizeY);
+
+	// Some constants for navigation math
+	const FTransform StartFrom = FTransform(StartRotation, StartLocation);
+	const FVector RowTranslate(0.f, 0.f, -TileSizeVertical);
+	const FVector ColTranslate(0.f, TileSizeHorizontal, 0.f);
+
+	// Compute horizontal margins and pixel offsets
+	const float PixelOffsetX = (AddMargin ? TileSizeHorizontal / TilePixelsHorizontal : TileSizeHorizontal / (TilePixelsHorizontal - 1));
+	const float MarginX = (AddMargin ? PixelOffsetX / 2.f : 0.f);
+	// Compute vertical margins and pixel offsets
+	const float PixelOffsetY = (AddMargin ? TileSizeVertical / TilePixelsVertical : TileSizeVertical / (TilePixelsVertical - 1));
+	const float MarginY = (AddMargin ? PixelOffsetY / 2.f : 0.f);
+
+	// Cache tile transforms so we won't have to compute it for every pixel
+	TMap<int, TMap<int, FTransform>> TransformsCache;
+
+	// The order is from left to right, from top to bottom
+	for (int Y = 0; Y < TexSizeY; ++Y)
+	{
+		// Current row index
+		const int CurRow = Y / TilePixelsVertical;
+		// Transform for current row
+		const FTransform CurRowTransform = (CurRow == 0 ? StartFrom : FTransform(TransformsCache[CurRow - 1][0].Rotator(), TransformsCache[CurRow - 1][0].TransformPosition(RowTranslate)));
+
+		// Cache current row transform
+		TransformsCache.Emplace(CurRow);
+		TransformsCache[CurRow].Emplace(0, CurRowTransform);
+
+		for (int X = 0; X < TexSizeX; ++X)
+		{
+			// Current column index
+			const int CurCol = X / TilePixelsHorizontal;
+			// Check if the column transform has been cached previously
+			const bool bCached = TransformsCache[CurRow].Contains(CurCol);
+			// Transform of the current tile (top left corner)
+			const FTransform CurTileTransform = (bCached ?
+												 TransformsCache[CurRow][CurCol] :
+												 (CurCol == 0 ? CurRowTransform : FTransform(TransformsCache[CurRow][CurCol - 1].Rotator().Add(0.f, ColumnAngle, 0.f), TransformsCache[CurRow][CurCol - 1].TransformPosition(ColTranslate))));
+
+											 // Cache new transform
+			if (!bCached)
+			{
+				TransformsCache[CurRow].Emplace(CurCol, CurTileTransform);
+			}
+
+			// XY within a tile
+			const int TilePixelY = Y % TilePixelsVertical;
+			const int TilePixelX = X % TilePixelsHorizontal;
+
+			// Tile index in the ValidityFlags array
+			const int TileArrayIdx = CurCol * TilesVertical + CurRow;
+
+			// Fake tiles produce Nan values
+			if (TilesValidityFlags[TileArrayIdx] == false)
+			{
+				PFMDataOut.Add(NanVector);
+				continue;
+			}
+
+			// Pixel offset in tile space
+			const FVector TileSpaceOffset = FVector(0.f, MarginX + TilePixelX * PixelOffsetX, -(MarginY + TilePixelY * PixelOffsetY));
+			// Pixel in world space
+			const FVector WorldSpacePixel = CurTileTransform.TransformPosition(TileSpaceOffset);
+			// Pixel in the PFM origin space
+			const FVector PFMSpacePixel = PFMOrigin->GetActorTransform().InverseTransformPosition(WorldSpacePixel);
+
+			// Store current pixel data
+			PFMDataOut.Add(PFMSpacePixel);
+		}
+	}
+
 }
 
 void UExposeRuntimeFunctionsBPLibrary::SetFPropertyValueInternal(FProperty* property, void* InContainer, const FString DataToSet)

@@ -100,4 +100,13 @@ class UExposeRuntimeFunctionsBPLibrary : public UBlueprintFunctionLibrary
 	static float GetMaxZVal(const TArray<FVector>& Vertices);
 
 
+	UFUNCTION(BlueprintCallable, Category = "ExposeRuntimeFunctions | VP_Utils")
+		static void GeneratePFMDataOnly(
+			const FString& File,
+			const FVector& StartLocation, const FRotator& StartRotation, const AActor* PFMOrigin,
+			const int TilesHorizontal, const int TilesVertical, const float ColumnAngle,
+			const float TileSizeHorizontal, const float TileSizeVertical, const int TilePixelsHorizontal,
+			const int TilePixelsVertical, const bool AddMargin, const TArray<bool>& TilesValidityFlags, TArray<FVector>& PFMDataOut);
+
+
 };
