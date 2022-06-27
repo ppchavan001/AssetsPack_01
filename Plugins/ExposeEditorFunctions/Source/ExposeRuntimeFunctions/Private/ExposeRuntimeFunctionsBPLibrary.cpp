@@ -61,6 +61,40 @@ void UExposeRuntimeFunctionsBPLibrary::StringToBuffer(const FString& message, TA
 
 }
 
+void UExposeRuntimeFunctionsBPLibrary::ConvertStringToVector(TArray<FString> Lines, TArray<FVector>& VerticesOut)
+{
+	VerticesOut.Empty();
+
+	for (auto line : Lines)
+	{
+		FVector Vec;
+		// X=-0.000 Y=0.496 Z=-0.476
+		TArray<FString> arr;
+		line.ParseIntoArray(arr, &FString(" ")[0]);
+
+		FString val;
+		arr[0].Split("=", nullptr, &val);
+		Vec.X = FCString::Atof(&val[0]);
+
+
+		arr[0].Split("=", nullptr, &val);
+		Vec.X = FCString::Atof(&val[0]);
+
+
+		arr[1].Split("=", nullptr, &val);
+		Vec.Y = FCString::Atof(&val[0]);
+
+
+		arr[2].Split("=", nullptr, &val);
+		Vec.Z = FCString::Atof(&val[0]);
+
+
+		VerticesOut.Add(Vec);
+
+	}
+
+}
+
 
 
 void UExposeRuntimeFunctionsBPLibrary::SetFPropertyValueInternal(FProperty* property, void* InContainer, const FString DataToSet)

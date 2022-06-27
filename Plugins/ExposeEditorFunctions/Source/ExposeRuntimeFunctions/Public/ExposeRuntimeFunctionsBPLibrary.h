@@ -77,4 +77,19 @@ class UExposeRuntimeFunctionsBPLibrary : public UBlueprintFunctionLibrary
 
 	UFUNCTION(BlueprintCallable, meta = (DisplayName = "String To Buffer"), Category = "ExposeRuntimeFunctions | Type Conversions")
 	static void StringToBuffer(const FString& message, TArray<uint8>& DataBuffer);
+
+	/*
+	* String Input:
+		X=-0.000 Y=21.332 Z=-0.476
+		X=-0.000 Y=22.324 Z=-0.476
+		X=-0.000 Y=23.316 Z=-0.476
+		
+
+		Output 
+		Array of vectors with 3 elements
+
+		Note: Will clear VerticesOut before filling it with vectors
+	*/
+	UFUNCTION(BlueprintCallable)
+	void ConvertStringToVector(TArray<FString> Lines, TArray<FVector>& VerticesOut);
 };
