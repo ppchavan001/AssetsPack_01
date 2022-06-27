@@ -90,6 +90,10 @@ class UExposeRuntimeFunctionsBPLibrary : public UBlueprintFunctionLibrary
 
 		Note: Will clear VerticesOut before filling it with vectors
 	*/
-	UFUNCTION(BlueprintCallable)
-	void ConvertStringToVector(TArray<FString> Lines, TArray<FVector>& VerticesOut);
+	UFUNCTION(BlueprintCallable, Category = "ExposeRuntimeFunctions | VP_Utils")
+	static void ConvertStringToVector(TArray<FString> Lines, TArray<FVector>& VerticesOut);
+
+	UFUNCTION(BlueprintCallable, Category = "ExposeRuntimeFunctions | VP_Utils")
+	static void PlotVertices(const TArray<FVector>& VerticesToPlot);
+
 };
