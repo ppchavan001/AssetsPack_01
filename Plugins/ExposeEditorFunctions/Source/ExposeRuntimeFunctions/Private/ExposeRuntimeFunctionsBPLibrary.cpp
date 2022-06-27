@@ -97,6 +97,13 @@ void UExposeRuntimeFunctionsBPLibrary::ConvertStringToVector(TArray<FString> Lin
 
 
 
+
+
+void UExposeRuntimeFunctionsBPLibrary::PlotVertices(const TArray<FVector>& VerticesToPlot)
+{
+
+}
+
 void UExposeRuntimeFunctionsBPLibrary::SetFPropertyValueInternal(FProperty* property, void* InContainer, const FString DataToSet)
 {
 
