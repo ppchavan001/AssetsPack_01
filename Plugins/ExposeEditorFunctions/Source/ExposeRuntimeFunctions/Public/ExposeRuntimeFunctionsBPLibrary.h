@@ -94,6 +94,10 @@ class UExposeRuntimeFunctionsBPLibrary : public UBlueprintFunctionLibrary
 	static void ConvertStringToVector(TArray<FString> Lines, TArray<FVector>& VerticesOut);
 
 	UFUNCTION(BlueprintCallable, Category = "ExposeRuntimeFunctions | VP_Utils")
-	static void PlotVertices(const TArray<FVector>& VerticesToPlot);
+	static bool PlotVertices(const TArray<FVector>& VerticesToPlot);
+
+	UFUNCTION(BlueprintCallable, Category = "ExposeRuntimeFunctions | VP_Utils")
+	static float GetMaxZVal(const TArray<FVector>& Vertices);
+
 
 };

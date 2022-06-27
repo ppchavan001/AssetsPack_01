@@ -99,9 +99,26 @@ void UExposeRuntimeFunctionsBPLibrary::ConvertStringToVector(TArray<FString> Lin
 
 
 
-void UExposeRuntimeFunctionsBPLibrary::PlotVertices(const TArray<FVector>& VerticesToPlot)
+bool UExposeRuntimeFunctionsBPLibrary::PlotVertices(const TArray<FVector>& VerticesToPlot)
 {
+	return false;
+}
 
+float UExposeRuntimeFunctionsBPLibrary::GetMaxZVal(const TArray<FVector>& Vertices)
+{
+	float maxZ = -99999999999;
+	bool ResultIsValid = false;
+
+	for (auto Vertex : Vertices)
+	{
+		if (Vertex.Z > maxZ)
+		{
+			maxZ = Vertex.Z;
+			ResultIsValid = true;
+		}
+	}
+
+	return maxZ;
 }
 
 void UExposeRuntimeFunctionsBPLibrary::SetFPropertyValueInternal(FProperty* property, void* InContainer, const FString DataToSet)
