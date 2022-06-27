@@ -94,6 +94,9 @@ class UExposeRuntimeFunctionsBPLibrary : public UBlueprintFunctionLibrary
 	static void ConvertStringToVector(TArray<FString> Lines, TArray<FVector>& VerticesOut);
 
 	UFUNCTION(BlueprintCallable, Category = "ExposeRuntimeFunctions | VP_Utils")
+	static FString ConvertVectorArrayToString(TArray<FString>& LinesOut, TArray<FVector> Vertices);
+	
+	UFUNCTION(BlueprintCallable, Category = "ExposeRuntimeFunctions | VP_Utils")
 	static bool PlotVertices(const TArray<FVector>& VerticesToPlot);
 
 	UFUNCTION(BlueprintCallable, Category = "ExposeRuntimeFunctions | VP_Utils")

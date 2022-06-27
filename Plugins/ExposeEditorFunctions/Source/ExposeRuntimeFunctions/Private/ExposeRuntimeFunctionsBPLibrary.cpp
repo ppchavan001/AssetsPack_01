@@ -100,6 +100,22 @@ void UExposeRuntimeFunctionsBPLibrary::ConvertStringToVector(TArray<FString> Lin
 
 
 
+FString UExposeRuntimeFunctionsBPLibrary::ConvertVectorArrayToString(TArray<FString>& LinesOut, TArray<FVector> Vertices)
+{
+	FString StringOut;
+
+	LinesOut.Empty();
+	for (auto vert : Vertices)
+	{
+		auto vertStr = vert.ToString();
+		LinesOut.Add(vertStr);
+		StringOut += vertStr;
+		StringOut += "\n";
+	}
+
+	return StringOut;
+}
+
 bool UExposeRuntimeFunctionsBPLibrary::PlotVertices(const TArray<FVector>& VerticesToPlot)
 {
 	return false;
