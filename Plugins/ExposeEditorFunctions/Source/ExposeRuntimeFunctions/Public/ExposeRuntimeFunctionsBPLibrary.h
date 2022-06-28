@@ -102,6 +102,15 @@ class UExposeRuntimeFunctionsBPLibrary : public UBlueprintFunctionLibrary
 	UFUNCTION(BlueprintCallable, Category = "ExposeRuntimeFunctions | VP_Utils")
 	static float GetMaxZVal(const TArray<FVector>& Vertices);
 
+	UFUNCTION(BlueprintCallable, Category = "ExposeRuntimeFunctions | VP_Utils")
+	static void MassDebugDrawPoint(const TArray<FVector>& Vertices, const FVector DeltaLocation, const AActor* ParentActor, float Size, FColor const& Color, bool bPersistentLines, float LifeTime, uint8 DepthPriority);
+
+
+	// TODO : Find a way to modify in place
+	// Target channel 0 = X, 1 = Y, 2 = Z
+	UFUNCTION(BlueprintCallable, Category = "ExposeRuntimeFunctions | VP_Utils")
+	static TArray<FVector> AddDeltaToMatrixVertices(const TArray<FVector>& VerticesIn, const int32 TargetChannel = 2, const float MaxDelta = 1, const  int32 MatrixWidth = 0, bool InvertDelta = false);
+
 
 	UFUNCTION(BlueprintCallable, Category = "ExposeRuntimeFunctions | VP_Utils")
 		static void GeneratePFMDataOnly(

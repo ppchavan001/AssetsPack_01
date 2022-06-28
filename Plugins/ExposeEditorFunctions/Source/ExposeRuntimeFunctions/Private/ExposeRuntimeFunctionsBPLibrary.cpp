@@ -7,6 +7,7 @@
 
 #include <string>
 #include "Logging/LogMacros.h"
+#include "DrawDebugHelpers.h"
 
 UExposeRuntimeFunctionsBPLibrary::UExposeRuntimeFunctionsBPLibrary(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
@@ -137,6 +138,76 @@ float UExposeRuntimeFunctionsBPLibrary::GetMaxZVal(const TArray<FVector>& Vertic
 
 	return maxZ;
 }
+
+
+
+void UExposeRuntimeFunctionsBPLibrary::MassDebugDrawPoint(const TArray<FVector>& Vertices, const FVector DeltaLocation, const AActor* ParentActor, float Size, FColor const& Color, bool bPersistentLines, float LifeTime, uint8 DepthPriority)
+{
+	if (!ParentActor || !ParentActor->GetWorld())
+	{
+		UE_LOG(LogTemp, Error, TEXT("ExposedEditorPlugin [MassDebugDrawPoint]: Invelid parent actor or world!"));
+		return;
+	}
+
+	for (auto Position : Vertices)
+		DrawDebugPoint(ParentActor->GetWorld(), Position + DeltaLocation, Size, Color, bPersistentLines, LifeTime, DepthPriority);
+}
+
+#pragma optimize( "", off )
+TArray<FVector> UExposeRuntimeFunctionsBPLibrary::AddDeltaToMatrixVertices(const TArray<FVector>& VerticesIn, const int32 TargetChannel, const float MaxDelta, const int32 MatrixWidth, bool InvertDelta)
+{
+	TArray<FVector> VecArr;
+
+	for (int i = 0; i < VerticesIn.Num(); ++i)
+	{
+		// get column number
+		auto ColumnNumber = i % MatrixWidth; 
+
+		// Converts the column number to 0 - 1 range
+		auto Alpha = ColumnNumber / (float)MatrixWidth;
+
+		// range 0 - 180
+		auto AlphaAngle = Alpha * 180;
+
+		// converting range to smooth curve
+		auto FinalAlphaAngle = FMath::Sin(PI / (180.f) * AlphaAngle);
+
+		auto Delta = FMath::Lerp(MaxDelta, (float)0, FinalAlphaAngle);
+
+		if (InvertDelta) Delta = 1 - Delta;
+
+		auto vec = VerticesIn[i];
+
+		if (i < MatrixWidth) UE_LOG(LogTemp, Warning, TEXT("Delta : %f"), Delta);
+		
+		switch (TargetChannel)
+		{
+			case 0:
+				vec.X += Delta;
+				break;
+
+			case 1:
+				vec.Y += Delta;
+				break;
+
+			case 2:
+				vec.Z += Delta;
+				break;
+		}
+
+		VecArr.Add(vec);
+
+
+	}
+
+
+
+
+
+	return VecArr;
+}
+
+#pragma optimize( "", on )
 
 void UExposeRuntimeFunctionsBPLibrary::GeneratePFMDataOnly(const FString& File, const FVector& StartLocation, const FRotator& StartRotation, const AActor* PFMOrigin, const int TilesHorizontal, const int TilesVertical, const float ColumnAngle, const float TileSizeHorizontal, const float TileSizeVertical, const int TilePixelsHorizontal, const int TilePixelsVertical, const bool AddMargin, const TArray<bool>& TilesValidityFlags, TArray<FVector>& PFMDataOut)
 {
