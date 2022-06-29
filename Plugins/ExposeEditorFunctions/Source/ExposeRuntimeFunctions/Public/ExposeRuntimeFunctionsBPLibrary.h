@@ -103,7 +103,7 @@ class UExposeRuntimeFunctionsBPLibrary : public UBlueprintFunctionLibrary
 	static float GetMaxZVal(const TArray<FVector>& Vertices);
 
 	UFUNCTION(BlueprintCallable, Category = "ExposeRuntimeFunctions | VP_Utils")
-	static void MassDebugDrawPoint(const TArray<FVector>& Vertices, const FVector DeltaLocation, const AActor* ParentActor, float Size, FColor const& Color, bool bPersistentLines, float LifeTime, uint8 DepthPriority);
+	static void MassDebugDrawPoint(const TArray<FVector>& Vertices, const AActor* ParentActor, const float DrawPercentage = 25, const FVector DeltaLocation = FVector(0,0,0), float Size = 1.0f, FColor const& Color = FColor(255,255,0,255), bool bPersistentLines = false, float LifeTime = 2.0f, uint8 DepthPriority = 0);
 
 
 	// TODO : Find a way to modify in place

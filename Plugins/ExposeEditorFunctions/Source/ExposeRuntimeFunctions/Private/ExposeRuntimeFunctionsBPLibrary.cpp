@@ -141,19 +141,51 @@ float UExposeRuntimeFunctionsBPLibrary::GetMaxZVal(const TArray<FVector>& Vertic
 
 
 
-void UExposeRuntimeFunctionsBPLibrary::MassDebugDrawPoint(const TArray<FVector>& Vertices, const FVector DeltaLocation, const AActor* ParentActor, float Size, FColor const& Color, bool bPersistentLines, float LifeTime, uint8 DepthPriority)
+void UExposeRuntimeFunctionsBPLibrary::MassDebugDrawPoint(const TArray<FVector>& Vertices, const AActor* ParentActor, const float DrawPercentage /*= 25*/, const FVector DeltaLocation /*= FVector(0,0,0)*/, float Size /*= 1.0f*/, FColor const& Color /*= FColor(255,255,0,255)*/, bool bPersistentLines /*= false*/, float LifeTime /*= 2.0f*/, uint8 DepthPriority /*= 0*/)
 {
 	if (!ParentActor || !ParentActor->GetWorld())
 	{
-		UE_LOG(LogTemp, Error, TEXT("ExposedEditorPlugin [MassDebugDrawPoint]: Invelid parent actor or world!"));
+		UE_LOG(LogTemp, Error, TEXT("ExposedEditorPlugin [MassDebugDrawPoint]: Invalid parent actor or world!"));
 		return;
 	}
 
-	for (auto Position : Vertices)
-		DrawDebugPoint(ParentActor->GetWorld(), Position + DeltaLocation, Size, Color, bPersistentLines, LifeTime, DepthPriority);
+	float DrawRatio = DrawPercentage / 100.0f;
+
+	int32 DrawCount = static_cast<int32>(FMath::Floor(Vertices.Num() * DrawRatio));
+	int32 SkipCount = Vertices.Num() - DrawCount;
+	int32 gcd = 0;
+	
+	do
+	{
+		gcd = FMath::GreatestCommonDivisor(DrawCount, SkipCount);
+
+		if (gcd < 1) break;
+
+		DrawCount /= gcd;
+		SkipCount /= gcd;
+						 
+	} while (gcd > 1 && DrawCount > 1 && SkipCount > 1);
+
+	int i = 0;
+	int32 SlotLength = DrawCount + SkipCount;
+	while (i < Vertices.Num())
+	{	
+		for (int k = 0; k < SlotLength; ++k)
+		{
+			if (k < DrawCount)
+			{
+				auto Position = Vertices[i];
+				DrawDebugPoint(ParentActor->GetWorld(), Position + DeltaLocation, Size, Color, bPersistentLines, LifeTime, DepthPriority);
+			}
+			
+			
+			++i;
+		}
+	}
 }
 
-#pragma optimize( "", off )
+
+#pragma optimize( "", on )
 TArray<FVector> UExposeRuntimeFunctionsBPLibrary::AddDeltaToMatrixVertices(const TArray<FVector>& VerticesIn, const int32 TargetChannel, const float MaxDelta, const int32 MatrixWidth, bool InvertDelta)
 {
 	TArray<FVector> VecArr;
