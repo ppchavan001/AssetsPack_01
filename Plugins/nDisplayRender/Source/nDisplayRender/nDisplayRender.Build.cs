@@ -35,7 +35,9 @@ public class nDisplayRender : ModuleRules
                 "DisplayClusterEditor",
                  "DisplayClusterConfiguration",
                 "DisplayClusterConfigurator",
-                "EditorScriptingUtilities"
+                "EditorScriptingUtilities",
+                "LevelSequence",
+                "MovieScene"
 				// ... add private dependencies that you statically link with here ...	
 
 
