@@ -29,7 +29,7 @@
 
 #include "EditorLevelLibrary.h"
 
-#endif // EEFBPL_ENGINE_VERSION_MAJOR == 5
+#endif // EEFBPL_ENGINE_VERSION_MAJOR == 427
 
 
 
@@ -206,13 +206,13 @@ TArray<class AActor*> UExposeEditorFunctionsBPLibrary::GetAllLevelActors()
 
 #if EEFBPL_ENGINE_VERSION_MAJOR > 426
 
-FText UExposeEditorFunctionsBPLibrary::GetDisplayClusterExportConfigPathFromBlueprint(UObject* Object)
+FText UExposeEditorFunctionsBPLibrary::GetDisplayClusterExportConfigPathFromBlueprint(UObject* Object, const bool bForceExport)
 {
 	bool bReturnedValidPath = false;
 	FText text = GetDisplayClusterExportConfigPathFromBlueprintInternal(Object, bReturnedValidPath);
 
 
-	if (bReturnedValidPath)
+	if (bReturnedValidPath && !bForceExport)
 	{
 		return text;
 	}

@@ -37,7 +37,7 @@ public:
 		static void SetStaticMeshLightMapResolution(UStaticMeshComponent* TargetMesh, int NewRes);
 
 	UFUNCTION(BlueprintCallable, meta = (DisplayName = "Get Display Cluster Export Config Path From Blueprint", Keywords = "Get Display Cluster Export Config Path"), Category = "Exposed Functions | NDisplay | Display Cluster Blueprint")
-		static FText GetDisplayClusterExportConfigPathFromBlueprint(UObject* Object);
+		static FText GetDisplayClusterExportConfigPathFromBlueprint(UObject* Object, const bool bForceExport = true);
 	
 	UFUNCTION(BlueprintCallable, meta = (DisplayName = "Get Display Cluster Config", Keywords = "Get Display Cluster  Config "), Category = "Exposed Functions | NDisplay | Display Cluster Blueprint")
 	static FString GetConfigData(UObject* Object);
