@@ -38,6 +38,13 @@
 		{
 			"Name": "Switchboard",
 			"Enabled": true
+		},
+		{
+			"Name": "ExposeEditorFunctions",
+			"Enabled": false,
+			"SupportedTargetPlatforms": [
+				"Win64"
+			]
 		}
 	]
 }

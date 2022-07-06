@@ -3,6 +3,7 @@
 #pragma once
 
 #include "Kismet/BlueprintFunctionLibrary.h"
+#include "Components/ComboBoxString.h"
 #include "nDisplayRenderBPLibrary.generated.h"
 
 /* 
@@ -27,6 +28,18 @@ class UnDisplayRenderBPLibrary : public UBlueprintFunctionLibrary
 {
 	GENERATED_UCLASS_BODY()
 
-	UFUNCTION(BlueprintCallable, meta = (DisplayName = "Execute Sample function", Keywords = "nDisplayRender sample test testing"), Category = "nDisplayRenderTesting")
-	static float nDisplayRenderSampleFunction(float Param);
+
+	UFUNCTION(BlueprintCallable, meta = (DisplayName = "Open Select Directory Dialog", Keywords = "Open Select Directory Dialog"), Category = "Exposed Functions | File Manager")
+	static FString OpenSelectDirectoryDialog(FString DefaultDirectory);
+
+	UFUNCTION(BlueprintCallable, meta = (DisplayName = "Get Display Cluster Export Config Path From Blueprint", Keywords = "Get Display Cluster Export Config Path"), Category = "Exposed Functions | NDisplay | Display Cluster Blueprint")
+	static FText GetDisplayClusterExportConfigPathFromBlueprint(UObject* Object, const bool bForceExport = true);
+
+	static FText GetDisplayClusterExportConfigPathFromBlueprintInternal(UObject* Object, bool& ReturningValidPath);
+
+	UFUNCTION(BlueprintCallable, meta = (DisplayName = "Get Display Cluster Config", Keywords = "Get Display Cluster  Config "), Category = "Exposed Functions | NDisplay | Display Cluster Blueprint")
+		static bool ExportNDisplayConfigFromDisplayClusterRootActorBlueprint(UObject* Object, const FString& FilePath);
+
+	UFUNCTION(BlueprintCallable, meta = (DisplayName = "Set ComboBoxString Font", Keywords = "Set ComboBoxString Font"), Category = "Exposed Functions | Widgets")
+		static void SetComboBoxStringFont(UComboBoxString* ComboBoxToUpdate, FSlateFontInfo NewFont);
 };

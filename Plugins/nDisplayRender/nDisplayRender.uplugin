@@ -17,8 +17,8 @@
 	"Modules": [
 		{
 			"Name": "nDisplayRender",
-			"Type": "Runtime",
-			"LoadingPhase": "PreLoadingScreen"
+			"Type": "Editor",
+			"LoadingPhase": "Default"
 		}
 	],
 	"Plugins": [
