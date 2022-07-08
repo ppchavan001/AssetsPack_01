@@ -6,6 +6,7 @@
 
 #include "UObject/PropertyAccessUtil.h"
 #include "UObject/UnrealType.h"
+#include "UObject/TextProperty.h"
 
 #include <string>
 
