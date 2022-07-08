@@ -26,6 +26,10 @@ public class DataFactory : ModuleRules
 			new string[]
 			{
 				"Core",
+                "Engine",
+                "Slate",
+                "SlateCore",
+                "InputCore"
 				// ... add other public dependencies that you statically link with here ...
 			}
 			);
