@@ -42,7 +42,10 @@ void ASnapToSequencerCameraActor::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	if (SequenceToFollow)
+	if (SequenceToFollow 
+		&& SequenceToFollow->SequencePlayer 
+		&& SequenceToFollow->SequencePlayer->GetActiveCameraComponent()
+		&& SequenceToFollow->SequencePlayer->GetActiveCameraComponent()->GetComponentTransform().IsValid())
 	{
 		SetActorTransform(SequenceToFollow->SequencePlayer->GetActiveCameraComponent()->GetComponentTransform());
 

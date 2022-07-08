@@ -8,7 +8,7 @@
 #include "SnapToSequencerCameraActor.generated.h"
 
 UCLASS()
-class NDISPLAYRENDER_API ASnapToSequencerCameraActor : public AActor
+class ASnapToSequencerCameraActor : public AActor
 {
 	GENERATED_BODY()
 	
