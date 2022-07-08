@@ -3,12 +3,10 @@
 
 #include "SnapToSequencerCameraActor.h"
 #include "Camera/CameraComponent.h"
-#include "EditorLevelLibrary.h"
 #include "Misc/EngineVersionComparison.h"
 
 #if UE_VERSION_NEWER_THAN(4, 27, 2)
 
-#include "Subsystems/EditorActorSubsystem.h"
 
 #endif
 
@@ -54,15 +52,6 @@ void ASnapToSequencerCameraActor::Tick(float DeltaTime)
 	}
 	else
 	{
-	#if UE_VERSION_NEWER_THAN(4, 27, 2)
-		UEditorActorSubsystem* EditorActorSubsystem = GEditor->GetEditorSubsystem<UEditorActorSubsystem>();
-
-		TArray<class AActor*> AllActorsInCurrentWorld = EditorActorSubsystem ? EditorActorSubsystem->GetAllLevelActors() : TArray<AActor*>();
-
-	#else
-		TArray<class AActor*> AllActorsInCurrentWorld = UEditorLevelLibrary::GetAllLevelActors();
-
-	#endif
 
 		if (GEngine)
 			GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Yellow, TEXT("Searching for new Sequence actor to follow."));

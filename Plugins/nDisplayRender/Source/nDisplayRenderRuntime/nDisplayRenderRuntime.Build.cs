@@ -28,14 +28,10 @@ public class nDisplayRenderRuntime : ModuleRules
             {
                 "CoreUObject",
                 "Engine",
-                "UnrealEd",
                 "Slate",
                 "SlateCore",
                 "DisplayCluster",
-                "DisplayClusterEditor",
                  "DisplayClusterConfiguration",
-                "DisplayClusterConfigurator",
-                "EditorScriptingUtilities",
                 "LevelSequence",
                 "MovieScene"
 				// ... add private dependencies that you statically link with here ...	
