@@ -274,7 +274,7 @@ void UDataFactoryBPLibrary::SetFPropertyValueInternal(FProperty* property, void*
 
 		// Update this value defending on the default value of the channel 
 		// ex Location = "0", scale = "1"
-		#define DefaultChannelValue "This value should never be used! Replace with default value for the channel"
+		FString DefaultChannelValue = "This value should never be used! Replace with default value for the channel";
 
 		// Return FString for specified channel
 		// If key is defined 
@@ -331,7 +331,7 @@ void UDataFactoryBPLibrary::SetFPropertyValueInternal(FProperty* property, void*
 			// Vector i.e location, scale, etc
 			if (StuctTypeName == "Vector")
 			{
-			#define DefaultChannelValue "0"
+				DefaultChannelValue = "0";
 
 				ImplementLocation(0, 1, 2);
 
@@ -346,7 +346,7 @@ void UDataFactoryBPLibrary::SetFPropertyValueInternal(FProperty* property, void*
 			// Rotation
 			if (StuctTypeName == "Rotator")
 			{
-			#define DefaultChannelValue "0"
+				DefaultChannelValue = "0";
 
 				ImplementRotator(0, 1, 2, 3);
 
@@ -361,7 +361,7 @@ void UDataFactoryBPLibrary::SetFPropertyValueInternal(FProperty* property, void*
 			if (StuctTypeName == "Color")
 			{
 
-			#define DefaultChannelValue "255"
+				DefaultChannelValue = "255";
 
 
 				FColor ColorValue;
@@ -380,14 +380,14 @@ void UDataFactoryBPLibrary::SetFPropertyValueInternal(FProperty* property, void*
 			if (StuctTypeName == "Transform")
 			{
 
-			#define DefaultChannelValue "0"
+				DefaultChannelValue = "0";
 
 				ImplementLocation(0, 1, 2);
 				ImplementRotator(3, 4, 5, 9);
 
 
 
-			#define DefaultChannelValue "1"
+				DefaultChannelValue = "1";
 
 				FVector Scale;
 				Scale.X = FCString::Atof(&(AssignChannelValue(ScaleX, 6))[0]);
