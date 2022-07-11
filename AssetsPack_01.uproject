@@ -20,10 +20,6 @@
 			"MarketplaceURL": "com.epicgames.launcher://ue/marketplace/product/4f737815666c4e7dabf2043fb55a8419"
 		},
 		{
-			"Name": "EditorScriptingUtilities",
-			"Enabled": true
-		},
-		{
 			"Name": "SequencerScripting",
 			"Enabled": true
 		},
@@ -34,10 +30,6 @@
 				"Win64",
 				"Linux"
 			]
-		},
-		{
-			"Name": "Switchboard",
-			"Enabled": true
 		},
 		{
 			"Name": "ExposeEditorFunctions",
