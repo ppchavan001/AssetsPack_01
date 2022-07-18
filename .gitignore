@@ -74,4 +74,3 @@ Plugins/*/Intermediate/*
 DerivedDataCache/*
 ExposeRuntimeFunctions/Intermediate
 Plugins/FileSDK
-*.pfm
