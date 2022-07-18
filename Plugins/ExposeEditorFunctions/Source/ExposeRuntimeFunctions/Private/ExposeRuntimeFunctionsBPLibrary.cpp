@@ -15,107 +15,10 @@ UExposeRuntimeFunctionsBPLibrary::UExposeRuntimeFunctionsBPLibrary(const FObject
 
 }
 
-FKey UExposeRuntimeFunctionsBPLibrary::GetKeyFromName(FName name)
-{
-	return FKey(name);
-
-}
-
-void UExposeRuntimeFunctionsBPLibrary::SetFPropertyByName(UObject* Object, FName NameOfThePropertyToUpdate, const FString DataToSet)
-{
-
-	if (Object)
-	{
-		UClass* _Class = Object->GetClass();
-
-		FProperty* property = _Class->FindPropertyByName(NameOfThePropertyToUpdate);
-
-		SetFPropertyValueInternal(property, Object, DataToSet);
-	}
-}
-
-
-FString UExposeRuntimeFunctionsBPLibrary::BufferToString(const TArray<uint8>& DataBuffer)
-{
-
-	if (DataBuffer[DataBuffer.Num() - 1] == 0x00)
-	{
-		return UTF8_TO_TCHAR(DataBuffer.GetData());
-	}
-
-	TArray<uint8> tempBuffer;
-	tempBuffer.SetNum(DataBuffer.Num() + 1);
-	FMemory::Memcpy(tempBuffer.GetData(), DataBuffer.GetData(), DataBuffer.Num());
-	tempBuffer[tempBuffer.Num() - 1] = 0x00;
-
-	return UTF8_TO_TCHAR(tempBuffer.GetData());
-}
-
-
-void UExposeRuntimeFunctionsBPLibrary::StringToBuffer(const FString& message, TArray<uint8>& DataBuffer)
-{
-	std::string _str = TCHAR_TO_UTF8(*message);
-
-	DataBuffer.SetNum(_str.size() + 1);
-	DataBuffer[DataBuffer.Num() - 1] = 0x00;
-
-	FMemory::Memcpy(DataBuffer.GetData(), _str.c_str(), _str.size());
-
-}
-
-void UExposeRuntimeFunctionsBPLibrary::ConvertStringToVector(TArray<FString> Lines, TArray<FVector>& VerticesOut)
-{
-	VerticesOut.Empty();
-
-	for (auto line : Lines)
-	{
-		FVector Vec;
-		// X=-0.000 Y=0.496 Z=-0.476
-		TArray<FString> arr;
-		line.ParseIntoArray(arr, &FString(" ")[0]);
-
-		FString val;
-		arr[0].Split("=", nullptr, &val);
-		Vec.X = FCString::Atof(&val[0]);
-
-
-		arr[0].Split("=", nullptr, &val);
-		Vec.X = FCString::Atof(&val[0]);
-
-
-		arr[1].Split("=", nullptr, &val);
-		Vec.Y = FCString::Atof(&val[0]);
-
-
-		arr[2].Split("=", nullptr, &val);
-		Vec.Z = FCString::Atof(&val[0]);
-
-
-		VerticesOut.Add(Vec);
-
-	}
-
-}
 
 
 
 
-
-FString UExposeRuntimeFunctionsBPLibrary::ConvertVectorArrayToString(TArray<FString>& LinesOut, TArray<FVector> Vertices)
-{
-	FString StringOut;
-
-	LinesOut.Empty();
-	for (auto vert : Vertices)
-	{
-		auto vertStr = vert.ToString();
-		LinesOut.Add(vertStr);
-		StringOut += vertStr;
-		StringOut += "\n";
-	}
-
-	return StringOut;
-}
 
 bool UExposeRuntimeFunctionsBPLibrary::PlotVertices(const TArray<FVector>& VerticesToPlot)
 {
@@ -186,7 +89,7 @@ void UExposeRuntimeFunctionsBPLibrary::MassDebugDrawPoint(const TArray<FVector>&
 
 
 #pragma optimize( "", on )
-TArray<FVector> UExposeRuntimeFunctionsBPLibrary::AddDeltaToMatrixVertices(const TArray<FVector>& VerticesIn, const int32 TargetChannel, const float MaxDeltaL, const float MaxDeltaR, const int32 MatrixWidth, bool InvertDelta)
+TArray<FVector> UExposeRuntimeFunctionsBPLibrary::AddDeltaToMatrixVertices(const TArray<FVector>& VerticesIn, const Axis3D TargetChannel, const float MaxDeltaL, const float MaxDeltaR, const int32 MatrixWidth, bool InvertDelta)
 {
 	TArray<FVector> VecArr;
 
@@ -216,15 +119,15 @@ TArray<FVector> UExposeRuntimeFunctionsBPLibrary::AddDeltaToMatrixVertices(const
 		
 		switch (TargetChannel)
 		{
-			case 0:
+			case Axis3D::X:
 				vec.X += Delta;
 				break;
 
-			case 1:
+			case Axis3D::Y:
 				vec.Y += Delta;
 				break;
 
-			case 2:
+			case Axis3D::Z:
 				vec.Z += Delta;
 				break;
 		}
@@ -239,6 +142,19 @@ TArray<FVector> UExposeRuntimeFunctionsBPLibrary::AddDeltaToMatrixVertices(const
 
 
 	return VecArr;
+}
+
+TArray<FVector> UExposeRuntimeFunctionsBPLibrary::MultiAddDeltaToMatrixVertices(const TArray<FVector>& VerticesIn, const TArray<FDeltaVertexRequiredInfo> DeltaVertexInfo, const int32 MatrixWidth /*= 0*/, bool InvertDelta /*= false*/)
+{
+	TArray<FVector> VecArr = VerticesIn;
+
+
+	for (FDeltaVertexRequiredInfo Info : DeltaVertexInfo);
+	VecArr = AddDeltaToMatrixVertices(VecArr, Info.) 
+
+
+	return VecArr;
+
 }
 
 #pragma optimize( "", on )
@@ -333,28 +249,5 @@ void UExposeRuntimeFunctionsBPLibrary::GeneratePFMDataOnly(const FString& File, 
 	}
 
 }
-
-void UExposeRuntimeFunctionsBPLibrary::SetFPropertyValueInternal(FProperty* property, void* InContainer, const FString DataToSet)
-{
-
-}
-
-
-FString UExposeRuntimeFunctionsBPLibrary::GetFPropertyClassName(UObject* Object, FName PropertyName)
-{
-	if (Object)
-	{
-		UClass* _Class = Object->GetClass();
-
-		FProperty* property = _Class->FindPropertyByName(PropertyName);
-
-		if (property) return property->GetClass()->GetName();
-
-		return FString("Invalid Property name!");
-
-	}
-	return FString("Invalid Object!");
-}
-
 
 
