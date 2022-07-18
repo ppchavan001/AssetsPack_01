@@ -109,7 +109,7 @@ class UExposeRuntimeFunctionsBPLibrary : public UBlueprintFunctionLibrary
 	// TODO : Find a way to modify in place
 	// Target channel 0 = X, 1 = Y, 2 = Z
 	UFUNCTION(BlueprintCallable, Category = "ExposeRuntimeFunctions | VP_Utils")
-	static TArray<FVector> AddDeltaToMatrixVertices(const TArray<FVector>& VerticesIn, const int32 TargetChannel = 2, const float MaxDelta = 1, const  int32 MatrixWidth = 0, bool InvertDelta = false);
+	static TArray<FVector> AddDeltaToMatrixVertices(const TArray<FVector>& VerticesIn, const int32 TargetChannel = 2, const float MaxDeltaL = 1, const float MaxDeltaR = 1, const  int32 MatrixWidth = 0, bool InvertDelta = false);
 
 
 	UFUNCTION(BlueprintCallable, Category = "ExposeRuntimeFunctions | VP_Utils")
