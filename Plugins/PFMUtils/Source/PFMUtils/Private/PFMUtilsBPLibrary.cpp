@@ -3,6 +3,7 @@
 #include "PFMUtilsBPLibrary.h"
 #include "PFMUtils.h"
 #include "DrawDebugHelpers.h"
+#include "Misc/FileHelper.h"
 
 UPFMUtilsBPLibrary::UPFMUtilsBPLibrary(const FObjectInitializer& ObjectInitializer)
 : Super(ObjectInitializer)
@@ -46,6 +47,7 @@ void UPFMUtilsBPLibrary::ConvertStringToVector(TArray<FString> Lines, TArray<FVe
 }
 
 
+#pragma optimize( "", off )
 FString UPFMUtilsBPLibrary::ConvertVectorArrayToString(TArray<FString>& LinesOut, TArray<FVector> Vertices)
 {
 	FString StringOut;
@@ -53,16 +55,21 @@ FString UPFMUtilsBPLibrary::ConvertVectorArrayToString(TArray<FString>& LinesOut
 	LinesOut.Empty();
 	for (auto vert : Vertices)
 	{
-		auto vertStr = vert.ToString();
+		// start a new line for new vertex
+		if (StringOut.Len() > 0) StringOut += "\n";
+		
+		FString vertStr = vert.ToString();
 		LinesOut.Add(vertStr);
+		
 		StringOut += vertStr;
-		StringOut += "\n";
+
 	}
 
 	return StringOut;
 }
 
 
+#pragma optimize( "", on )
 void UPFMUtilsBPLibrary::MassDebugDrawPoint(const TArray<FVector>& Vertices, const AActor* ParentActor, const float DrawPercentage /*= 25*/, const FVector DeltaLocation /*= FVector(0,0,0)*/, float Size /*= 1.0f*/, FColor const& Color /*= FColor(255,255,0,255)*/, bool bPersistentLines /*= false*/, float LifeTime /*= 2.0f*/, uint8 DepthPriority /*= 0*/)
 {
 	if (!ParentActor || !ParentActor->GetWorld())
@@ -251,5 +258,26 @@ void UPFMUtilsBPLibrary::GeneratePFMDataOnly(const FString& File, const FVector&
 
 }
 
+bool UPFMUtilsBPLibrary::WriteStringToFile(const FString FileName, const FString DataToWrite)
+{
+	return FFileHelper::SaveStringToFile(DataToWrite, &FileName[0]);
+
+}
+
+TArray<FString> UPFMUtilsBPLibrary::ReadLinesFromFile(const FString FileName)
+{
+	TArray<FString> Lines;
+	FFileHelper::LoadFileToStringArray(Lines, &FileName[0]);
+
+	return Lines;
+}
+
+bool UPFMUtilsBPLibrary::WriteVerticesToFile(const FString FileName, TArray<FVector> Vertices)
+{
+	TArray<FString> Lines;
+	FString Data = ConvertVectorArrayToString(Lines, Vertices);
+
+	return WriteStringToFile(FileName, Data);
+}
 
 

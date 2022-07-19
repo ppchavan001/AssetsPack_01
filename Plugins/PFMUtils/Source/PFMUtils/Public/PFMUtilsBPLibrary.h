@@ -3,6 +3,7 @@
 #pragma once
 
 #include "Kismet/BlueprintFunctionLibrary.h"
+
 #include "PFMUtilsBPLibrary.generated.h"
 
 /* 
@@ -66,5 +67,16 @@ class UPFMUtilsBPLibrary : public UBlueprintFunctionLibrary
 			const float TileSizeHorizontal, const float TileSizeVertical, const int TilePixelsHorizontal,
 			const int TilePixelsVertical, const bool AddMargin, const TArray<bool>& TilesValidityFlags, TArray<FVector>& PFMDataOut);
 
+
+
+	UFUNCTION(BlueprintCallable, Category = "PFM Utils BPLibrary | Import/ Export")
+	static bool WriteStringToFile(const FString FileName, const FString DataToWrite);
+
+
+	UFUNCTION(BlueprintGetter, Category = "PFM Utils BPLibrary | Import/ Export")
+	static TArray<FString> ReadLinesFromFile(const FString FileName);
+
+	UFUNCTION(BlueprintCallable, Category = "PFM Utils BPLibrary | Import/ Export")
+	static bool WriteVerticesToFile(const FString FileName, TArray<FVector> Vertices);
 
 };
