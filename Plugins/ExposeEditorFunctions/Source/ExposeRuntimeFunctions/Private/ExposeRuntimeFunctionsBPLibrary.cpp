@@ -117,10 +117,6 @@ FString UExposeRuntimeFunctionsBPLibrary::ConvertVectorArrayToString(TArray<FStr
 	return StringOut;
 }
 
-bool UExposeRuntimeFunctionsBPLibrary::PlotVertices(const TArray<FVector>& VerticesToPlot)
-{
-	return false;
-}
 
 float UExposeRuntimeFunctionsBPLibrary::GetMaxZVal(const TArray<FVector>& Vertices)
 {

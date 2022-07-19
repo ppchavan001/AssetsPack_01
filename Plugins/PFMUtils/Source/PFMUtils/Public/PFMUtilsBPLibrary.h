@@ -27,6 +27,44 @@ class UPFMUtilsBPLibrary : public UBlueprintFunctionLibrary
 {
 	GENERATED_UCLASS_BODY()
 
-	UFUNCTION(BlueprintCallable, meta = (DisplayName = "Execute Sample function", Keywords = "PFMUtils sample test testing"), Category = "PFMUtilsTesting")
-	static float PFMUtilsSampleFunction(float Param);
+
+
+	/*
+	* String Input:
+		X=-0.000 Y=21.332 Z=-0.476
+		X=-0.000 Y=22.324 Z=-0.476
+		X=-0.000 Y=23.316 Z=-0.476
+
+
+		Output
+		Array of vectors with 3 elements
+
+		Note: Will clear VerticesOut before filling it with vectors
+	*/
+	UFUNCTION(BlueprintCallable, Category = "PFM Utils BPLibrary | Import/ Export")
+	static void ConvertStringToVector(TArray<FString> Lines, TArray<FVector>& VerticesOut);
+
+
+
+	UFUNCTION(BlueprintCallable, Category = "PFM Utils BPLibrary | Import/ Export")
+	static FString ConvertVectorArrayToString(TArray<FString>& LinesOut, TArray<FVector> Vertices);
+
+	UFUNCTION(BlueprintCallable, Category = "PFM Utils BPLibrary | Visualization")
+	static void MassDebugDrawPoint(const TArray<FVector>& Vertices, const AActor* ParentActor, const float DrawPercentage = 25, const FVector DeltaLocation = FVector(0, 0, 0), float Size = 1.0f, FColor const& Color = FColor(255, 255, 0, 255), bool bPersistentLines = false, float LifeTime = 2.0f, uint8 DepthPriority = 0);
+
+	// TODO : Find a way to modify in place
+	// Target channel 0 = X, 1 = Y, 2 = Z
+	UFUNCTION(BlueprintCallable, Category = "PFM Utils BPLibrary | Visualization")
+	static TArray<FVector> AddDeltaToMatrixVertices(const TArray<FVector>& VerticesIn, const int32 TargetChannel = 2, const float MaxDeltaL = 1, const float MaxDeltaR = 1, const  int32 MatrixWidth = 0, bool InvertDelta = false);
+
+
+	UFUNCTION(BlueprintCallable, Category = "PFM Utils BPLibrary | Import/ Export")
+	static void GeneratePFMDataOnly(
+			const FString& File,
+			const FVector& StartLocation, const FRotator& StartRotation, const AActor* PFMOrigin,
+			const int TilesHorizontal, const int TilesVertical, const float ColumnAngle,
+			const float TileSizeHorizontal, const float TileSizeVertical, const int TilePixelsHorizontal,
+			const int TilePixelsVertical, const bool AddMargin, const TArray<bool>& TilesValidityFlags, TArray<FVector>& PFMDataOut);
+
+
 };

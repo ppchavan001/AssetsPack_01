@@ -34,10 +34,11 @@ public class PFMUtils : ModuleRules
 		PrivateDependencyModuleNames.AddRange(
 			new string[]
 			{
-				"CoreUObject",
-				"Engine",
-				"Slate",
-				"SlateCore",
+                "CoreUObject",
+                "Engine",
+                "Slate",
+                "SlateCore",
+                "InputCore"
 				// ... add private dependencies that you statically link with here ...	
 			}
 			);
