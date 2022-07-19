@@ -46,6 +46,14 @@ struct FDeltaVerticesRequiredData
 	// Non inclusive
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int32 EndRow = 720;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float FadeFalloffRow = 1.0f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float FadeFalloffColumn = 1.0f;
+
+
 };
 
 

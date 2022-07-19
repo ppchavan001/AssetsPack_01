@@ -142,8 +142,14 @@ TArray<FVector> UPFMUtilsBPLibrary::AddDeltaToMatrixVertices(const TArray<FVecto
 
 
 			// Converts the column number to 0 - 1 range
-			auto Alpha = (ColumnNumber - DeltaVerticesData.StartColumn ) 
+			auto AlphaX = (ColumnNumber - DeltaVerticesData.StartColumn ) * DeltaVerticesData.FadeFalloffColumn
 				/ (float)(DeltaVerticesData.EndColumn - DeltaVerticesData.StartColumn);
+
+			// Converts the row number to 0 - 1 range
+			auto AlphaY = (RowNumber - DeltaVerticesData.StartRow) * DeltaVerticesData.FadeFalloffRow
+				/ (float)(DeltaVerticesData.EndRow - DeltaVerticesData.StartRow);
+
+			auto Alpha = FMath::Sqrt(AlphaX * AlphaX) + FMath::Sqrt(AlphaY * AlphaY);
 
 			// range 0 - 90
 			auto AlphaAngle = Alpha * 90;
