@@ -115,7 +115,7 @@ void UPFMUtilsBPLibrary::MassDebugDrawPoint(const TArray<FVector>& Vertices, con
 
 
 
-TArray<FVector> UPFMUtilsBPLibrary::AddDeltaToMatrixVertices(const TArray<FVector>& VerticesIn, const int32 TargetChannel, const float MaxDeltaL, const float MaxDeltaR, const int32 MatrixWidth, bool InvertDelta)
+TArray<FVector> UPFMUtilsBPLibrary::AddDeltaToMatrixVertices(const TArray<FVector>& VerticesIn, const Axis3D TargetChannel, const float MaxDeltaL, const float MaxDeltaR, const int32 MatrixWidth, bool InvertDelta)
 {
 	TArray<FVector> VecArr;
 
@@ -141,19 +141,19 @@ TArray<FVector> UPFMUtilsBPLibrary::AddDeltaToMatrixVertices(const TArray<FVecto
 
 		auto vec = VerticesIn[i];
 
-		if (i < MatrixWidth) UE_LOG(LogTemp, Warning, TEXT("Delta : %f"), Delta);
+		//if (i < MatrixWidth) UE_LOG(LogTemp, Warning, TEXT("Delta : %f"), Delta);
 
 		switch (TargetChannel)
 		{
-		case 0:
+		case Axis3D::X:
 			vec.X += Delta;
 			break;
 
-		case 1:
+		case Axis3D::Y:
 			vec.Y += Delta;
 			break;
 
-		case 2:
+		case Axis3D::Z:
 			vec.Z += Delta;
 			break;
 		}

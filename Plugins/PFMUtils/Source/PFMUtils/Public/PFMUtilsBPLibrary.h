@@ -6,6 +6,15 @@
 
 #include "PFMUtilsBPLibrary.generated.h"
 
+UENUM(BlueprintType)
+enum class Axis3D : uint8
+{
+	X = 0,
+	Y = 1,
+	Z = 2
+};
+
+
 /* 
 *	Function library class.
 *	Each function in it is expected to be static and represents blueprint node that can be called in any blueprint.
@@ -56,7 +65,7 @@ class UPFMUtilsBPLibrary : public UBlueprintFunctionLibrary
 	// TODO : Find a way to modify in place
 	// Target channel 0 = X, 1 = Y, 2 = Z
 	UFUNCTION(BlueprintCallable, Category = "PFM Utils BPLibrary | Visualization")
-	static TArray<FVector> AddDeltaToMatrixVertices(const TArray<FVector>& VerticesIn, const int32 TargetChannel = 2, const float MaxDeltaL = 1, const float MaxDeltaR = 1, const  int32 MatrixWidth = 0, bool InvertDelta = false);
+	static TArray<FVector> AddDeltaToMatrixVertices(const TArray<FVector>& VerticesIn, const Axis3D TargetChannel = Axis3D::Z, const float MaxDeltaL = 1, const float MaxDeltaR = 1, const  int32 MatrixWidth = 0, bool InvertDelta = false);
 
 
 	UFUNCTION(BlueprintCallable, Category = "PFM Utils BPLibrary | Import/ Export")
