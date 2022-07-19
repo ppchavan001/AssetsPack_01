@@ -7,11 +7,45 @@
 #include "PFMUtilsBPLibrary.generated.h"
 
 UENUM(BlueprintType)
-enum class Axis3D : uint8
+enum class EAxis3D : uint8
 {
 	X = 0,
 	Y = 1,
 	Z = 2
+};
+
+
+// Valid range is all columns/ rows greater (>) than start and less (<) than end
+USTRUCT(BlueprintType)
+struct FDeltaVerticesRequiredData
+{
+	GENERATED_USTRUCT_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float MaxDelta = 1;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	EAxis3D TargetChannel = EAxis3D::Z;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int32 MatrixWidth = 1280;
+	
+
+	// Inclusive
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int32 StartColumn = 0;
+
+	// Inclusive
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int32 StartRow = 0;
+
+	// Non inclusive
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int32 EndColumn = 1280;
+
+	// Non inclusive
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int32 EndRow = 720;
 };
 
 
@@ -65,7 +99,10 @@ class UPFMUtilsBPLibrary : public UBlueprintFunctionLibrary
 	// TODO : Find a way to modify in place
 	// Target channel 0 = X, 1 = Y, 2 = Z
 	UFUNCTION(BlueprintCallable, Category = "PFM Utils BPLibrary | Visualization")
-	static TArray<FVector> AddDeltaToMatrixVertices(const TArray<FVector>& VerticesIn, const Axis3D TargetChannel = Axis3D::Z, const float MaxDeltaL = 1, const float MaxDeltaR = 1, const  int32 MatrixWidth = 0, bool InvertDelta = false);
+	static TArray<FVector> AddDeltaToMatrixVertices(
+		const TArray<FVector>& VerticesIn, 
+		const FDeltaVerticesRequiredData DeltaVerticesData,
+		bool InvertDelta = false);
 
 
 	UFUNCTION(BlueprintCallable, Category = "PFM Utils BPLibrary | Import/ Export")

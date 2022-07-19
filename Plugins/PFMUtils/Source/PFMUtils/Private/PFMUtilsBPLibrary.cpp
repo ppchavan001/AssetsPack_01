@@ -6,7 +6,7 @@
 #include "Misc/FileHelper.h"
 
 UPFMUtilsBPLibrary::UPFMUtilsBPLibrary(const FObjectInitializer& ObjectInitializer)
-: Super(ObjectInitializer)
+	: Super(ObjectInitializer)
 {
 
 }
@@ -57,10 +57,10 @@ FString UPFMUtilsBPLibrary::ConvertVectorArrayToString(TArray<FString>& LinesOut
 	{
 		// start a new line for new vertex
 		if (StringOut.Len() > 0) StringOut += "\n";
-		
+
 		FString vertStr = vert.ToString();
 		LinesOut.Add(vertStr);
-		
+
 		StringOut += vertStr;
 
 	}
@@ -114,59 +114,90 @@ void UPFMUtilsBPLibrary::MassDebugDrawPoint(const TArray<FVector>& Vertices, con
 }
 
 
-
-TArray<FVector> UPFMUtilsBPLibrary::AddDeltaToMatrixVertices(const TArray<FVector>& VerticesIn, const Axis3D TargetChannel, const float MaxDeltaL, const float MaxDeltaR, const int32 MatrixWidth, bool InvertDelta)
+#pragma optimize("", off)
+TArray<FVector> UPFMUtilsBPLibrary::AddDeltaToMatrixVertices(const TArray<FVector>& VerticesIn,
+															 const FDeltaVerticesRequiredData DeltaVerticesData,
+															 bool InvertDelta)
 {
 	TArray<FVector> VecArr;
 
-	for (int i = 0; i < VerticesIn.Num(); ++i)
+	int32 ModifiedVertex = 0;
+
+	float MinD = 9999999999;
+	float MaxD = -9999999999;
+	float AvgD = 0;
+
+	for (int32 i = 0; i < VerticesIn.Num(); ++i)
 	{
 		// get column number
-		auto ColumnNumber = i % MatrixWidth;
+		auto ColumnNumber = i % DeltaVerticesData.MatrixWidth;
+		auto  RowNumber = FMath::DivideAndRoundDown(i , DeltaVerticesData.MatrixWidth);
 
-		// Converts the column number to 0 - 1 range
-		auto Alpha = ColumnNumber / (float)MatrixWidth;
 
-		// range 0 - 180
-		auto AlphaAngle = Alpha * 180;
 
-		// converting range to smooth curve
-		auto FinalAlphaAngle = FMath::Sin(PI / (180.f) * AlphaAngle);
-
-		auto MaxDelta = Alpha > 0.5 ? MaxDeltaR : MaxDeltaL;
-
-		auto Delta = FMath::Lerp(MaxDelta, (float)0, FinalAlphaAngle);
-
-		if (InvertDelta) Delta = 1 - Delta;
-
-		auto vec = VerticesIn[i];
-
-		//if (i < MatrixWidth) UE_LOG(LogTemp, Warning, TEXT("Delta : %f"), Delta);
-
-		switch (TargetChannel)
+		// Range Check
+		if (RowNumber >= DeltaVerticesData.StartRow && RowNumber < DeltaVerticesData.EndRow
+			&& ColumnNumber >= DeltaVerticesData.StartColumn && ColumnNumber < DeltaVerticesData.EndColumn)
 		{
-		case Axis3D::X:
-			vec.X += Delta;
-			break;
 
-		case Axis3D::Y:
-			vec.Y += Delta;
-			break;
 
-		case Axis3D::Z:
-			vec.Z += Delta;
-			break;
+			// Converts the column number to 0 - 1 range
+			auto Alpha = (ColumnNumber - DeltaVerticesData.StartColumn ) 
+				/ (float)(DeltaVerticesData.EndColumn - DeltaVerticesData.StartColumn);
+
+			// range 0 - 90
+			auto AlphaAngle = Alpha * 90;
+
+			// converting range to smooth curve of range 0 - 1
+			auto FinalAlphaAngle = FMath::Sin(PI / (180.f) * AlphaAngle);
+
+			// lerp range 0 - MaxDelta by FinalAlphaAngle
+			auto Delta = FMath::Lerp(DeltaVerticesData.MaxDelta, (float)0, FinalAlphaAngle);
+
+			if (InvertDelta) Delta = 1 - Delta;
+
+			auto vec = VerticesIn[i];
+
+			//if (i < MatrixWidth) UE_LOG(LogTemp, Warning, TEXT("Delta : %f"), Delta);
+
+			switch (DeltaVerticesData.TargetChannel)
+			{
+			case EAxis3D::X:
+				vec.X += Delta;
+				break;
+
+			case EAxis3D::Y:
+				vec.Y += Delta;
+				break;
+
+			case EAxis3D::Z:
+				vec.Z += Delta;
+				break;
+			}
+
+			VecArr.Add(vec);
+			
+			// Counters
+			++ModifiedVertex;
+
+			if (Delta < MinD) MinD = Delta;
+			if (Delta > MaxD) MaxD = Delta;
+			AvgD += Delta;
 		}
-
-		VecArr.Add(vec);
-
-
+		else
+		{
+			VecArr.Add(VerticesIn[i]);
+		}
 	}
-
+	UE_LOG(LogTemp, Warning, TEXT("Total modified vertex count : %d"), ModifiedVertex);
+	UE_LOG(LogTemp, Warning, TEXT("Min delta : %f"), MinD);
+	UE_LOG(LogTemp, Warning, TEXT("Max delta : %f"), MaxD);
+	UE_LOG(LogTemp, Warning, TEXT("Avg delta : %f"), AvgD / ModifiedVertex);
 	return VecArr;
 }
 
 
+#pragma optimize("", on)
 void UPFMUtilsBPLibrary::GeneratePFMDataOnly(const FString& File, const FVector& StartLocation, const FRotator& StartRotation, const AActor* PFMOrigin, const int TilesHorizontal, const int TilesVertical, const float ColumnAngle, const float TileSizeHorizontal, const float TileSizeVertical, const int TilePixelsHorizontal, const int TilePixelsVertical, const bool AddMargin, const TArray<bool>& TilesValidityFlags, TArray<FVector>& PFMDataOut)
 {
 	// Check all input data
