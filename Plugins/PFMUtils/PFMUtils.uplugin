@@ -1,0 +1,50 @@
+{
+	"FileVersion": 3,
+	"Version": 1,
+	"VersionName": "1.0",
+	"FriendlyName": "PFMUtils",
+	"Description": "PFM generating utils.",
+	"Category": "Other",
+	"CreatedBy": "ppchavan001",
+	"CreatedByURL": "ppchavan001.github.io",
+	"DocsURL": "",
+	"MarketplaceURL": "",
+	"SupportURL": "",
+	"CanContainContent": true,
+	"IsBetaVersion": false,
+	"IsExperimentalVersion": false,
+	"Installed": false,
+	"Modules": [
+		{
+			"Name": "PFMUtils",
+			"Type": "Runtime",
+			"LoadingPhase": "PreLoadingScreen"
+		}
+	],
+	"Plugins": [
+		{
+			"Name": "nDisplay",
+			"Enabled": true
+		},
+		{
+			"Name": "Switchboard",
+			"Enabled": true
+		},
+		{
+			"Name": "WarpUtils",
+			"Enabled": true
+		},
+		{
+			"Name": "EditorScriptingUtilities",
+			"Enabled": true
+		},
+		{
+			"Name": "SequencerScripting",
+			"Enabled": true
+		},
+		{
+			"Name": "BlueprintFileUtils",
+			"Enabled": true
+		}
+	]
+}
