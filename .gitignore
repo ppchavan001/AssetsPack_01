@@ -74,5 +74,5 @@ Plugins/*/Intermediate/*
 DerivedDataCache/*
 ExposeRuntimeFunctions/Intermediate
 Plugins/FileSDK
-Vertices.ini
-PFMVerticesFor1280x720.ini
+
+*.pfm
