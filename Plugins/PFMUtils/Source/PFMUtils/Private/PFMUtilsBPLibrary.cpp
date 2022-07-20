@@ -19,25 +19,19 @@ void UPFMUtilsBPLibrary::ConvertStringToVector(TArray<FString> Lines, TArray<FVe
 	for (auto line : Lines)
 	{
 		FVector Vec;
-		// X=-0.000 Y=0.496 Z=-0.476
+		// OLD X=-0.000 Y=0.496 Z=-0.476
+		// New CSV  0,3,5.4
+
 		TArray<FString> arr;
-		line.ParseIntoArray(arr, &FString(" ")[0]);
-
-		FString val;
-		arr[0].Split("=", nullptr, &val);
-		Vec.X = FCString::Atof(&val[0]);
+		line.ParseIntoArray(arr, &FString(",")[0], false);
 
 
-		arr[0].Split("=", nullptr, &val);
-		Vec.X = FCString::Atof(&val[0]);
+		const FString DefaultChannelVal = "0.0";
+	#define GetFloatFromStr(ArrIndex) FCString::Atof(arr[ArrIndex].Len() > 0 ? &arr[ArrIndex][0] : &DefaultChannelVal[0])
 
-
-		arr[1].Split("=", nullptr, &val);
-		Vec.Y = FCString::Atof(&val[0]);
-
-
-		arr[2].Split("=", nullptr, &val);
-		Vec.Z = FCString::Atof(&val[0]);
+		Vec.X = GetFloatFromStr(0);
+		Vec.Y = GetFloatFromStr(1);
+		Vec.Z = GetFloatFromStr(2);
 
 
 		VerticesOut.Add(Vec);
@@ -58,7 +52,15 @@ FString UPFMUtilsBPLibrary::ConvertVectorArrayToString(TArray<FString>& LinesOut
 		// start a new line for new vertex
 		if (StringOut.Len() > 0) StringOut += "\n";
 
-		FString vertStr = vert.ToString();
+		FString vertStr;
+
+		if (vert.X != 0.0) vertStr += FString::SanitizeFloat(vert.X);
+		vertStr += ',';
+		if (vert.Y != 0.0) vertStr += FString::SanitizeFloat(vert.Y);
+		vertStr += ',';
+		if (vert.Z != 0.0) vertStr += FString::SanitizeFloat(vert.Z);
+		
+
 		LinesOut.Add(vertStr);
 
 		StringOut += vertStr;
