@@ -76,7 +76,7 @@ void UPFMUtilsBPLibrary::ConvertStringToVector(TArray<FString> Lines, TArray<FVe
 }
 
 
-#pragma optimize( "", off )
+#pragma optimize( "", on )
 FString UPFMUtilsBPLibrary::ConvertVectorArrayToString(TArray<FString>& LinesOut, TArray<FVector> Vertices)
 {
 	FString StringOut;
@@ -155,7 +155,16 @@ FString UPFMUtilsBPLibrary::ConvertMatrixArrayToString(const TArray<FVector> Ver
 
 
 #pragma optimize( "", on )
-void UPFMUtilsBPLibrary::MassDebugDrawPoint(const TArray<FVector>& Vertices, const AActor* ParentActor, const float DrawPercentage /*= 25*/, const FVector DeltaLocation /*= FVector(0,0,0)*/, float Size /*= 1.0f*/, FColor const& Color /*= FColor(255,255,0,255)*/, bool bPersistentLines /*= false*/, float LifeTime /*= 2.0f*/, uint8 DepthPriority /*= 0*/)
+void UPFMUtilsBPLibrary::MassDebugDrawPoint(const TArray<FVector>& Vertices, 
+											const AActor* ParentActor, 
+											const float DrawPercentage /*= 25*/, 
+											const FVector DeltaLocation /*= FVector(0,0,0)*/, 
+											float Size /*= 1.0f*/,
+											FColor const& Color /*= FColor(255,255,0,255)*/,
+											bool bPersistentLines /*= false*/, 
+											float LifeTime /*= 2.0f*/, 
+											const bool UseSlotsToDraw /*= false */,
+											uint8 DepthPriority /*= 0*/)
 {
 	if (!ParentActor || !ParentActor->GetWorld())
 	{
@@ -163,47 +172,65 @@ void UPFMUtilsBPLibrary::MassDebugDrawPoint(const TArray<FVector>& Vertices, con
 		return;
 	}
 
-	float DrawRatio = DrawPercentage / 100.0f;
-
-	int32 DrawCount = static_cast<int32>(FMath::Floor(Vertices.Num() * DrawRatio));
-	int32 SkipCount = Vertices.Num() - DrawCount;
-	int32 gcd = 0;
-
-	do
+	if(UseSlotsToDraw)
 	{
-		gcd = FMath::GreatestCommonDivisor(DrawCount, SkipCount);
+		float DrawRatio = DrawPercentage / 100.0f;
 
-		if (gcd < 1) break;
+		int32 DrawCount = static_cast<int32>(FMath::Floor(Vertices.Num() * DrawRatio));
+		int32 SkipCount = Vertices.Num() - DrawCount;
+		int32 gcd = 0;
 
-		DrawCount /= gcd;
-		SkipCount /= gcd;
-
-	} while (gcd > 1 && DrawCount > 1 && SkipCount > 1);
-
-	int i = 0;
-	int32 SlotLength = DrawCount + SkipCount;
-	while (i < Vertices.Num())
-	{
-		for (int k = 0; k < SlotLength; ++k)
+		do
 		{
-			if (k < DrawCount)
+			gcd = FMath::GreatestCommonDivisor(DrawCount, SkipCount);
+
+			if (gcd < 1) break;
+
+			DrawCount /= gcd;
+			SkipCount /= gcd;
+
+		} while (gcd > 1 && DrawCount > 1 && SkipCount > 1);
+
+		int i = 0;
+		int32 SlotLength = DrawCount + SkipCount;
+		while (i < Vertices.Num())
+		{
+			for (int k = 0; k < SlotLength; ++k)
+			{
+				if (k < DrawCount)
+				{
+					auto Position = Vertices[i];
+					DrawDebugPoint(ParentActor->GetWorld(), Position + DeltaLocation, Size, Color, bPersistentLines, LifeTime, DepthPriority);
+				}
+				++i;
+			}
+		}
+	}
+	else
+	{
+		int i = 0;
+		while (i < Vertices.Num())
+		{
+			if (FMath::RandRange(0, 100) < DrawPercentage)
 			{
 				auto Position = Vertices[i];
 				DrawDebugPoint(ParentActor->GetWorld(), Position + DeltaLocation, Size, Color, bPersistentLines, LifeTime, DepthPriority);
 			}
-
-
 			++i;
 		}
 	}
 }
 
 
-#pragma optimize("", off)
+#pragma optimize("", on)
 TArray<FVector> UPFMUtilsBPLibrary::AddDeltaToMatrixVertices(const TArray<FVector>& VerticesIn,
-															 const FDeltaVerticesRequiredData DeltaVerticesData,
-															 bool InvertDelta)
+															 const FDeltaVerticesRequiredData DeltaVerticesData
+															 )
 {
+	/* ********************
+		Data prep
+	******************** */
+
 	TArray<FVector> VecArr;
 
 	int32 ModifiedVertex = 0;
@@ -211,6 +238,32 @@ TArray<FVector> UPFMUtilsBPLibrary::AddDeltaToMatrixVertices(const TArray<FVecto
 	float MinD = 9999999999;
 	float MaxD = -9999999999;
 	float AvgD = 0;
+
+
+	// Input Start And End Row
+	auto _StartRow = DeltaVerticesData.StartRow;
+	auto _EndRow = DeltaVerticesData.EndRow;
+
+	// Processed start and End row
+	// Always processed from lower value to the higher
+	auto StartRow = _StartRow < _EndRow ? _StartRow : _EndRow;
+	auto EndRow = _StartRow > _EndRow ? _StartRow : _EndRow;
+
+	// Input Start And End Columns
+	auto _StartColumn = DeltaVerticesData.StartColumn;
+	auto _EndColumn = DeltaVerticesData.EndColumn;
+
+	// Processed start and End Columns
+	// Always processed from lower value to the higher
+	auto StartColumn = _StartColumn < _EndColumn ? _StartColumn : _EndColumn;
+	auto EndColumn = _StartColumn > _EndColumn ? _StartColumn : _EndColumn;
+
+
+
+
+	/* ****************************************
+		Process per vertex
+	**************************************** */
 
 	for (int32 i = 0; i < VerticesIn.Num(); ++i)
 	{
@@ -221,38 +274,65 @@ TArray<FVector> UPFMUtilsBPLibrary::AddDeltaToMatrixVertices(const TArray<FVecto
 		auto  RowNumber = FMath::DivideAndRoundDown(i , DeltaVerticesData.MatrixWidth);
 
 
-
 		// Range Check
 		// Only modify if in the given range
-		if (RowNumber >= DeltaVerticesData.StartRow && RowNumber < DeltaVerticesData.EndRow
-			&& ColumnNumber >= DeltaVerticesData.StartColumn && ColumnNumber < DeltaVerticesData.EndColumn)
+		// Processed start/ end numbers for simplicity in operations
+		if (RowNumber >= StartRow && RowNumber < EndRow
+			&& ColumnNumber >= StartColumn && ColumnNumber < EndColumn)
 		{
-
+			/* ********************
+				Determining Alpha/ falloff of the vertex
+			******************** */
 
 			// Converts the column number to 0 - 1 range
-			auto AlphaX = (ColumnNumber - DeltaVerticesData.StartColumn ) * DeltaVerticesData.FadeFalloffRow
-				/ (float)(DeltaVerticesData.EndColumn - DeltaVerticesData.StartColumn);
+			auto AlphaX = (ColumnNumber - StartColumn ) * DeltaVerticesData.FadeFalloffRow / (float)(EndColumn - StartColumn);
 
 			// Converts the row number to 0 - 1 range
-			auto AlphaY = (RowNumber - DeltaVerticesData.StartRow) * DeltaVerticesData.FadeFalloffColumn
-				/ (float)(DeltaVerticesData.EndRow - DeltaVerticesData.StartRow);
+			auto AlphaY = (RowNumber - StartRow) * DeltaVerticesData.FadeFalloffColumn / (float)(EndRow - StartRow);
 
+			// If start number is greater than end number,
+			// the user expects an inverted effect,
+			// hence the alpha is inverted for the respective type
+			if (_StartColumn > _EndColumn) AlphaX = 1 - AlphaX;
+			if (_StartRow > _EndRow) AlphaY = 1 - AlphaY;
+
+
+
+			/* ********************
+				Smoothing and curving, Alpha/ falloff of the vertex
+			******************** */
+
+
+			// combining horizontal and vertical alpha / falloff
 			auto Alpha = FMath::Clamp(FMath::Sqrt(AlphaX * AlphaX + AlphaY * AlphaY), 0.0f, 1.0f);
 
-			// range 0 - 90 to prepare for sin (0 - 1) conversion
+			// converting alpha to a range 0 - 90 to prepare for sin (0 - 1) conversion
 			auto AlphaAngle = Alpha * 90;
 
 			// converting range to smooth curve of range 0 - 1
 			auto FinalAlphaAngle = FMath::Sin(PI / (180.f) * AlphaAngle);
 
+
+
+			/* ********************
+				Converting alpha into delta for the vertex
+			******************** */
+
+
 			// lerp range 0 - MaxDelta by FinalAlphaAngle
 			auto Delta = FMath::Lerp(DeltaVerticesData.MaxDelta, 0.0f, FinalAlphaAngle);
 
-			if (InvertDelta) Delta = 1 - Delta;
+			if (DeltaVerticesData.InvertDelta) Delta = 1 - Delta;
 
 			auto vec = VerticesIn[i];
 
 			
+
+
+			/* ********************
+				Add delta to vertex
+			******************** */
+
 
 			// Switch based on the channel we are trying to modify
 			switch (DeltaVerticesData.TargetChannel)
@@ -272,7 +352,11 @@ TArray<FVector> UPFMUtilsBPLibrary::AddDeltaToMatrixVertices(const TArray<FVecto
 
 			VecArr.Add(vec);
 			
-			// Counters
+			
+			/* ********************
+				Counters
+			******************** */
+
 			++ModifiedVertex;
 
 			if (Delta < MinD) MinD = Delta;

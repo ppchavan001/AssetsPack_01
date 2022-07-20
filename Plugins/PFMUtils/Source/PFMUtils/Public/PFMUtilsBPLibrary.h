@@ -35,13 +35,15 @@ struct FDeltaVerticesRequiredData
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int32 StartColumn = 0;
 
+	// Non inclusive
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int32 EndColumn = 1280;
+
+
 	// Inclusive
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int32 StartRow = 0;
 
-	// Non inclusive
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	int32 EndColumn = 1280;
 
 	// Non inclusive
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
@@ -52,6 +54,9 @@ struct FDeltaVerticesRequiredData
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float FadeFalloffColumn = 1.0f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	bool InvertDelta = false;
 
 
 };
@@ -107,15 +112,23 @@ class UPFMUtilsBPLibrary : public UBlueprintFunctionLibrary
 	static FString ConvertMatrixArrayToString(const TArray<FVector> Vertices);
 
 	UFUNCTION(BlueprintCallable, Category = "PFM Utils BPLibrary | Visualization")
-	static void MassDebugDrawPoint(const TArray<FVector>& Vertices, const AActor* ParentActor, const float DrawPercentage = 25, const FVector DeltaLocation = FVector(0, 0, 0), float Size = 1.0f, FColor const& Color = FColor(255, 255, 0, 255), bool bPersistentLines = false, float LifeTime = 2.0f, uint8 DepthPriority = 0);
+	static void MassDebugDrawPoint(const TArray<FVector>& Vertices, 
+								   const AActor* ParentActor,
+								   const float DrawPercentage = 25, 
+								   const FVector DeltaLocation = FVector(0, 0, 0), 
+								   float Size = 1.0f, 
+								   FColor const& Color = FColor(255, 255, 0, 255), 
+								   bool bPersistentLines = false, 
+								   float LifeTime = 2.0f, 
+								   const bool UseSlotsToDraw = false,
+								   uint8 DepthPriority = 0);
 
 	// TODO : Find a way to modify in place
 	// Target channel 0 = X, 1 = Y, 2 = Z
 	UFUNCTION(BlueprintCallable, Category = "PFM Utils BPLibrary | Visualization")
 	static TArray<FVector> AddDeltaToMatrixVertices(
 		const TArray<FVector>& VerticesIn, 
-		const FDeltaVerticesRequiredData DeltaVerticesData,
-		bool InvertDelta = false);
+		const FDeltaVerticesRequiredData DeltaVerticesData);
 
 
 	UFUNCTION(BlueprintCallable, Category = "PFM Utils BPLibrary | Import/ Export")
