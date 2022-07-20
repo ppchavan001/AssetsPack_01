@@ -214,43 +214,47 @@ TArray<FVector> UPFMUtilsBPLibrary::AddDeltaToMatrixVertices(const TArray<FVecto
 
 	for (int32 i = 0; i < VerticesIn.Num(); ++i)
 	{
-		// get column number
+		// get column number of this vertex
 		auto ColumnNumber = i % DeltaVerticesData.MatrixWidth;
+		
+		// get row number of this vertex
 		auto  RowNumber = FMath::DivideAndRoundDown(i , DeltaVerticesData.MatrixWidth);
 
 
 
 		// Range Check
+		// Only modify if in the given range
 		if (RowNumber >= DeltaVerticesData.StartRow && RowNumber < DeltaVerticesData.EndRow
 			&& ColumnNumber >= DeltaVerticesData.StartColumn && ColumnNumber < DeltaVerticesData.EndColumn)
 		{
 
 
 			// Converts the column number to 0 - 1 range
-			auto AlphaX = (ColumnNumber - DeltaVerticesData.StartColumn ) * DeltaVerticesData.FadeFalloffColumn
+			auto AlphaX = (ColumnNumber - DeltaVerticesData.StartColumn ) * DeltaVerticesData.FadeFalloffRow
 				/ (float)(DeltaVerticesData.EndColumn - DeltaVerticesData.StartColumn);
 
 			// Converts the row number to 0 - 1 range
-			auto AlphaY = (RowNumber - DeltaVerticesData.StartRow) * DeltaVerticesData.FadeFalloffRow
+			auto AlphaY = (RowNumber - DeltaVerticesData.StartRow) * DeltaVerticesData.FadeFalloffColumn
 				/ (float)(DeltaVerticesData.EndRow - DeltaVerticesData.StartRow);
 
-			auto Alpha = FMath::Sqrt(AlphaX * AlphaX) + FMath::Sqrt(AlphaY * AlphaY);
+			auto Alpha = FMath::Clamp(FMath::Sqrt(AlphaX * AlphaX + AlphaY * AlphaY), 0.0f, 1.0f);
 
-			// range 0 - 90
+			// range 0 - 90 to prepare for sin (0 - 1) conversion
 			auto AlphaAngle = Alpha * 90;
 
 			// converting range to smooth curve of range 0 - 1
 			auto FinalAlphaAngle = FMath::Sin(PI / (180.f) * AlphaAngle);
 
 			// lerp range 0 - MaxDelta by FinalAlphaAngle
-			auto Delta = FMath::Lerp(DeltaVerticesData.MaxDelta, (float)0, FinalAlphaAngle);
+			auto Delta = FMath::Lerp(DeltaVerticesData.MaxDelta, 0.0f, FinalAlphaAngle);
 
 			if (InvertDelta) Delta = 1 - Delta;
 
 			auto vec = VerticesIn[i];
 
-			//if (i < MatrixWidth) UE_LOG(LogTemp, Warning, TEXT("Delta : %f"), Delta);
+			
 
+			// Switch based on the channel we are trying to modify
 			switch (DeltaVerticesData.TargetChannel)
 			{
 			case EAxis3D::X:
