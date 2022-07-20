@@ -94,12 +94,17 @@ class UPFMUtilsBPLibrary : public UBlueprintFunctionLibrary
 		Note: Will clear VerticesOut before filling it with vectors
 	*/
 	UFUNCTION(BlueprintCallable, Category = "PFM Utils BPLibrary | Import/ Export")
-	static void ConvertStringToVector(TArray<FString> Lines, TArray<FVector>& VerticesOut);
-
+	static void ConvertStringToVector(TArray<FString> Lines, TArray<FVector>& VerticesOut, const bool IsMatrix = true);
 
 
 	UFUNCTION(BlueprintCallable, Category = "PFM Utils BPLibrary | Import/ Export")
 	static FString ConvertVectorArrayToString(TArray<FString>& LinesOut, TArray<FVector> Vertices);
+
+
+	// Will only export 
+	// x/y/z of extreme vertices
+	UFUNCTION(BlueprintCallable, Category = "PFM Utils BPLibrary | Import/ Export")
+	static FString ConvertMatrixArrayToString(const TArray<FVector> Vertices);
 
 	UFUNCTION(BlueprintCallable, Category = "PFM Utils BPLibrary | Visualization")
 	static void MassDebugDrawPoint(const TArray<FVector>& Vertices, const AActor* ParentActor, const float DrawPercentage = 25, const FVector DeltaLocation = FVector(0, 0, 0), float Size = 1.0f, FColor const& Color = FColor(255, 255, 0, 255), bool bPersistentLines = false, float LifeTime = 2.0f, uint8 DepthPriority = 0);
@@ -131,6 +136,6 @@ class UPFMUtilsBPLibrary : public UBlueprintFunctionLibrary
 	static TArray<FString> ReadLinesFromFile(const FString FileName);
 
 	UFUNCTION(BlueprintCallable, Category = "PFM Utils BPLibrary | Import/ Export")
-	static bool WriteVerticesToFile(const FString FileName, TArray<FVector> Vertices);
+	static bool WriteVerticesToFile(const FString FileName, const TArray<FVector> Vertices, const bool MatrixOptimization = true);
 
 };

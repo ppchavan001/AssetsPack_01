@@ -12,13 +12,45 @@ UPFMUtilsBPLibrary::UPFMUtilsBPLibrary(const FObjectInitializer& ObjectInitializ
 }
 
 
-void UPFMUtilsBPLibrary::ConvertStringToVector(TArray<FString> Lines, TArray<FVector>& VerticesOut)
+void UPFMUtilsBPLibrary::ConvertStringToVector(TArray<FString> Lines, TArray<FVector>& VerticesOut, const bool IsMatrix)
 {
 	VerticesOut.Empty();
+
+	if (IsMatrix)
+	{
+
+		TArray<FString> XArr;
+		Lines[0].ParseIntoArray(XArr, &FString(",")[0]);
+
+
+		TArray<FString> YArr;
+		Lines[1].ParseIntoArray(YArr, &FString(",")[0]);
+
+		TArray<FString> ZArr;
+		Lines[2].ParseIntoArray(ZArr, &FString(",")[0]);
+
+		for (auto Z : ZArr)
+			for (auto Y : YArr)
+				for (auto X : XArr)
+				{
+					FVector vec;
+					vec.X = FCString::Atof(&X[0]);
+					vec.Y = FCString::Atof(&Y[0]);
+					vec.Z = FCString::Atof(&Z[0]);
+
+					VerticesOut.Add(vec);
+				}
+
+		
+		return;
+
+	}
 
 	for (auto line : Lines)
 	{
 		FVector Vec;
+
+
 		// OLD X=-0.000 Y=0.496 Z=-0.476
 		// New CSV  0,3,5.4
 
@@ -27,6 +59,7 @@ void UPFMUtilsBPLibrary::ConvertStringToVector(TArray<FString> Lines, TArray<FVe
 
 
 		const FString DefaultChannelVal = "0.0";
+
 	#define GetFloatFromStr(ArrIndex) FCString::Atof(arr[ArrIndex].Len() > 0 ? &arr[ArrIndex][0] : &DefaultChannelVal[0])
 
 		Vec.X = GetFloatFromStr(0);
@@ -37,6 +70,8 @@ void UPFMUtilsBPLibrary::ConvertStringToVector(TArray<FString> Lines, TArray<FVe
 		VerticesOut.Add(Vec);
 
 	}
+	
+
 
 }
 
@@ -69,6 +104,54 @@ FString UPFMUtilsBPLibrary::ConvertVectorArrayToString(TArray<FString>& LinesOut
 
 	return StringOut;
 }
+
+
+FString UPFMUtilsBPLibrary::ConvertMatrixArrayToString(const TArray<FVector> Vertices)
+{
+	FString StringOut;
+
+	float MaxX = -999999999;
+    float MaxY = -999999999;
+	float MaxZ = -999999999;
+	for (auto vert : Vertices)
+	{
+          if (vert.X > MaxX) MaxX = vert.X;
+          if (vert.Y > MaxY) MaxY = vert.Y;
+          if (vert.Z > MaxZ) MaxZ = vert.Z;
+	}
+	
+	FString XVals;
+	FString YVals;
+	FString ZVals;
+
+	for (auto vert : Vertices)
+	{
+          if (vert.Y == MaxY && vert.Z == MaxZ) 
+		  {
+			  if (XVals.Len() > 0) XVals += ",";
+			  XVals += FString::SanitizeFloat(vert.X);
+		  }
+
+
+		  if (vert.X == MaxX && vert.Z == MaxZ)
+		  {
+			  if (YVals.Len() > 0) YVals += ",";
+			  YVals += FString::SanitizeFloat(vert.Y);
+		  }
+
+
+		  if (vert.Y == MaxY && vert.X == MaxX)
+		  {
+			  if (ZVals.Len() > 0) ZVals += ",";
+			  ZVals += FString::SanitizeFloat(vert.Z);
+		  }
+
+	}
+	StringOut = XVals + '\n' + YVals + '\n' + ZVals;
+	return StringOut;
+
+}
+
 
 
 #pragma optimize( "", on )
@@ -311,11 +394,19 @@ TArray<FString> UPFMUtilsBPLibrary::ReadLinesFromFile(const FString FileName)
 	return Lines;
 }
 
-bool UPFMUtilsBPLibrary::WriteVerticesToFile(const FString FileName, TArray<FVector> Vertices)
+bool UPFMUtilsBPLibrary::WriteVerticesToFile(const FString FileName, const TArray<FVector> Vertices, const bool MatrixOptimization)
 {
 	TArray<FString> Lines;
-	FString Data = ConvertVectorArrayToString(Lines, Vertices);
-
+	FString Data;
+	
+	if (MatrixOptimization)
+	{
+		Data = ConvertMatrixArrayToString(Vertices);
+	}
+	else
+	{
+		Data = ConvertVectorArrayToString(Lines, Vertices);
+	}
 	return WriteStringToFile(FileName, Data);
 }
 
