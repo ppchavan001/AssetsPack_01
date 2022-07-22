@@ -9,6 +9,7 @@
 #include "UObject/TextProperty.h"
 
 #include <string>
+#include <Misc/FileHelper.h>
 
 
 UDataFactoryBPLibrary::UDataFactoryBPLibrary(const FObjectInitializer& ObjectInitializer)
@@ -27,7 +28,21 @@ void UDataFactoryBPLibrary::SetFPropertyByName(UObject* Object, FName NameOfTheP
 
 		FProperty* property = _Class->FindPropertyByName(NameOfThePropertyToUpdate);
 
-		SetFPropertyValueInternal(property, Object, DataToSet);
+		if (property)
+		{
+			SetFPropertyValueInternal(property, Object, DataToSet, NameOfThePropertyToUpdate);
+		}
+		else
+		{
+			UE_LOG(LogTemp, Warning, 
+				   TEXT("DataFactoryBPLibrary.cpp : SetFPropertyByName : Couldn't find property name = %s."), 
+				   *(NameOfThePropertyToUpdate.ToString()));
+		}
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning,
+			   TEXT("DataFactoryBPLibrary.cpp : SetFPropertyByName : Invalid object provided."));
 	}
 }
 
@@ -39,7 +54,7 @@ FKey UDataFactoryBPLibrary::GetKeyFromName(FName name)
 }
 
 
-void UDataFactoryBPLibrary::SetFPropertyValueInternal(FProperty* property, void* InContainer, const FString DataToSet)
+void UDataFactoryBPLibrary::SetFPropertyValueInternal(FProperty* property, void* InContainer, const FString DataToSet, FName NameOfThePropertyToUpdate)
 {
 
 #define Object InContainer
@@ -185,7 +200,7 @@ void UDataFactoryBPLibrary::SetFPropertyValueInternal(FProperty* property, void*
 				Data.TrimStartAndEndInline();
 				if (Data.Len() < 1)	Data = "0";
 
-				SetFPropertyValueInternal(ArrayProperty->Inner, ValuePtr, Data);
+				SetFPropertyValueInternal(ArrayProperty->Inner, ValuePtr, Data, NameOfThePropertyToUpdate);
 
 			}
 
@@ -237,7 +252,7 @@ void UDataFactoryBPLibrary::SetFPropertyValueInternal(FProperty* property, void*
 			// Setup Start
 			// ---------------------
 
-			FString StuctTypeName = FString(StructProperty->Struct->GetName());
+			FString StructTypeName = FString(StructProperty->Struct->GetName());
 
 
 			// Get CSV data from string
@@ -330,7 +345,7 @@ void UDataFactoryBPLibrary::SetFPropertyValueInternal(FProperty* property, void*
 
 
 			// Vector i.e location, scale, etc
-			if (StuctTypeName == "Vector")
+			if (StructTypeName == "Vector")
 			{
 				DefaultChannelValue = "0";
 
@@ -345,7 +360,7 @@ void UDataFactoryBPLibrary::SetFPropertyValueInternal(FProperty* property, void*
 
 
 			// Rotation
-			if (StuctTypeName == "Rotator")
+			if (StructTypeName == "Rotator")
 			{
 				DefaultChannelValue = "0";
 
@@ -358,8 +373,13 @@ void UDataFactoryBPLibrary::SetFPropertyValueInternal(FProperty* property, void*
 			}
 
 
-			// Color(0-255) Struct
-			if (StuctTypeName == "Color")
+			// Color Struct
+			// 
+			// UInt8 for each channel
+			// hence limited to (0-255) range
+			//
+			
+			if (StructTypeName == "Color")
 			{
 
 				DefaultChannelValue = "255";
@@ -378,7 +398,7 @@ void UDataFactoryBPLibrary::SetFPropertyValueInternal(FProperty* property, void*
 			}
 
 			// Transform
-			if (StuctTypeName == "Transform")
+			if (StructTypeName == "Transform")
 			{
 
 				DefaultChannelValue = "0";
@@ -405,11 +425,51 @@ void UDataFactoryBPLibrary::SetFPropertyValueInternal(FProperty* property, void*
 				return;
 			}
 
+
+
+			//
+			// Linear Color Struct
+			// 
+			// Channels defined by float variables
+			// hence can store any value in floating point range
+			// 
+			//
+			if (StructTypeName == "LinearColor")
+			{
+
+				DefaultChannelValue = "1";
+
+
+				FLinearColor ColorValue;
+				ColorValue.R = FCString::Atof(&(AssignChannelValue(ColorR, 0))[0]);
+				ColorValue.G = FCString::Atof(&(AssignChannelValue(ColorG, 1))[0]);
+				ColorValue.B = FCString::Atof(&(AssignChannelValue(ColorB, 2))[0]);
+				ColorValue.A = FCString::Atof(&(AssignChannelValue(ColorA, 3))[0]);
+
+				StructProperty->CopyCompleteValue(StructProperty->ContainerPtrToValuePtr< void >(Object), &ColorValue);
+
+				return;
+
+			}
+
+
+			UE_LOG(LogTemp, Warning, 
+				   TEXT("DataFactoryBPLibrary.cpp : SetFPropertyValueInternal : Tried to set value of unsupported struct type = %s , Property name = %s"), 
+				   *StructTypeName, *(NameOfThePropertyToUpdate.ToString()));
+
 			return;
 		}
 
+		UE_LOG(LogTemp, Warning, TEXT("DataFactoryBPLibrary.cpp : SetFPropertyValueInternal : Tried to set value of unsupported type. Property Name = %s"), *(NameOfThePropertyToUpdate.ToString()));
 
+		
 	}
+
+	
+	UE_LOG(LogTemp, Warning, 
+		   TEXT("DataFactoryBPLibrary.cpp : SetFPropertyValueInternal : The property or the object provided is invalid. DataToSet = %s"),
+		   *(DataToSet));
+
 }
 
 
@@ -427,4 +487,14 @@ FString UDataFactoryBPLibrary::GetFPropertyClassName(UObject* Object, FName Prop
 
 	}
 	return FString("Invalid Object!");
+}
+
+bool UDataFactoryBPLibrary::WriteStringToFile(const FString FileName, const FString DataToWrite)
+{
+	return FFileHelper::SaveStringToFile(DataToWrite, &FileName[0]);
+}
+
+bool UDataFactoryBPLibrary::ReadLinesFromFile(const FString FileName, TArray<FString>& LinesOut)
+{
+	return FFileHelper::LoadFileToStringArray(LinesOut, &FileName[0]);
 }
