@@ -474,12 +474,9 @@ bool UPFMUtilsBPLibrary::WriteStringToFile(const FString FileName, const FString
 
 }
 
-TArray<FString> UPFMUtilsBPLibrary::ReadLinesFromFile(const FString FileName)
+bool UPFMUtilsBPLibrary::ReadLinesFromFile(const FString FileName, TArray<FString>& LinesOut)
 {
-	TArray<FString> Lines;
-	FFileHelper::LoadFileToStringArray(Lines, &FileName[0]);
-
-	return Lines;
+	return FFileHelper::LoadFileToStringArray(LinesOut, &FileName[0]);
 }
 
 bool UPFMUtilsBPLibrary::WriteVerticesToFile(const FString FileName, const TArray<FVector> Vertices, const bool MatrixOptimization)

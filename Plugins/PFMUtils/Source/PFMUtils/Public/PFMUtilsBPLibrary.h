@@ -146,7 +146,7 @@ class UPFMUtilsBPLibrary : public UBlueprintFunctionLibrary
 
 
 	UFUNCTION(BlueprintGetter, Category = "PFM Utils BPLibrary | Import/ Export")
-	static TArray<FString> ReadLinesFromFile(const FString FileName);
+	static bool ReadLinesFromFile(const FString FileName, TArray<FString>& LinesOut);
 
 	UFUNCTION(BlueprintCallable, Category = "PFM Utils BPLibrary | Import/ Export")
 	static bool WriteVerticesToFile(const FString FileName, const TArray<FVector> Vertices, const bool MatrixOptimization = true);

@@ -28,7 +28,8 @@ void AVertexManager::Tick(float DeltaTime)
 
 bool AVertexManager::LoadVertices(FString FileName)
 {
-	TArray<FString> Lines = UPFMUtilsBPLibrary::ReadLinesFromFile(FileName);
+	TArray<FString> Lines;
+	UPFMUtilsBPLibrary::ReadLinesFromFile(FileName, Lines);
 
 	UPFMUtilsBPLibrary::ConvertStringToVector(Lines, Vertices);
 
