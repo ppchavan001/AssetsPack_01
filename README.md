@@ -1,15 +1,7 @@
 // AssetsPack_01
 
 included assets:  
-DoubleJump  
-WallJump   
-Inventory   
-SkillTree  
-Grapple  
-AiBase  
-Pawn movement on Splines  
+Check different branches/ releases for latest assets.
 
-Spline movement demo: https://youtu.be/kxUFAqN2qf0
-
-Developed with Unreal Engine 4 (.22 in BluePrints).
+Developed with ❤️ for Unreal Engine 4/5,  
 By ppchavan001
