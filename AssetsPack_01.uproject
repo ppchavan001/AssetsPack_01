@@ -1,6 +1,6 @@
 {
 	"FileVersion": 3,
-	"EngineAssociation": "4.26",
+	"EngineAssociation": "{961FF81E-42D2-D372-C199-C9895FF5331C}",
 	"Category": "",
 	"Description": "",
 	"Modules": [
@@ -14,11 +14,6 @@
 		}
 	],
 	"Plugins": [
-		{
-			"Name": "FileSDK",
-			"Enabled": true,
-			"MarketplaceURL": "com.epicgames.launcher://ue/marketplace/product/4f737815666c4e7dabf2043fb55a8419"
-		},
 		{
 			"Name": "EditorScriptingUtilities",
 			"Enabled": true
@@ -44,6 +39,10 @@
 			"SupportedTargetPlatforms": [
 				"Win64"
 			]
+		},
+		{
+			"Name": "DataFactory",
+			"Enabled": true
 		}
 	]
 }

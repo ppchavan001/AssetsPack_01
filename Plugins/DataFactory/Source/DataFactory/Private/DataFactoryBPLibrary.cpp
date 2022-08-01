@@ -10,7 +10,13 @@
 
 #include <string>
 #include <Misc/FileHelper.h>
+#include "Components/InputComponent.h"
+#include "Misc/CString.h"
 
+
+DEFINE_LOG_CATEGORY(DataFactoryLog);
+
+FString CurrentFileName = FString(__FILE__).RightChop(FString(__FILE__).Find(&FString("\\")[0], ESearchCase::IgnoreCase, ESearchDir::FromEnd) + 1);
 
 UDataFactoryBPLibrary::UDataFactoryBPLibrary(const FObjectInitializer& ObjectInitializer)
 : Super(ObjectInitializer)
@@ -34,16 +40,20 @@ void UDataFactoryBPLibrary::SetFPropertyByName(UObject* Object, FName NameOfTheP
 		}
 		else
 		{
-			UE_LOG(LogTemp, Warning, 
+			UE_LOG(DataFactoryLog, Warning, 
 				   TEXT("DataFactoryBPLibrary.cpp : SetFPropertyByName : Couldn't find property name = %s."), 
 				   *(NameOfThePropertyToUpdate.ToString()));
 		}
 	}
 	else
 	{
-		UE_LOG(LogTemp, Warning,
+		UE_LOG(DataFactoryLog, Warning,
 			   TEXT("DataFactoryBPLibrary.cpp : SetFPropertyByName : Invalid object provided."));
 	}
+
+
+
+
 }
 
 
@@ -453,20 +463,20 @@ void UDataFactoryBPLibrary::SetFPropertyValueInternal(FProperty* property, void*
 			}
 
 
-			UE_LOG(LogTemp, Warning, 
+			UE_LOG(DataFactoryLog, Warning, 
 				   TEXT("DataFactoryBPLibrary.cpp : SetFPropertyValueInternal : Tried to set value of unsupported struct type = %s , Property name = %s"), 
 				   *StructTypeName, *(NameOfThePropertyToUpdate.ToString()));
 
 			return;
 		}
 
-		UE_LOG(LogTemp, Warning, TEXT("DataFactoryBPLibrary.cpp : SetFPropertyValueInternal : Tried to set value of unsupported type. Property Name = %s"), *(NameOfThePropertyToUpdate.ToString()));
+		UE_LOG(DataFactoryLog, Warning, TEXT("DataFactoryBPLibrary.cpp : SetFPropertyValueInternal : Tried to set value of unsupported type. Property Name = %s"), *(NameOfThePropertyToUpdate.ToString()));
 
 		
 	}
 
 	
-	UE_LOG(LogTemp, Warning, 
+	UE_LOG(DataFactoryLog, Warning, 
 		   TEXT("DataFactoryBPLibrary.cpp : SetFPropertyValueInternal : The property or the object provided is invalid. DataToSet = %s"),
 		   *(DataToSet));
 
