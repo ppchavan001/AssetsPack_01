@@ -12,6 +12,8 @@
 #include <Misc/FileHelper.h>
 #include "Components/InputComponent.h"
 #include "Misc/CString.h"
+#include "GameFramework/PlayerInput.h"
+#include "GameFramework/InputSettings.h"
 
 
 DEFINE_LOG_CATEGORY(DataFactoryLog);
@@ -480,6 +482,7 @@ void UDataFactoryBPLibrary::SetFPropertyValueInternal(FProperty* property, void*
 		   TEXT("DataFactoryBPLibrary.cpp : SetFPropertyValueInternal : The property or the object provided is invalid. DataToSet = %s"),
 		   *(DataToSet));
 
+#undef Object
 }
 
 
@@ -499,12 +502,111 @@ FString UDataFactoryBPLibrary::GetFPropertyClassName(UObject* Object, FName Prop
 	return FString("Invalid Object!");
 }
 
+#pragma optimize("", on)
+bool UDataFactoryBPLibrary::BindFunctionToActionBindingByName(AActor* Actor, 
+															  FName ActionName, 
+															  FName FunctionName, 
+															  EInputEvent KeyEvent, 
+															  bool bShouldSpawnInputComponent, 
+															  bool bForceEnablePlayerInput, 
+															  TEnumAsByte<EAutoReceiveInput::Type> ReceivePlayerInputFrom)
+{
+
+	if (Actor)
+	{
+		UInputComponent* InputComponent;
+
+		UInputSettings* InputSettings = UInputSettings::GetInputSettings();
+		bool ActionPresentInSettings = InputSettings->DoesActionExist(ActionName);
+
+
+		if (!ActionPresentInSettings)
+		{
+
+			UE_LOG(DataFactoryLog, Warning, TEXT("%s::%s::%d : Action name : %s, not present in InputSettings!"),
+				   *CurrentFileName, *FString(__func__), __LINE__, *(ActionName.ToString()));
+
+			return false;
+		}
+
+
+		InputComponent = Cast<UInputComponent>(Actor->GetComponentByClass(InputComponent->StaticClass()));
+
+		if (!InputComponent)
+		{
+
+			if (bShouldSpawnInputComponent)
+			{
+				UE_LOG(DataFactoryLog, Log, TEXT("%s::%s::%d : InputComponent not found on the actor. Adding new InputComponent to the actor. for function: %s, action : %s"),
+					   *CurrentFileName, *FString(__func__), __LINE__, *(FunctionName.ToString()), *(ActionName.ToString()));
+
+				Actor->AddComponentByClass(InputComponent->StaticClass(), false, FTransform(), false);
+				InputComponent = Cast<UInputComponent>(Actor->GetComponentByClass(InputComponent->StaticClass()));
+			}
+			else
+			{
+				UE_LOG(DataFactoryLog, Warning, TEXT("%s::%s::%d : InputComponent not found on the actor! Returning false for function: %s, action : %s"),
+					   *CurrentFileName, *FString(__func__), __LINE__, *(FunctionName.ToString()), *(ActionName.ToString()));
+
+				return false;
+			}
+		}
+
+		int32 ActionIndex = -1;
+		for (int32 i = 0; i < InputComponent->GetNumActionBindings(); ++i)
+		{
+			if (InputComponent->GetActionBinding(i).GetActionName() == ActionName)
+			{
+				ActionIndex = i;
+				break;
+			}
+		}
+
+		if(ActionIndex > -1)
+		{
+			InputComponent->GetActionBinding(ActionIndex).ActionDelegate.GetDelegateForManualSet().BindUFunction(Actor, FunctionName);
+
+		}
+		else
+		{
+
+			FInputActionBinding NewActionBinding(ActionName, KeyEvent);
+
+			NewActionBinding.ActionDelegate.GetDelegateForManualSet().BindUFunction(Actor, FunctionName);
+
+			InputComponent->AddActionBinding(NewActionBinding);
+				
+		}
+		
+		if (bForceEnablePlayerInput)
+		{
+			if (Actor->GetWorld() && Actor->GetWorld()->GetFirstPlayerController())
+			{
+				Actor->EnableInput(Actor->GetWorld()->GetFirstPlayerController());
+
+				Actor->AutoReceiveInput = ReceivePlayerInputFrom;
+			}
+		}
+		UE_LOG(DataFactoryLog, Log, TEXT("%s::%s::%d : Bound function : %s to action with name : %s "),
+			   *CurrentFileName, *FString(__func__), __LINE__, *(FunctionName.ToString()), *(ActionName.ToString()));
+
+		return true;
+
+	}
+
+	UE_LOG(DataFactoryLog, Warning, TEXT("%s::%s::%d : Invalid actor provided!"),
+		   *CurrentFileName, *FString(__func__), __LINE__);
+	return false;
+}
+
+#pragma optimize("", on)
+
 bool UDataFactoryBPLibrary::WriteStringToFile(const FString FileName, const FString DataToWrite)
 {
 	return FFileHelper::SaveStringToFile(DataToWrite, &FileName[0]);
 }
-
 bool UDataFactoryBPLibrary::ReadLinesFromFile(const FString FileName, TArray<FString>& LinesOut)
 {
 	return FFileHelper::LoadFileToStringArray(LinesOut, &FileName[0]);
 }
+

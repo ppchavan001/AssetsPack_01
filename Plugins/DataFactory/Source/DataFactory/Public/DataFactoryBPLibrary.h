@@ -61,11 +61,25 @@ class UDataFactoryBPLibrary : public UBlueprintFunctionLibrary
 	UFUNCTION(BlueprintCallable, meta = (DisplayName = "Get Property Class Name"), Category = "DataFactory | General")
 		static FString GetFPropertyClassName(UObject* Object, FName PropertyName);
 
+	// Binds UFunction to the action.
+	// Creates action on the object if not already present.
+	// Spawning new input components and enabling player input could affect performance severely
+	UFUNCTION(BlueprintCallable, Category = "DataFactory | Controller")
+		static bool BindFunctionToActionBindingByName(AActor* Actor, 
+													  FName ActionName, 
+													  FName FunctionName, 
+													  EInputEvent KeyEvent = IE_Released, 
+													  bool bShouldSpawnInputComponent = false,
+													  bool bForceEnablePlayerInput = false,
+													  TEnumAsByte<EAutoReceiveInput::Type> ReceivePlayerInputFrom = EAutoReceiveInput::Disabled);
+
 
 	UFUNCTION(BlueprintCallable, Category = "DataFactory | Import/ Export")
 	static bool WriteStringToFile(const FString FileName, const FString DataToWrite);
 
 	UFUNCTION(BlueprintGetter, Category = "DataFactory | Import/ Export")
 	static bool ReadLinesFromFile(const FString FileName, TArray<FString>& LinesOut);
+
+
 
 };
