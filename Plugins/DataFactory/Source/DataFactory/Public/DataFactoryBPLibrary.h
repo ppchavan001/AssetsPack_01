@@ -63,15 +63,11 @@ class UDataFactoryBPLibrary : public UBlueprintFunctionLibrary
 
 	// Binds UFunction to the action.
 	// Creates action on the object if not already present.
-	// Spawning new input components and enabling player input could affect performance severely
 	UFUNCTION(BlueprintCallable, Category = "DataFactory | Controller")
 		static bool BindFunctionToActionBindingByName(AActor* Actor, 
 													  FName ActionName, 
 													  FName FunctionName, 
-													  EInputEvent KeyEvent = IE_Released, 
-													  bool bShouldSpawnInputComponent = false,
-													  bool bForceEnablePlayerInput = false,
-													  TEnumAsByte<EAutoReceiveInput::Type> ReceivePlayerInputFrom = EAutoReceiveInput::Disabled);
+													  EInputEvent KeyEvent = IE_Released);
 
 
 	UFUNCTION(BlueprintCallable, Category = "DataFactory | Import/ Export")

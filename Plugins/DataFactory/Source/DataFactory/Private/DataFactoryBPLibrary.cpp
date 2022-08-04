@@ -506,52 +506,67 @@ FString UDataFactoryBPLibrary::GetFPropertyClassName(UObject* Object, FName Prop
 bool UDataFactoryBPLibrary::BindFunctionToActionBindingByName(AActor* Actor, 
 															  FName ActionName, 
 															  FName FunctionName, 
-															  EInputEvent KeyEvent, 
-															  bool bShouldSpawnInputComponent, 
-															  bool bForceEnablePlayerInput, 
-															  TEnumAsByte<EAutoReceiveInput::Type> ReceivePlayerInputFrom)
+															  EInputEvent KeyEvent)
 {
 
-	if (Actor)
+	if (Actor && Actor->GetWorld() && Actor->GetWorld()->GetFirstPlayerController())
 	{
-		UInputComponent* InputComponent;
 
 		UInputSettings* InputSettings = UInputSettings::GetInputSettings();
-		bool ActionPresentInSettings = InputSettings->DoesActionExist(ActionName);
+		bool ActionPresentInSettings = false;
 
-
-		if (!ActionPresentInSettings)
+		if (InputSettings)
 		{
-
-			UE_LOG(DataFactoryLog, Warning, TEXT("%s::%s::%d : Action name : %s, not present in InputSettings!"),
+			ActionPresentInSettings = InputSettings->DoesActionExist(ActionName);
+		}
+		else
+		{
+			UE_LOG(DataFactoryLog, Error, TEXT("%s::%s::%d : Couldn't find Input settings for Action : %s!"),
 				   *CurrentFileName, *FString(__func__), __LINE__, *(ActionName.ToString()));
 
 			return false;
 		}
 
 
+		// If provided action name is not present in action mappings at runtime:
+		// Return false
+		if (!ActionPresentInSettings)
+		{
+
+			UE_LOG(DataFactoryLog, Error, TEXT("%s::%s::%d : Action name : %s, not present in InputSettings!"),
+				   *CurrentFileName, *FString(__func__), __LINE__, *(ActionName.ToString()));
+
+			return false;
+		}
+
+
+		// Input component setup start ************************
+
+		UInputComponent* InputComponent;
 		InputComponent = Cast<UInputComponent>(Actor->GetComponentByClass(InputComponent->StaticClass()));
 
 		if (!InputComponent)
 		{
 
-			if (bShouldSpawnInputComponent)
-			{
-				UE_LOG(DataFactoryLog, Log, TEXT("%s::%s::%d : InputComponent not found on the actor. Adding new InputComponent to the actor. for function: %s, action : %s"),
-					   *CurrentFileName, *FString(__func__), __LINE__, *(FunctionName.ToString()), *(ActionName.ToString()));
+			auto Player0Controller = Actor->GetWorld()->GetFirstPlayerController();
 
-				Actor->AddComponentByClass(InputComponent->StaticClass(), false, FTransform(), false);
-				InputComponent = Cast<UInputComponent>(Actor->GetComponentByClass(InputComponent->StaticClass()));
+			if (Player0Controller->InputComponent)
+			{
+				InputComponent = Player0Controller->InputComponent;
 			}
 			else
 			{
-				UE_LOG(DataFactoryLog, Warning, TEXT("%s::%s::%d : InputComponent not found on the actor! Returning false for function: %s, action : %s"),
+				UE_LOG(DataFactoryLog, Error, TEXT("%s::%s::%d : InputComponent not found on the player0! Returning false for function: %s, action : %s"),
 					   *CurrentFileName, *FString(__func__), __LINE__, *(FunctionName.ToString()), *(ActionName.ToString()));
 
 				return false;
 			}
+
 		}
 
+		// Input component setup End ************************
+
+		// Searching for action on the InputComponent
 		int32 ActionIndex = -1;
 		for (int32 i = 0; i < InputComponent->GetNumActionBindings(); ++i)
 		{
@@ -565,28 +580,18 @@ bool UDataFactoryBPLibrary::BindFunctionToActionBindingByName(AActor* Actor,
 		if(ActionIndex > -1)
 		{
 			InputComponent->GetActionBinding(ActionIndex).ActionDelegate.GetDelegateForManualSet().BindUFunction(Actor, FunctionName);
-
 		}
 		else
 		{
+			// Action binding not found on the controller,
+			// Create and assign new action binding
 
 			FInputActionBinding NewActionBinding(ActionName, KeyEvent);
-
 			NewActionBinding.ActionDelegate.GetDelegateForManualSet().BindUFunction(Actor, FunctionName);
-
 			InputComponent->AddActionBinding(NewActionBinding);
 				
 		}
-		
-		if (bForceEnablePlayerInput)
-		{
-			if (Actor->GetWorld() && Actor->GetWorld()->GetFirstPlayerController())
-			{
-				Actor->EnableInput(Actor->GetWorld()->GetFirstPlayerController());
-
-				Actor->AutoReceiveInput = ReceivePlayerInputFrom;
-			}
-		}
+	
 		UE_LOG(DataFactoryLog, Log, TEXT("%s::%s::%d : Bound function : %s to action with name : %s "),
 			   *CurrentFileName, *FString(__func__), __LINE__, *(FunctionName.ToString()), *(ActionName.ToString()));
 
@@ -594,7 +599,7 @@ bool UDataFactoryBPLibrary::BindFunctionToActionBindingByName(AActor* Actor,
 
 	}
 
-	UE_LOG(DataFactoryLog, Warning, TEXT("%s::%s::%d : Invalid actor provided!"),
+	UE_LOG(DataFactoryLog, Error, TEXT("%s::%s::%d : Invalid actor or world or player0 controller!"),
 		   *CurrentFileName, *FString(__func__), __LINE__);
 	return false;
 }
