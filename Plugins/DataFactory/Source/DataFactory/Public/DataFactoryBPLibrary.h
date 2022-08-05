@@ -66,7 +66,7 @@ class UDataFactoryBPLibrary : public UBlueprintFunctionLibrary
 	// Binds UFunction to the action.
 	// Creates action on the object if not already present.
 	UFUNCTION(BlueprintCallable, Category = "DataFactory | Controller")
-		static bool BindFunctionToActionBindingByName(AActor* Actor, 
+		static bool BindFunctionToActionBindingByName(UObject* Object, 
 													  FName ActionName, 
 													  FName FunctionName, 
 													  EInputEvent KeyEvent = IE_Released);
