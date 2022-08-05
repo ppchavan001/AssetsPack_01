@@ -66,11 +66,8 @@ FKey UDataFactoryBPLibrary::GetKeyFromName(FName name)
 }
 
 
-void UDataFactoryBPLibrary::SetFPropertyValueInternal(FProperty* property, void* InContainer, const FString DataToSet, FName NameOfThePropertyToUpdate)
+void UDataFactoryBPLibrary::SetFPropertyValueInternal(FProperty* property, void* Object, const FString DataToSet, FName NameOfThePropertyToUpdate)
 {
-
-#define Object InContainer
-
 	// If property is valid for the object
 	// Determine property type
 	if (property && Object)
@@ -189,7 +186,7 @@ void UDataFactoryBPLibrary::SetFPropertyValueInternal(FProperty* property, void*
 			DataToSet.ParseIntoArray(DataArray, *FString(","), false);
 
 
-			FScriptArrayHelper_InContainer Helper(ArrayProperty, InContainer);
+			FScriptArrayHelper_InContainer Helper(ArrayProperty, Object);
 
 			// Clear old values
 			Helper.EmptyValues(DataArray.Num());
@@ -482,7 +479,6 @@ void UDataFactoryBPLibrary::SetFPropertyValueInternal(FProperty* property, void*
 		   TEXT("DataFactoryBPLibrary.cpp : SetFPropertyValueInternal : The property or the object provided is invalid. DataToSet = %s"),
 		   *(DataToSet));
 
-#undef Object
 }
 
 
