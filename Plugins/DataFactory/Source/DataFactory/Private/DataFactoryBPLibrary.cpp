@@ -515,14 +515,19 @@ bool UDataFactoryBPLibrary::BindFunctionToActionBindingByName(AActor* Actor,
 		UInputSettings* InputSettings = UInputSettings::GetInputSettings();
 		bool ActionPresentInSettings = false;
 
-		if (InputSettings)
-		{
-			ActionPresentInSettings = InputSettings->DoesActionExist(ActionName);
-		}
+		if (InputSettings) ActionPresentInSettings = InputSettings->DoesActionExist(ActionName);
 		else
 		{
 			UE_LOG(DataFactoryLog, Error, TEXT("%s::%s::%d : Couldn't find Input settings for Action : %s!"),
 				   *CurrentFileName, *FString(__func__), __LINE__, *(ActionName.ToString()));
+
+			return false;
+		}
+
+		if (!(Actor->GetClass()->FindFunctionByName(FunctionName)))
+		{
+			UE_LOG(DataFactoryLog, Error, TEXT("%s::%s::%d : Actor doesn't have the specified function : %s, for Action : %s!"),
+				   *CurrentFileName, *FString(__func__), __LINE__, *(FunctionName.ToString()) , *(ActionName.ToString()));
 
 			return false;
 		}
