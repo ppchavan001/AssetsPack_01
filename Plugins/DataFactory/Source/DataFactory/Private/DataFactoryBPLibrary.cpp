@@ -651,29 +651,27 @@ void UDataFactoryBPLibrary::BindAxisInputInternal(UInputComponent* InputComponen
 {
 
 	// Searching for action on the InputComponent
-	int32 ActionIndex = -1;
-	for (int32 i = 0; i < InputComponent->GetNumActionBindings(); ++i)
+	int32 AxisIndex = -1;
+	for (int32 i = 0; i < InputComponent->AxisBindings.Num(); ++i)
 	{
-		if (InputComponent->GetActionBinding(i).GetActionName() == ActionName)
+		if (InputComponent->AxisBindings[i].AxisName == ActionName)
 		{
-			ActionIndex = i;
+			AxisIndex = i;
 			break;
 		}
 	}
 
 
-	if (ActionIndex > -1)
-		InputComponent->GetActionBinding(ActionIndex).ActionDelegate.GetDelegateForManualSet().BindUFunction(Object, FunctionName);
+	if (AxisIndex > -1)
+		InputComponent->AxisBindings[AxisIndex].AxisDelegate.GetDelegateForManualSet().BindUFunction(Object, FunctionName);
 
 	else
 	{
-		// Action binding not found on the controller,
-		// Create and assign new action binding
-
-		FInputActionBinding NewActionBinding(ActionName, KeyEvent);
-		NewActionBinding.ActionDelegate.GetDelegateForManualSet().BindUFunction(Object, FunctionName);
-		InputComponent->AddActionBinding(NewActionBinding);
-
+		// Key binding not found on the controller,
+		// Create and assign new Key binding
+		FInputAxisBinding NewAxisBinding(ActionName);
+		NewAxisBinding.AxisDelegate.GetDelegateForManualSet().BindUFunction(Object, FunctionName);
+		InputComponent->AxisBindings.Add(NewAxisBinding);
 	}
 }
 
