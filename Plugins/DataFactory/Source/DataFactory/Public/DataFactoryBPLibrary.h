@@ -72,18 +72,30 @@ class UDataFactoryBPLibrary : public UBlueprintFunctionLibrary
 	UFUNCTION(BlueprintCallable, meta = (DisplayName = "Get Property Class Name"), Category = "DataFactory | General")
 		static FString GetFPropertyClassName(UObject* Object, FName PropertyName);
 
-	// Binds UFunction to the action.
-	// Creates action on the object if not already present.
+	
+	/// <summary>
+	// Removes existing action/axis/key bindings and binds the function to it.
+	//	
+	// Object = Container of the function
+	// SourceName = Action name/ axis name / key to bind function to
+	// KeyEvent = Trigger type. Only used in action/ key bindings
+	// InputComponent = Component to use to update bindings
+	//		if InputComponent is not provided, player0 Controller's InputComponent will be used for binding 
+	// 
+	// Returns Bool : true if succeeded in binding function false otherwise
+	// 
+	/// </summary>
 	UFUNCTION(BlueprintCallable, Category = "DataFactory | Controller")
 		static bool AddInputBinding(UObject* Object,
-									FName ActionName,
+									FName SourceName,
 									FName FunctionName,
 									EInputBindingSupportedTypes InputBindingType,
-									EInputEvent KeyEvent = IE_Released);
+									EInputEvent KeyEvent = IE_Released,
+									UInputComponent* InputComponent = nullptr);
 
 	static void BindActionInputInternal(UInputComponent* InputComponent, const FName& ActionName, UObject* Object, FName& FunctionName, EInputEvent KeyEvent);
-	static void BindAxisInputInternal(UInputComponent* InputComponent, const FName& ActionName, UObject* Object, FName& FunctionName, EInputEvent KeyEvent);
-	static void BindKeyInputInternal(UInputComponent* InputComponent, const FName& ActionName, UObject* Object, FName& FunctionName, EInputEvent KeyEvent);
+	static void BindAxisInputInternal(UInputComponent* InputComponent, const FName& AxisName, UObject* Object, FName& FunctionName);
+	static void BindKeyInputInternal(UInputComponent* InputComponent, const FName& KeyName, UObject* Object, FName& FunctionName, EInputEvent KeyEvent);
 
 
 	UFUNCTION(BlueprintCallable, Category = "DataFactory | Import/ Export")
