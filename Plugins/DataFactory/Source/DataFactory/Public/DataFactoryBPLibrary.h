@@ -11,6 +11,15 @@
 
 DECLARE_LOG_CATEGORY_EXTERN(DataFactoryLog, Log, All);
 
+UENUM(BlueprintType)
+enum class EInputBindingSupportedTypes : uint8
+{
+	ActionBinding,
+	KeyBinding,
+	AxisBinding
+};
+
+
 UCLASS()
 class UDataFactoryBPLibrary : public UBlueprintFunctionLibrary
 {
@@ -66,10 +75,15 @@ class UDataFactoryBPLibrary : public UBlueprintFunctionLibrary
 	// Binds UFunction to the action.
 	// Creates action on the object if not already present.
 	UFUNCTION(BlueprintCallable, Category = "DataFactory | Controller")
-		static bool BindFunctionToActionBindingByName(UObject* Object, 
-													  FName ActionName, 
-													  FName FunctionName, 
-													  EInputEvent KeyEvent = IE_Released);
+		static bool AddInputBinding(UObject* Object,
+									FName ActionName,
+									FName FunctionName,
+									EInputBindingSupportedTypes InputBindingType,
+									EInputEvent KeyEvent = IE_Released);
+
+	static void BindActionInputInternal(UInputComponent* InputComponent, const FName& ActionName, UObject* Object, FName& FunctionName, EInputEvent KeyEvent);
+	static void BindAxisInputInternal(UInputComponent* InputComponent, const FName& ActionName, UObject* Object, FName& FunctionName, EInputEvent KeyEvent);
+	static void BindKeyInputInternal(UInputComponent* InputComponent, const FName& ActionName, UObject* Object, FName& FunctionName, EInputEvent KeyEvent);
 
 
 	UFUNCTION(BlueprintCallable, Category = "DataFactory | Import/ Export")
