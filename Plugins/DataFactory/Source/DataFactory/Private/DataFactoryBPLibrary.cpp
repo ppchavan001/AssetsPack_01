@@ -309,7 +309,28 @@ void UDataFactoryBPLibrary::SetFPropertyValueInternal(FProperty* property, void*
 		//		return Value at index 
 		//	else 
 		//		return default value for channel
-		#define AssignChannelValue(Key, Index) (ChannelData.Contains(Key) && ChannelData[Key].Len() > 0) ? ChannelData[Key] : ((CSVArray.Num() > Index && !(CSVArray[Index].Contains(":"))) ? CSVArray[Index] : DefaultChannelValue)
+		/* Equivalent to 
+		auto AssignChannelValue = [](FString Key, int32 Index, TMap<FString, FString> ChannelData, TArray<FString> CSVArray)
+		{
+
+			if (ChannelData.Contains(Key) && ChannelData[Key].Len() > 0)
+			{
+				return ChannelData[Key];
+			}
+
+			if (CSVArray.Num() > Index && !(CSVArray[Index].Contains(":")))
+			{
+				return CSVArray[Index];
+			}
+
+			return FString("0"); // DefaultChannelValue;
+
+
+		};*/
+		#define AssignChannelValue(Key, Index) (ChannelData.Contains(Key) && ChannelData[Key].Len() > 0) ? \
+				 /* If contains valid key, return immediately */ ChannelData[Key] : \
+				/* if key is not present, if array contains valid value, return array val otherwise return default channel val. */ \
+				(CSVArray.Num() > Index && CSVArray[Index].Len() > 0 &&!(CSVArray[Index].Contains(":"))) ?  CSVArray[Index] : DefaultChannelValue
 
 
 		#define ColorR	"R"
