@@ -38,7 +38,8 @@ public:
 	void PostDataLoadingCallbackAsync();
 
 
-
+	UFUNCTION(BlueprintCallable)
+	void GetAllObjectsWithTagCached(TArray<UObject*>& OutActors, const FName Tag, bool bForceRecache = false);
 
 	//UFUNCTION(BlueprintCallable)
 	//void GetActorsWithTag(Fs);
@@ -56,5 +57,19 @@ public:
 
 
 private:
-	
+	// stores set of actors/components with the tag
+	TMap<FName, TSet<UObject*>> TagMapOfObjects;
+	void BuildTagMap();
+	void AddObjectToTagMap(UObject* Object, FName Tag)
+	{
+		if (TagMapOfObjects.Contains(Tag))
+		{
+			TagMapOfObjects[Tag].Add(Object);
+		}
+		else
+		{
+			TagMapOfObjects.Add(Tag);
+			TagMapOfObjects[Tag].Add(Object);
+		}
+	}
 };

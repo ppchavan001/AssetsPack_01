@@ -71,6 +71,19 @@ void ADataLoaderActorBackend::PostDataLoadingCallbackAsync()
 
 }
 
+void ADataLoaderActorBackend::GetAllObjectsWithTagCached(TArray<UObject*>& OutActors, const FName Tag, bool bForceRecache)
+{
+	if (bForceRecache || TagMapOfObjects.Num() == 0 || !TagMapOfObjects.Contains(Tag))
+	{
+		BuildTagMap();
+	}
+
+	if (TagMapOfObjects.Contains(Tag))
+	{
+		OutActors = TagMapOfObjects[Tag].Array();
+	}
+}
+
 // Called when the game starts or when spawned
 void ADataLoaderActorBackend::BeginPlay()
 {
@@ -85,4 +98,33 @@ void ADataLoaderActorBackend::Tick(float DeltaTime)
 
 }
 
+void ADataLoaderActorBackend::BuildTagMap()
+{
+	UWorld* World = GetWorld();
+
+	if (World)
+	{
+		TagMapOfObjects.Reset();
+	
+		for (TActorIterator<AActor> It(World, AActor::StaticClass()); It; ++It)
+		{
+			AActor* Actor = *It;
+			if (Actor && !Actor->IsPendingKill())
+			{
+				for (auto Tag : Actor->Tags)
+				{
+					AddObjectToTagMap(Actor, Tag);
+				}
+
+				for (auto component : Actor->GetComponents())
+				{
+					for (auto Tag : component->ComponentTags)
+					{
+						AddObjectToTagMap(component, Tag);
+					}
+				}
+			}
+		}
+	}
+}
 
