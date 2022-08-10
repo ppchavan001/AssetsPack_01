@@ -55,7 +55,6 @@ public:
 	FOnDataLoadingFinished OnDataLoadingFinished;
 
 
-	void PostDataLoadingCallback_Internal();
 private:
-
+	
 };

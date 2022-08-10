@@ -85,8 +85,4 @@ void ADataLoaderActorBackend::Tick(float DeltaTime)
 
 }
 
-void ADataLoaderActorBackend::PostDataLoadingCallback_Internal()
-{
-	
-}
 
