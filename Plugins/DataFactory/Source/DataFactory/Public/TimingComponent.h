@@ -8,8 +8,39 @@
 #include "TimingComponent.generated.h"
 
 
+USTRUCT(BlueprintType)
+struct FLogParameters
+{
+	GENERATED_BODY()
 
+	// if true Starts timing on construct
+	// else will start on begin play
+		UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (ExposeOnSpawn = "true"))
+		bool bStartTimerOnConstruct = true;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (ExposeOnSpawn = "true"))
+		bool bPrintToLog = false;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (ExposeOnSpawn = "true"))
+		bool bPrintToScreen = true;
+
+	// String to append before time
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (ExposeOnSpawn = "true"))
+		FString Prefix = "";
+
+	// String to append after time
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (ExposeOnSpawn = "true"))
+		FString Postfix = "";
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (ExposeOnSpawn = "true"))
+		EDataFactoryLogVerbosity LogVerbosity = EDataFactoryLogVerbosity::Log;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (ExposeOnSpawn = "true"))
+		FLinearColor OnScreenMessageColor = FLinearColor::Yellow;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (ExposeOnSpawn = "true"))
+		float TimeToDisplayMessageOnScreen = 2.0f;
+};
 
 /*
 * Saves time at begin play and on destroyed.
@@ -32,37 +63,13 @@ protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (ExposeOnSpawn = "true"))
+		FLogParameters LogParameters;
+
 public:
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
-	// if true Starts timing on construct
-	// else will start on begin play
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (ExposeOnSpawn = "true"))
-		bool bStartTimerOnConstruct = true;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (ExposeOnSpawn = "true"))
-		bool bPrintToLog = false;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (ExposeOnSpawn = "true"))
-		bool bPrintToScreen = true;
-
-	// String to append before time
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (ExposeOnSpawn = "true"))
-		FString Prefix = "";
-
-	// String to append after time
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (ExposeOnSpawn = "true"))
-		FString Postfix = "";
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (ExposeOnSpawn = "true"))
-	EDataFactoryLogVerbosity LogVerbosity = EDataFactoryLogVerbosity::Log;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (ExposeOnSpawn = "true"))
-	FLinearColor OnScreenMessageColor = FLinearColor::Yellow;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (ExposeOnSpawn = "true"))
-	float TimeToDisplayMessageOnScreen = 2.0f;
 
 private:
 	FDateTime BeginPlayTime;

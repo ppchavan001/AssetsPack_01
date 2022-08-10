@@ -11,7 +11,7 @@ UTimingComponent::UTimingComponent()
 	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
 	// off to improve performance if you don't need them.
 	PrimaryComponentTick.bCanEverTick = false;
-	if (bStartTimerOnConstruct) BeginPlayTime = FDateTime::Now();
+	if (LogParameters.bStartTimerOnConstruct) BeginPlayTime = FDateTime::Now();
 	// ...
 }
 
@@ -20,19 +20,20 @@ void UTimingComponent::DestroyComponent(bool bPromoteChildren /*= false*/)
 {
 	FTimespan DeltaTime = FDateTime::Now() - BeginPlayTime;
 
-	FString FinalDisplayString = Prefix;
+	FString FinalDisplayString = LogParameters.Prefix;
 	FinalDisplayString += DeltaTime.ToString();
-	FinalDisplayString += Postfix;
+	FinalDisplayString += LogParameters.Postfix;
 
-	if (bPrintToLog)
+	if (LogParameters.bPrintToLog)
 	{
-		GLog->Log(DataFactoryLog.GetCategoryName(), (ELogVerbosity::Type)(LogVerbosity), &FinalDisplayString[0]);
+		GLog->Log(DataFactoryLog.GetCategoryName(), (ELogVerbosity::Type)(LogParameters.LogVerbosity), &FinalDisplayString[0]);
 	}
 
 	if (this->GetWorld() && this->GetWorld()->GetFirstPlayerController())
 	{
 		if (GEngine)
-			GEngine->AddOnScreenDebugMessage(-1, TimeToDisplayMessageOnScreen, OnScreenMessageColor.ToFColor(true), FinalDisplayString);
+			GEngine->AddOnScreenDebugMessage(-1, LogParameters.TimeToDisplayMessageOnScreen,
+											 LogParameters.OnScreenMessageColor.ToFColor(true), FinalDisplayString);
 	}
 }
 
@@ -41,7 +42,7 @@ void UTimingComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
-	if (!bStartTimerOnConstruct) BeginPlayTime = FDateTime::Now();
+	if (!LogParameters.bStartTimerOnConstruct) BeginPlayTime = FDateTime::Now();
 
 }
 

@@ -114,7 +114,7 @@ class UDataFactoryBPLibrary : public UBlueprintFunctionLibrary
 	UFUNCTION(BlueprintCallable, meta = (DisplayName = "Get Property Class Name"), Category = "DataFactory | General")
 		static FString GetFPropertyClassName(UObject* Object, FName PropertyName);
 
-	
+
 	/// <summary>
 	// Removes existing action/axis/key bindings and binds the function to it.
 	//	
@@ -141,10 +141,10 @@ class UDataFactoryBPLibrary : public UBlueprintFunctionLibrary
 
 
 	UFUNCTION(BlueprintCallable, Category = "DataFactory | Import/ Export")
-	static bool WriteStringToFile(const FString FileName, const FString DataToWrite);
+		static bool WriteStringToFile(const FString FileName, const FString DataToWrite);
 
 	UFUNCTION(BlueprintGetter, Category = "DataFactory | Import/ Export")
-	static bool ReadLinesFromFile(const FString FileName, TArray<FString>& LinesOut);
+		static bool ReadLinesFromFile(const FString FileName, TArray<FString>& LinesOut);
 
 
 
