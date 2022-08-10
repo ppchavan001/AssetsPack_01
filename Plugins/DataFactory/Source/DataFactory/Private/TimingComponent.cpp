@@ -3,7 +3,7 @@
 
 #include "TimingComponent.h"
 #include "Engine/Console.h"
-
+#include "Logging/LogVerbosity.h"
 
 // Sets default values for this component's properties
 UTimingComponent::UTimingComponent()
@@ -20,20 +20,19 @@ void UTimingComponent::DestroyComponent(bool bPromoteChildren /*= false*/)
 {
 	FTimespan DeltaTime = FDateTime::Now() - BeginPlayTime;
 
-	FString FinalDisplayString = DeltaTime.ToString();
+	FString FinalDisplayString = Prefix;
+	FinalDisplayString += DeltaTime.ToString();
+	FinalDisplayString += Postfix;
 
 	if (bPrintToLog)
 	{
-		UE_LOG(LogTemp, Log, TEXT("%s"), *FinalDisplayString);
+		GLog->Log(DataFactoryLog.GetCategoryName(), (ELogVerbosity::Type)(LogVerbosity), &FinalDisplayString[0]);
 	}
 
-	if (this->GetWorld()->GetFirstPlayerController())
+	if (this->GetWorld() && this->GetWorld()->GetFirstPlayerController())
 	{
-		ULocalPlayer* LocalPlayer = Cast<ULocalPlayer>(this->GetWorld()->GetFirstPlayerController()->Player);
-		if (LocalPlayer && LocalPlayer->ViewportClient && LocalPlayer->ViewportClient->ViewportConsole)
-		{
-			LocalPlayer->ViewportClient->ViewportConsole->OutputText(FinalDisplayString);
-		}
+		if (GEngine)
+			GEngine->AddOnScreenDebugMessage(-1, TimeToDisplayMessageOnScreen, OnScreenMessageColor.ToFColor(true), FinalDisplayString);
 	}
 }
 
@@ -43,7 +42,7 @@ void UTimingComponent::BeginPlay()
 	Super::BeginPlay();
 
 	if (!bStartTimerOnConstruct) BeginPlayTime = FDateTime::Now();
-	
+
 }
 
 
