@@ -4,7 +4,57 @@
 #include "DataLoaderActorBackend.h"
 #include "Kismet/GameplayStatics.h"
 #include "EngineUtils.h"
-//#include "Async/Async.h"
+#include "Async/Async.h"
+#include "Async/AsyncWork.h"
+
+class DataLoaderAsyncTask : public FNonAbandonableTask
+{
+	friend class FAutoDeleteAsyncTask<DataLoaderAsyncTask>;
+
+	UObject* WorldContextObject;
+
+	DataLoaderAsyncTask(UObject* Object)
+		: WorldContextObject(Object)
+	{}
+
+	void DoWork()
+	{
+		if (UWorld* World = WorldContextObject->GetWorld())
+		{
+			auto lvls = World->GetLevels();
+			for (ULevel* Level : lvls)
+			{
+				if (Level)
+				{
+					auto actrs = Level->Actors;
+					for (auto Actor : actrs)
+					{
+						if (Actor && Actor->Implements<UDataLoaderInterface>())
+						{
+							IDataLoaderInterface::Execute_PostDataLoadCallback(Actor);
+						}
+					}
+				}
+			}
+
+
+			return;
+			for (FActorIterator It(World); It; ++It)
+			{
+				AActor* Actor = *It;
+				if (Actor->Implements<UDataLoaderInterface>())
+				{
+					IDataLoaderInterface::Execute_PostDataLoadCallback(Actor);
+				}
+			}
+		}
+	}
+
+	FORCEINLINE TStatId GetStatId() const
+	{
+		RETURN_QUICK_DECLARE_CYCLE_STAT(DataLoaderAsyncTask, STATGROUP_ThreadPoolAsyncTasks);
+	}
+};
 
 // Sets default values
 ADataLoaderActorBackend::ADataLoaderActorBackend()
@@ -14,9 +64,10 @@ ADataLoaderActorBackend::ADataLoaderActorBackend()
 
 }
 
-void ADataLoaderActorBackend::PostDataLoadingCallback()
+void ADataLoaderActorBackend::PostDataLoadingCallbackAsync()
 {
-	PostDataLoadingCallback_Internal();
+	OnDataLoadingFinished.Broadcast();
+	(new FAutoDeleteAsyncTask<DataLoaderAsyncTask>(this))->StartBackgroundTask();
 
 }
 
@@ -36,18 +87,6 @@ void ADataLoaderActorBackend::Tick(float DeltaTime)
 
 void ADataLoaderActorBackend::PostDataLoadingCallback_Internal()
 {
-	OnDataLoadingFinished.Broadcast();
-
-	if (UWorld* World = GetWorld())
-	{
-		for (FActorIterator It(World); It; ++It)
-		{
-			AActor* Actor = *It;
-			if (Actor->Implements<UDataLoaderInterface>())
-			{
-				IDataLoaderInterface::Execute_PostDataLoadCallback(Actor);
-			}
-		}
-	}
+	
 }
 

@@ -7,6 +7,7 @@
 #include "DataLoaderActorBackend.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnDataLoadingFinished);
+DECLARE_DYNAMIC_DELEGATE(FAsyncPostLoadCallbackDelegate);
 
 UINTERFACE(MinimalAPI, Blueprintable, BlueprintType)
 class UDataLoaderInterface : public UInterface
@@ -34,7 +35,7 @@ public:
 	ADataLoaderActorBackend();
 
 	UFUNCTION(BlueprintCallable)
-	void PostDataLoadingCallback();
+	void PostDataLoadingCallbackAsync();
 
 
 
@@ -54,7 +55,7 @@ public:
 	FOnDataLoadingFinished OnDataLoadingFinished;
 
 
-private:
 	void PostDataLoadingCallback_Internal();
+private:
 
 };
