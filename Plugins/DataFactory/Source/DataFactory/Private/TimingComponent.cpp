@@ -11,14 +11,14 @@ UTimingComponent::UTimingComponent()
 	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
 	// off to improve performance if you don't need them.
 	PrimaryComponentTick.bCanEverTick = false;
-	if (LogParameters.bStartTimerOnConstruct) BeginPlayTime = FDateTime::Now();
+	if (LogParameters.bStartTimerOnConstruct) StartTime = FDateTime::Now();
 	// ...
 }
 
 
 void UTimingComponent::DestroyComponent(bool bPromoteChildren /*= false*/)
 {
-	FTimespan DeltaTime = FDateTime::Now() - BeginPlayTime;
+	FTimespan DeltaTime = GetTimeSpan();
 
 	FString FinalDisplayString = LogParameters.Prefix;
 	FinalDisplayString += DeltaTime.ToString();
@@ -42,16 +42,12 @@ void UTimingComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
-	if (!LogParameters.bStartTimerOnConstruct) BeginPlayTime = FDateTime::Now();
+	if (!LogParameters.bStartTimerOnConstruct) StartTime = FDateTime::Now();
 
 }
 
-
-// Called every frame
-void UTimingComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
+const FTimespan UTimingComponent::GetTimeSpan()
 {
-	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-
-	// ...
+	return FDateTime::Now() - StartTime;
 }
 

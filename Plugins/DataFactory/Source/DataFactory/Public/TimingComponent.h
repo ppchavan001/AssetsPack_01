@@ -67,11 +67,11 @@ protected:
 		FLogParameters LogParameters;
 
 public:
-	// Called every frame
-	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
-
+	// The time since the timer started
+	UFUNCTION(BlueprintPure)
+	const FTimespan GetTimeSpan();
 
 private:
-	FDateTime BeginPlayTime;
+	FDateTime StartTime;
 
 };
