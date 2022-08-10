@@ -34,10 +34,13 @@ public:
 	ADataLoaderActorBackend();
 
 	UFUNCTION(BlueprintCallable)
-	void PostDataLoadingCallback()
-	{
-		OnDataLoadingFinished.Broadcast();
-	}
+	void PostDataLoadingCallback();
+
+
+
+
+	//UFUNCTION(BlueprintCallable)
+	//void GetActorsWithTag(Fs);
 
 protected:
 	// Called when the game starts or when spawned
@@ -49,5 +52,9 @@ public:
 
 	UPROPERTY(BlueprintAssignable)
 	FOnDataLoadingFinished OnDataLoadingFinished;
+
+
+private:
+	void PostDataLoadingCallback_Internal();
 
 };
