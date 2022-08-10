@@ -15,13 +15,13 @@ struct FLogParameters
 
 	// if true Starts timing on construct
 	// else will start on begin play
-		UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (ExposeOnSpawn = "true"))
+		UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (ExposeOnSpawn = "true"), AdvancedDisplay)
 		bool bStartTimerOnConstruct = true;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (ExposeOnSpawn = "true"))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (ExposeOnSpawn = "true"), AdvancedDisplay)
 		bool bPrintToLog = false;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (ExposeOnSpawn = "true"))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (ExposeOnSpawn = "true"), AdvancedDisplay)
 		bool bPrintToScreen = true;
 
 	// String to append before time
@@ -29,10 +29,10 @@ struct FLogParameters
 		FString Prefix = "";
 
 	// String to append after time
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (ExposeOnSpawn = "true"))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (ExposeOnSpawn = "true"), AdvancedDisplay)
 		FString Postfix = "";
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (ExposeOnSpawn = "true"))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (ExposeOnSpawn = "true"), AdvancedDisplay)
 		EDataFactoryLogVerbosity LogVerbosity = EDataFactoryLogVerbosity::Log;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (ExposeOnSpawn = "true"))
