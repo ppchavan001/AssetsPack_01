@@ -6,6 +6,7 @@
 #include "GameFramework/Actor.h"
 #include "DataLoaderActorBackend.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnDataLoadingFinished);
 
 UINTERFACE(MinimalAPI, Blueprintable, BlueprintType)
 class UDataLoaderInterface : public UInterface
@@ -19,7 +20,7 @@ class IDataLoaderInterface
 
 public:
 	/** Add interface function declarations here */
-	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category="DataFactory : Interface")
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category="DataFactory | Interface")
 	void PostDataLoadCallback();
 };
 
@@ -32,6 +33,12 @@ public:
 	// Sets default values for this actor's properties
 	ADataLoaderActorBackend();
 
+	UFUNCTION(BlueprintCallable)
+	void PostDataLoadingCallback()
+	{
+		OnDataLoadingFinished.Broadcast();
+	}
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -39,5 +46,8 @@ protected:
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
+
+	UPROPERTY(BlueprintAssignable)
+	FOnDataLoadingFinished OnDataLoadingFinished;
 
 };
