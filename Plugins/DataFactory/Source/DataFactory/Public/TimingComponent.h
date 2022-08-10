@@ -71,7 +71,24 @@ public:
 	UFUNCTION(BlueprintPure)
 	const FTimespan GetTimeSpan();
 
-private:
-	FDateTime StartTime;
+	UFUNCTION(BlueprintCallable)
+	void PauseTimer();
 
+	UFUNCTION(BlueprintCallable)
+	void ResumeTimer()
+	{
+		ResumeTimerPrivate(false);
+	}
+
+private:
+
+	void ResumeTimerPrivate(bool bForceResume = false);
+
+	FDateTime LastStartTime;
+	// contains a list of start and end times
+	TArray<TArray<FDateTime>> TimeSpanData;
+
+
+	// will be resumed on construct or begin play based on the parameters
+	bool bIsPaused = true;
 };
