@@ -37,17 +37,6 @@ class DataLoaderAsyncTask : public FNonAbandonableTask
 					}
 				}
 			}
-
-
-			return;
-			for (FActorIterator It(World); It; ++It)
-			{
-				AActor* Actor = *It;
-				if (Actor->Implements<UDataLoaderInterface>())
-				{
-					IDataLoaderInterface::Execute_PostDataLoadCallback(Actor);
-				}
-			}
 		}
 	}
 

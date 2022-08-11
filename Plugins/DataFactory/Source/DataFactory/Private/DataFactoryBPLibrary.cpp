@@ -42,6 +42,8 @@ void UDataFactoryBPLibrary::SetFPropertyByName(UObject* Object, FName NameOfTheP
 		}
 		else
 		{
+			return;
+			// causing performance issues with logging with Everything!
 			UE_LOG(DataFactoryLog, Warning, 
 				   TEXT("DataFactoryBPLibrary.cpp : SetFPropertyByName : Couldn't find property name = %s."), 
 				   *(NameOfThePropertyToUpdate.ToString()));
