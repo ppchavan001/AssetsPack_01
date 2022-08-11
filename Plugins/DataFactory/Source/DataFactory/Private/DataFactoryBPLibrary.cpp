@@ -639,7 +639,8 @@ void UDataFactoryBPLibrary::BindActionInputInternal(UInputComponent* InputCompon
 	int32 ActionIndex = -1;
 	for (int32 i = 0; i < InputComponent->GetNumActionBindings(); ++i)
 	{
-		if (InputComponent->GetActionBinding(i).GetActionName() == ActionName)
+		if (InputComponent->GetActionBinding(i).GetActionName() == ActionName &&
+			InputComponent->GetActionBinding(i).KeyEvent == KeyEvent)
 		{
 			ActionIndex = i;
 			break;
@@ -712,7 +713,8 @@ void UDataFactoryBPLibrary::BindKeyInputInternal(UInputComponent* InputComponent
 	int32 KeyIndex = -1;
 	for (int32 i = 0; i < InputComponent->KeyBindings.Num(); ++i)
 	{
-		if (InputComponent->KeyBindings[i].Chord.GetKeyText().ToString() == KeyName.ToString())
+		if (InputComponent->KeyBindings[i].Chord.GetKeyText().ToString() == KeyName.ToString() && 
+			InputComponent->KeyBindings[i].KeyEvent == KeyEvent)
 		{
 			KeyIndex = i;
 			break;
