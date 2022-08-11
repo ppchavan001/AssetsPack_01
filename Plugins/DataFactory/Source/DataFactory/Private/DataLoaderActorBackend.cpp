@@ -6,6 +6,7 @@
 #include "EngineUtils.h"
 #include "Async/Async.h"
 #include "Async/AsyncWork.h"
+#include <DataFactory/Public/DataFactoryBPLibrary.h>
 
 class DataLoaderAsyncTask : public FNonAbandonableTask
 {
@@ -126,5 +127,58 @@ void ADataLoaderActorBackend::BuildTagMap()
 			}
 		}
 	}
+}
+
+void ADataLoaderActorBackend::UpdatePropertyOnTargetObjects(const TArray<UObject*>& TargetObjects, 
+															const FName NameOfThePropertyToUpdate, 
+															const FString& DataToSet)
+{
+	EInputBindingSupportedTypes InputBindingType = EInputBindingSupportedTypes::Invalid;
+
+
+	if (NameOfThePropertyToUpdate == ActionBindingTag) InputBindingType = EInputBindingSupportedTypes::ActionBinding;
+	else if (NameOfThePropertyToUpdate == AxisBindingTag) InputBindingType = EInputBindingSupportedTypes::AxisBinding;
+	else if (NameOfThePropertyToUpdate == KeyBindingTag) InputBindingType = EInputBindingSupportedTypes::KeyBinding;
+
+	if (InputBindingType == EInputBindingSupportedTypes::Invalid)
+	{
+		for (auto Object : GetTargetObjectsBackend(TargetObjects))
+		{
+			UDataFactoryBPLibrary::SetFPropertyByName(Object, NameOfThePropertyToUpdate, DataToSet);
+		}
+
+		return;
+	}
+
+	/*
+	*  Ex NameOfThePropertyToUpdate = DataToSet.
+		SetActionBinding = Jump, TestEvent, 1
+		SetKeyBinding= L, LoadFile, 1
+		SetAxisBinding = MoveTest, TestEvent1
+	*/
+	TArray<FString> InputKeys;
+	DataToSet.ParseIntoArray(InputKeys, &FString(",")[0], false);
+	if (InputKeys.Num() < 3) InputKeys.Add("1");
+
+
+	for (auto Object : GetTargetObjectsBackend(TargetObjects))
+	{
+		UDataFactoryBPLibrary::AddInputBinding(Object,
+											   FName(*(InputKeys[0].TrimStartAndEnd())),
+											   FName(*(InputKeys[1].TrimStartAndEnd())),
+											   InputBindingType,
+											   static_cast<EInputEvent>(FCString::Atoi(&InputKeys[2][0])));
+	}
+
+
+}
+
+TArray<UObject*> ADataLoaderActorBackend::GetTargetObjectsBackend(const TArray<UObject*> TargetObjectsOut)
+{
+	if (TargetObjectsOut.Num() > 0) return TargetObjectsOut;
+
+	TArray<UObject*> Arr;
+	Arr.Add(this);
+	return Arr;
 }
 

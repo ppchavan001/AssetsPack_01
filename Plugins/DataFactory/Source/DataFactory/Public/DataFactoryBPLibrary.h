@@ -58,7 +58,8 @@ enum class EInputBindingSupportedTypes : uint8
 {
 	ActionBinding,
 	KeyBinding,
-	AxisBinding
+	AxisBinding,
+	Invalid
 };
 
 

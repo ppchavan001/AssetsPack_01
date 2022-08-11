@@ -56,8 +56,18 @@ public:
 	FOnDataLoadingFinished OnDataLoadingFinished;
 
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Parameters | Tags")
+	FName ActionBindingTag = "SetActionBinding";
+
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Parameters | Tags")
+		FName AxisBindingTag = "SetAxisBinding";
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Parameters | Tags")
+		FName KeyBindingTag = "SetKeyBinding";
+
 private:
-	// stores set of actors/components with the tag
+	// stores set of actors/components a the tag
 	TMap<FName, TSet<UObject*>> TagMapOfObjects;
 	void BuildTagMap();
 	void AddObjectToTagMap(UObject* Object, FName Tag)
@@ -72,4 +82,16 @@ private:
 			TagMapOfObjects[Tag].Add(Object);
 		}
 	}
+
+	UFUNCTION(BlueprintCallable)
+		void UpdatePropertyOnTargetObjects(const TArray<UObject*>& TargetObjects, 
+										   const FName NameOfThePropertyToUpdate, 
+										   const FString& DataToSet);
+
+
+	UFUNCTION(BlueprintPure)
+		TArray<UObject*> GetTargetObjectsBackend(const TArray<UObject*> TargetObjectsOut);
+
+
+
 };
