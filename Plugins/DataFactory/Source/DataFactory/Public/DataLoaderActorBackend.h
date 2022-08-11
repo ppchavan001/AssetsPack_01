@@ -35,7 +35,7 @@ public:
 	ADataLoaderActorBackend();
 
 	UFUNCTION(BlueprintCallable)
-	void PostDataLoadingCallbackAsync();
+	void PostDataLoadingCallbackAsync(bool bUseAsync = false);
 
 
 	UFUNCTION(BlueprintCallable)

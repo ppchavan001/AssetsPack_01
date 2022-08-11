@@ -54,10 +54,30 @@ ADataLoaderActorBackend::ADataLoaderActorBackend()
 
 }
 
-void ADataLoaderActorBackend::PostDataLoadingCallbackAsync()
+void ADataLoaderActorBackend::PostDataLoadingCallbackAsync(bool bUseAsync /*= false*/)
 {
 	OnDataLoadingFinished.Broadcast();
+	if(bUseAsync)
 	(new FAutoDeleteAsyncTask<DataLoaderAsyncTask>(this))->StartBackgroundTask();
+
+	else if (UWorld* World = GetWorld())
+	{
+		auto lvls = World->GetLevels();
+		for (ULevel* Level : lvls)
+		{
+			if (Level)
+			{
+				auto actrs = Level->Actors;
+				for (auto Actor : actrs)
+				{
+					if (Actor && Actor->Implements<UDataLoaderInterface>())
+					{
+						IDataLoaderInterface::Execute_PostDataLoadCallback(Actor);
+					}
+				}
+			}
+		}
+	}
 
 }
 
