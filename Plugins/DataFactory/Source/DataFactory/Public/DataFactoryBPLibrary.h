@@ -9,7 +9,59 @@
 #include "DataFactoryBPLibrary.generated.h"
 
 
+
+UENUM(BlueprintType)
+enum class EDataFactoryLogVerbosity : uint8
+{
+	/** Not used */
+	NoLogging = 0,
+
+	/** Always prints a fatal error to console (and log file) and crashes (even if logging is disabled) */
+	Fatal,
+
+	/**
+		* Prints an error to console (and log file).
+		* Commandlets and the editor collect and report errors. Error messages result in commandlet failure.
+		*/
+		Error,
+
+		/**
+		* Prints a warning to console (and log file).
+		* Commandlets and the editor collect and report warnings. Warnings can be treated as an error.
+		*/
+		Warning,
+
+		/** Prints a message to console (and log file) */
+		Display,
+
+		/** Prints a message to a log file (does not print to console) */
+		Log,
+
+		/**
+		* Prints a verbose message to a log file (if Verbose logging is enabled for the given category,
+		* usually used for detailed logging)
+		*/
+		Verbose,
+
+		/**
+		* Prints a verbose message to a log file (if VeryVerbose logging is enabled,
+		* usually used for detailed logging that would otherwise spam output)
+		*/
+		VeryVerbose,
+
+};
+
 DECLARE_LOG_CATEGORY_EXTERN(DataFactoryLog, Log, All);
+
+UENUM(BlueprintType)
+enum class EInputBindingSupportedTypes : uint8
+{
+	ActionBinding,
+	KeyBinding,
+	AxisBinding,
+	Invalid
+};
+
 
 UCLASS()
 class UDataFactoryBPLibrary : public UBlueprintFunctionLibrary
@@ -63,20 +115,37 @@ class UDataFactoryBPLibrary : public UBlueprintFunctionLibrary
 	UFUNCTION(BlueprintCallable, meta = (DisplayName = "Get Property Class Name"), Category = "DataFactory | General")
 		static FString GetFPropertyClassName(UObject* Object, FName PropertyName);
 
-	// Binds UFunction to the action.
-	// Creates action on the object if not already present.
+
+	/// <summary>
+	// Removes existing action/axis/key bindings and binds the function to it.
+	//	
+	// Object = Container of the function
+	// SourceName = Action name/ axis name / key to bind function to
+	// KeyEvent = Trigger type. Only used in action/ key bindings
+	// InputComponent = Component to use to update bindings
+	//		if InputComponent is not provided, player0 Controller's InputComponent will be used for binding 
+	// 
+	// Returns Bool : true if succeeded in binding function false otherwise
+	// 
+	/// </summary>
 	UFUNCTION(BlueprintCallable, Category = "DataFactory | Controller")
-		static bool BindFunctionToActionBindingByName(AActor* Actor, 
-													  FName ActionName, 
-													  FName FunctionName, 
-													  EInputEvent KeyEvent = IE_Released);
+		static bool AddInputBinding(UObject* Object,
+									FName SourceName,
+									FName FunctionName,
+									EInputBindingSupportedTypes InputBindingType,
+									EInputEvent KeyEvent = IE_Released,
+									UInputComponent* InputComponent = nullptr);
+
+	static void BindActionInputInternal(UInputComponent* InputComponent, const FName& ActionName, UObject* Object, FName& FunctionName, EInputEvent KeyEvent);
+	static void BindAxisInputInternal(UInputComponent* InputComponent, const FName& AxisName, UObject* Object, FName& FunctionName);
+	static void BindKeyInputInternal(UInputComponent* InputComponent, const FName& KeyName, UObject* Object, FName& FunctionName, EInputEvent KeyEvent);
 
 
 	UFUNCTION(BlueprintCallable, Category = "DataFactory | Import/ Export")
-	static bool WriteStringToFile(const FString FileName, const FString DataToWrite);
+		static bool WriteStringToFile(const FString FileName, const FString DataToWrite);
 
 	UFUNCTION(BlueprintGetter, Category = "DataFactory | Import/ Export")
-	static bool ReadLinesFromFile(const FString FileName, TArray<FString>& LinesOut);
+		static bool ReadLinesFromFile(const FString FileName, TArray<FString>& LinesOut);
 
 
 

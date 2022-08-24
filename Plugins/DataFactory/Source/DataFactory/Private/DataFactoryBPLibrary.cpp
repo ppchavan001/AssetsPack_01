@@ -42,6 +42,8 @@ void UDataFactoryBPLibrary::SetFPropertyByName(UObject* Object, FName NameOfTheP
 		}
 		else
 		{
+			return;
+			// causing performance issues with logging with Everything!
 			UE_LOG(DataFactoryLog, Warning, 
 				   TEXT("DataFactoryBPLibrary.cpp : SetFPropertyByName : Couldn't find property name = %s."), 
 				   *(NameOfThePropertyToUpdate.ToString()));
@@ -309,7 +311,28 @@ void UDataFactoryBPLibrary::SetFPropertyValueInternal(FProperty* property, void*
 		//		return Value at index 
 		//	else 
 		//		return default value for channel
-		#define AssignChannelValue(Key, Index) (ChannelData.Contains(Key) && ChannelData[Key].Len() > 0) ? ChannelData[Key] : ((CSVArray.Num() > Index && !(CSVArray[Index].Contains(":"))) ? CSVArray[Index] : DefaultChannelValue)
+		/* Equivalent to 
+		auto AssignChannelValue = [](FString Key, int32 Index, TMap<FString, FString> ChannelData, TArray<FString> CSVArray)
+		{
+
+			if (ChannelData.Contains(Key) && ChannelData[Key].Len() > 0)
+			{
+				return ChannelData[Key];
+			}
+
+			if (CSVArray.Num() > Index && !(CSVArray[Index].Contains(":")))
+			{
+				return CSVArray[Index];
+			}
+
+			return FString("0"); // DefaultChannelValue;
+
+
+		};*/
+		#define AssignChannelValue(Key, Index) (ChannelData.Contains(Key) && ChannelData[Key].Len() > 0) ? \
+				 /* If contains valid key, return immediately */ ChannelData[Key] : \
+				/* if key is not present, if array contains valid value, return array val otherwise return default channel val. */ \
+				(CSVArray.Num() > Index && CSVArray[Index].Len() > 0 &&!(CSVArray[Index].Contains(":"))) ?  CSVArray[Index] : DefaultChannelValue
 
 
 		#define ColorR	"R"
@@ -499,57 +522,71 @@ FString UDataFactoryBPLibrary::GetFPropertyClassName(UObject* Object, FName Prop
 }
 
 #pragma optimize("", on)
-bool UDataFactoryBPLibrary::BindFunctionToActionBindingByName(AActor* Actor, 
-															  FName ActionName, 
-															  FName FunctionName, 
-															  EInputEvent KeyEvent)
+bool UDataFactoryBPLibrary::AddInputBinding(UObject* Object,
+											FName SourceName,
+											FName FunctionName,
+											EInputBindingSupportedTypes InputBindingType,
+											EInputEvent KeyEvent,
+											UInputComponent* InputComponent)
 {
 
-	if (Actor && Actor->GetWorld() && Actor->GetWorld()->GetFirstPlayerController())
+	if (Object && Object->GetWorld() && Object->GetWorld()->GetFirstPlayerController())
 	{
-
+		// Required object checks start **************************
 		UInputSettings* InputSettings = UInputSettings::GetInputSettings();
-		bool ActionPresentInSettings = false;
-
-		if (InputSettings) ActionPresentInSettings = InputSettings->DoesActionExist(ActionName);
-		else
+		if (!InputSettings)
 		{
 			UE_LOG(DataFactoryLog, Error, TEXT("%s::%s::%d : Couldn't find Input settings for Action : %s!"),
-				   *CurrentFileName, *FString(__func__), __LINE__, *(ActionName.ToString()));
+				   *CurrentFileName, *FString(__func__), __LINE__, *(SourceName.ToString()));
 
 			return false;
 		}
 
-		if (!(Actor->GetClass()->FindFunctionByName(FunctionName)))
+		// Proceed only if a function with the FunctionName exists on the provided Object
+		if (!(Object->GetClass()->FindFunctionByName(FunctionName)))
 		{
-			UE_LOG(DataFactoryLog, Error, TEXT("%s::%s::%d : Actor doesn't have the specified function : %s, for Action : %s!"),
-				   *CurrentFileName, *FString(__func__), __LINE__, *(FunctionName.ToString()) , *(ActionName.ToString()));
+			UE_LOG(DataFactoryLog, Error, TEXT("%s::%s::%d : Object doesn't have the specified function : %s, for binding : %s!"),
+				   *CurrentFileName, *FString(__func__), __LINE__, *(FunctionName.ToString()) , *(SourceName.ToString()));
 
 			return false;
 		}
 
 
-		// If provided action name is not present in action mappings at runtime:
+		// If provided action/ axis name is not present in action mappings at runtime:
 		// Return false
+		bool ActionPresentInSettings = false;
+		switch (InputBindingType)
+		{
+		case EInputBindingSupportedTypes::ActionBinding:
+			ActionPresentInSettings = InputSettings->DoesActionExist(SourceName);
+			break;
+
+		case EInputBindingSupportedTypes::KeyBinding:
+			ActionPresentInSettings = true;
+			break;
+
+		case EInputBindingSupportedTypes::AxisBinding:
+			ActionPresentInSettings = InputSettings->DoesAxisExist(SourceName);
+			break;
+		}
+
 		if (!ActionPresentInSettings)
 		{
 
 			UE_LOG(DataFactoryLog, Error, TEXT("%s::%s::%d : Action name : %s, not present in InputSettings!"),
-				   *CurrentFileName, *FString(__func__), __LINE__, *(ActionName.ToString()));
+				   *CurrentFileName, *FString(__func__), __LINE__, *(SourceName.ToString()));
 
 			return false;
 		}
 
+		// Required object checks end **************************
+
 
 		// Input component setup start ************************
-
-		UInputComponent* InputComponent;
-		InputComponent = Cast<UInputComponent>(Actor->GetComponentByClass(InputComponent->StaticClass()));
-
+		// if no input component is provided, look for one
 		if (!InputComponent)
 		{
-
-			auto Player0Controller = Actor->GetWorld()->GetFirstPlayerController();
+			auto Player0Controller = Object->GetWorld()->GetFirstPlayerController();
 
 			if (Player0Controller->InputComponent)
 			{
@@ -558,43 +595,29 @@ bool UDataFactoryBPLibrary::BindFunctionToActionBindingByName(AActor* Actor,
 			else
 			{
 				UE_LOG(DataFactoryLog, Error, TEXT("%s::%s::%d : InputComponent not found on the player0! Returning false for function: %s, action : %s"),
-					   *CurrentFileName, *FString(__func__), __LINE__, *(FunctionName.ToString()), *(ActionName.ToString()));
+					   *CurrentFileName, *FString(__func__), __LINE__, *(FunctionName.ToString()), *(SourceName.ToString()));
 
 				return false;
 			}
-
 		}
 
 		// Input component setup End ************************
 
-		// Searching for action on the InputComponent
-		int32 ActionIndex = -1;
-		for (int32 i = 0; i < InputComponent->GetNumActionBindings(); ++i)
-		{
-			if (InputComponent->GetActionBinding(i).GetActionName() == ActionName)
-			{
-				ActionIndex = i;
-				break;
-			}
-		}
 
-		if(ActionIndex > -1)
+		switch (InputBindingType)
 		{
-			InputComponent->GetActionBinding(ActionIndex).ActionDelegate.GetDelegateForManualSet().BindUFunction(Actor, FunctionName);
-		}
-		else
-		{
-			// Action binding not found on the controller,
-			// Create and assign new action binding
-
-			FInputActionBinding NewActionBinding(ActionName, KeyEvent);
-			NewActionBinding.ActionDelegate.GetDelegateForManualSet().BindUFunction(Actor, FunctionName);
-			InputComponent->AddActionBinding(NewActionBinding);
-				
-		}
+		case EInputBindingSupportedTypes::ActionBinding:
+			BindActionInputInternal(InputComponent, SourceName, Object, FunctionName, KeyEvent);
+			break;
 	
-		UE_LOG(DataFactoryLog, Log, TEXT("%s::%s::%d : Bound function : %s to action with name : %s "),
-			   *CurrentFileName, *FString(__func__), __LINE__, *(FunctionName.ToString()), *(ActionName.ToString()));
+		case EInputBindingSupportedTypes::KeyBinding:
+			BindKeyInputInternal(InputComponent, SourceName, Object, FunctionName, KeyEvent);
+			break;
+		
+		case EInputBindingSupportedTypes::AxisBinding:
+			BindAxisInputInternal(InputComponent, SourceName, Object, FunctionName);
+			break;
+		}
 
 		return true;
 
@@ -603,6 +626,118 @@ bool UDataFactoryBPLibrary::BindFunctionToActionBindingByName(AActor* Actor,
 	UE_LOG(DataFactoryLog, Error, TEXT("%s::%s::%d : Invalid actor or world or player0 controller!"),
 		   *CurrentFileName, *FString(__func__), __LINE__);
 	return false;
+}
+
+void UDataFactoryBPLibrary::BindActionInputInternal(UInputComponent* InputComponent, 
+													const FName& ActionName, 
+													UObject* Object, 
+													FName& FunctionName, 
+													EInputEvent KeyEvent)
+{
+
+	// Searching for action on the InputComponent
+	int32 ActionIndex = -1;
+	for (int32 i = 0; i < InputComponent->GetNumActionBindings(); ++i)
+	{
+		if (InputComponent->GetActionBinding(i).GetActionName() == ActionName &&
+			InputComponent->GetActionBinding(i).KeyEvent == KeyEvent)
+		{
+			ActionIndex = i;
+			break;
+		}
+	}
+
+
+	if (ActionIndex > -1) 
+		InputComponent->GetActionBinding(ActionIndex).ActionDelegate.GetDelegateForManualSet().BindUFunction(Object, FunctionName);
+		
+	else
+	{
+		// Action binding not found on the controller,
+		// Create and assign new action binding
+
+		FInputActionBinding NewActionBinding(ActionName, KeyEvent);
+		NewActionBinding.ActionDelegate.GetDelegateForManualSet().BindUFunction(Object, FunctionName);
+		InputComponent->AddActionBinding(NewActionBinding);
+
+	}
+
+
+	UE_LOG(DataFactoryLog, Log, TEXT("%s::%s::%d : Bound function : %s to ActionMapping: %s "),
+		   *CurrentFileName, *FString(__func__), __LINE__, *(FunctionName.ToString()), *(ActionName.ToString()));
+
+}
+
+
+void UDataFactoryBPLibrary::BindAxisInputInternal(UInputComponent* InputComponent, 
+												  const FName& AxisName,
+												  UObject* Object, 
+												  FName& FunctionName)
+{
+
+	// Searching for action on the InputComponent
+	int32 AxisIndex = -1;
+	for (int32 i = 0; i < InputComponent->AxisBindings.Num(); ++i)
+	{
+		if (InputComponent->AxisBindings[i].AxisName == AxisName)
+		{
+			AxisIndex = i;
+			break;
+		}
+	}
+
+
+	if (AxisIndex > -1)
+		InputComponent->AxisBindings[AxisIndex].AxisDelegate.GetDelegateForManualSet().BindUFunction(Object, FunctionName);
+
+	else
+	{
+		// Key binding not found on the controller,
+		// Create and assign new Key binding
+		FInputAxisBinding NewAxisBinding(AxisName);
+		NewAxisBinding.AxisDelegate.GetDelegateForManualSet().BindUFunction(Object, FunctionName);
+		InputComponent->AxisBindings.Add(NewAxisBinding);
+	}
+
+
+
+	UE_LOG(DataFactoryLog, Log, TEXT("%s::%s::%d : Bound function : %s to AxisMapping: %s "),
+		   *CurrentFileName, *FString(__func__), __LINE__, *(FunctionName.ToString()), *(AxisName.ToString()));
+}
+
+
+void UDataFactoryBPLibrary::BindKeyInputInternal(UInputComponent* InputComponent, const FName& KeyName, UObject* Object, FName& FunctionName, EInputEvent KeyEvent)
+{
+
+	// Searching for action on the InputComponent
+	int32 KeyIndex = -1;
+	for (int32 i = 0; i < InputComponent->KeyBindings.Num(); ++i)
+	{
+		if (InputComponent->KeyBindings[i].Chord.GetKeyText().ToString() == KeyName.ToString() && 
+			InputComponent->KeyBindings[i].KeyEvent == KeyEvent)
+		{
+			KeyIndex = i;
+			break;
+		}
+	}
+
+
+	if (KeyIndex > -1)
+		InputComponent->KeyBindings[KeyIndex].KeyDelegate.GetDelegateForManualSet().BindUFunction(Object, FunctionName);
+
+	else
+	{
+		// Key binding not found on the controller,
+		// Create and assign new Key binding
+
+		FInputKeyBinding NewKeyBinding(FInputChord(FKey(KeyName)), KeyEvent);
+		NewKeyBinding.KeyDelegate.GetDelegateForManualSet().BindUFunction(Object, FunctionName);
+		InputComponent->KeyBindings.Add(NewKeyBinding);
+	}
+
+
+	UE_LOG(DataFactoryLog, Log, TEXT("%s::%s::%d : Bound function : %s to Key: %s "),
+		   *CurrentFileName, *FString(__func__), __LINE__, *(FunctionName.ToString()), *(KeyName.ToString()));
 }
 
 #pragma optimize("", on)
