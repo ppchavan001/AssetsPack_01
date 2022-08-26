@@ -95,6 +95,30 @@ void ADataLoaderActorBackend::GetAllObjectsWithTagCached(TArray<UObject*>& OutAc
 	}
 }
 
+FString ADataLoaderActorBackend::GetEnviornmentInfo(FString Separator /*= ""*/)
+{
+	FString str = "";
+
+	if (FApp::GetBuildTargetType() == EBuildTargetType::Program)
+	{
+		str += FApp::GetName();
+	}
+	else
+	{
+		str += FApp::GetProjectName();
+	}
+	
+	str += Separator;
+	str += LexToString(FApp::GetBuildConfiguration());
+	
+	
+	str += Separator;
+	str += LexToString(FApp::GetBuildTargetType());
+	
+	return str;
+}
+
+
 // Called when the game starts or when spawned
 void ADataLoaderActorBackend::BeginPlay()
 {

@@ -41,8 +41,9 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void GetAllObjectsWithTagCached(TArray<UObject*>& OutActors, const FName Tag, bool bForceRecache = false);
 
-	//UFUNCTION(BlueprintCallable)
-	//void GetActorsWithTag(Fs);
+	UFUNCTION(BlueprintPure)
+	FString GetEnviornmentInfo(FString Separator = "");
+	
 
 protected:
 	// Called when the game starts or when spawned
