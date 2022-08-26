@@ -112,7 +112,7 @@ class UDataFactoryBPLibrary : public UBlueprintFunctionLibrary
 	// Called from SetFPropertyByName
 	static void SetFPropertyValueInternal(FProperty* property, void* Object, const FString DataToSet, FName NameOfThePropertyToUpdate);
 
-	UFUNCTION(BlueprintCallable, meta = (DisplayName = "Get Property Class Name"), Category = "DataFactory | General")
+	UFUNCTION(BlueprintPure, meta = (DisplayName = "Get Property Class Name"), Category = "DataFactory | General")
 		static FString GetFPropertyClassName(UObject* Object, FName PropertyName);
 
 
