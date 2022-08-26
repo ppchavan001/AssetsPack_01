@@ -47,9 +47,10 @@ enum class EDataFactoryLogVerbosity : uint8
 		* Prints a verbose message to a log file (if VeryVerbose logging is enabled,
 		* usually used for detailed logging that would otherwise spam output)
 		*/
-		VeryVerbose,
+		VeryVerbose
 
 };
+
 
 DECLARE_LOG_CATEGORY_EXTERN(DataFactoryLog, Log, All);
 
@@ -69,8 +70,17 @@ class UDataFactoryBPLibrary : public UBlueprintFunctionLibrary
 	GENERATED_UCLASS_BODY()
 
 
-		UFUNCTION(BlueprintPure, meta = (DisplayName = "Get Key From Name", Keywords = "Get Key From Name"), Category = "ExposeRuntimeFunctions | Input")
+		UFUNCTION(BlueprintPure, meta = (DisplayName = "Get Key From Name", Keywords = "Get Key From Name"), Category = "DataFactory | Input")
 		static FKey GetKeyFromName(FName name);
+		
+
+	UFUNCTION(BlueprintCallable, meta = (WorldContext = "WorldContextObject", CallableWithoutWorldContext, Keywords = "log print", AdvancedDisplay = "2", DevelopmentOnly), Category = "DataFactory | Log")
+	static void DF_PrintString(const UObject* WorldContextObject, 
+							   const FString InString = "", 
+							   EDataFactoryLogVerbosity LogVerbosity = EDataFactoryLogVerbosity::Log,
+							   bool bPrintToScreen = true, 
+							   bool bPrintToLog = true, 
+							   float Duration = 2.f);
 
 
 

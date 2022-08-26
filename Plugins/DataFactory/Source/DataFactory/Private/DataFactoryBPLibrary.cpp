@@ -66,6 +66,67 @@ FKey UDataFactoryBPLibrary::GetKeyFromName(FName name)
 }
 
 
+void UDataFactoryBPLibrary::DF_PrintString(const UObject* WorldContextObject, const FString InString /*= ""*/, EDataFactoryLogVerbosity LogVerbosity, bool bPrintToScreen /*= true*/, bool bPrintToLog /*= true*/, float Duration /*= 2.f*/)
+{
+	UWorld* World = GEngine->GetWorldFromContextObject(WorldContextObject, EGetWorldErrorMode::ReturnNull);
+	FString Prefix;
+	if (World)
+	{
+		if (World->WorldType == EWorldType::PIE)
+		{
+			switch (World->GetNetMode())
+			{
+			case NM_Client:
+				// GPlayInEditorID 0 is always the server, so 1 will be first client.
+				// You want to keep this logic in sync with GeneratePIEViewportWindowTitle and UpdatePlayInEditorWorldDebugString
+				Prefix = FString::Printf(TEXT("Client %d: "), GPlayInEditorID);
+				break;
+			case NM_DedicatedServer:
+			case NM_ListenServer:
+				Prefix = FString::Printf(TEXT("Server: "));
+				break;
+			case NM_Standalone:
+				break;
+			}
+		}
+	}
+
+	const FString FinalDisplayString = Prefix + InString;
+	FString FinalLogString = FinalDisplayString;
+
+	static const FBoolConfigValueHelper DisplayPrintStringSource(TEXT("Kismet"), TEXT("bLogPrintStringSource"), GEngineIni);
+	if (DisplayPrintStringSource)
+	{
+		const FString SourceObjectPrefix = FString::Printf(TEXT("[%s] "), *GetNameSafe(WorldContextObject));
+		FinalLogString = SourceObjectPrefix + FinalLogString;
+	}
+
+	if (bPrintToLog)
+	{
+		//UE_LOG(DataFactoryLog, (ELogVerbosity::Type)LogVerbosity, TEXT("%s"), *FinalLogString);
+		GLog->Log(DataFactoryLog.GetCategoryName(), (ELogVerbosity::Type)(LogVerbosity), &FinalLogString[0]);
+	}
+
+	// Also output to the screen, if possible
+	if (bPrintToScreen)
+	{
+		if (GAreScreenMessagesEnabled)
+		{
+			if (GConfig && Duration < 0)
+			{
+				GConfig->GetFloat(TEXT("Kismet"), TEXT("PrintStringDuration"), Duration, GEngineIni);
+			}
+
+			FColor OnScreenTextColor = FColor::Blue;
+			GEngine->AddOnScreenDebugMessage((uint64)-1, Duration, OnScreenTextColor, FinalDisplayString);
+		}
+		else
+		{
+			UE_LOG(DataFactoryLog, VeryVerbose, TEXT("Screen messages disabled (!GAreScreenMessagesEnabled).  Cannot print to screen."));
+		}
+	}
+}
+
 void UDataFactoryBPLibrary::SetFPropertyValueInternal(FProperty* property, void* Object, const FString DataToSet, FName NameOfThePropertyToUpdate)
 {
 	// If property is valid for the object
