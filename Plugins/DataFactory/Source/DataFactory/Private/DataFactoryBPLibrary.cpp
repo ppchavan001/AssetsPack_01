@@ -42,9 +42,7 @@ void UDataFactoryBPLibrary::SetFPropertyByName(UObject* Object, FName NameOfTheP
 		}
 		else
 		{
-			return;
-			// causing performance issues with logging with Everything!
-			UE_LOG(DataFactoryLog, Warning, 
+			UE_LOG(DataFactoryLog, Verbose,
 				   TEXT("DataFactoryBPLibrary.cpp : SetFPropertyByName : Couldn't find property name = %s."), 
 				   *(NameOfThePropertyToUpdate.ToString()));
 		}
@@ -498,7 +496,7 @@ void UDataFactoryBPLibrary::SetFPropertyValueInternal(FProperty* property, void*
 	}
 
 	
-	UE_LOG(DataFactoryLog, Warning, 
+	UE_LOG(DataFactoryLog, Verbose, 
 		   TEXT("DataFactoryBPLibrary.cpp : SetFPropertyValueInternal : The property or the object provided is invalid. DataToSet = %s"),
 		   *(DataToSet));
 
