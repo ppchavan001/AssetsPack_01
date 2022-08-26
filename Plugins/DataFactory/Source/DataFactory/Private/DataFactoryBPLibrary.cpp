@@ -742,7 +742,7 @@ void UDataFactoryBPLibrary::BindKeyInputInternal(UInputComponent* InputComponent
 
 bool UDataFactoryBPLibrary::WriteStringToFile(const FString FileName, const FString DataToWrite)
 {
-	return FFileHelper::SaveStringToFile(DataToWrite, &FileName[0]);
+	return FFileHelper::SaveStringToFile(DataToWrite, &FileName[0], FFileHelper::EEncodingOptions::ForceUTF8);
 }
 bool UDataFactoryBPLibrary::ReadLinesFromFile(const FString FileName, TArray<FString>& LinesOut)
 {
