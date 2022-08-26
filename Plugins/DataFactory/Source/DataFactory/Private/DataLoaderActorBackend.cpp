@@ -54,8 +54,9 @@ ADataLoaderActorBackend::ADataLoaderActorBackend()
 
 }
 
-void ADataLoaderActorBackend::PostDataLoadingCallbackAsync(bool bUseAsync /*= false*/)
+void ADataLoaderActorBackend::PostDataLoadingCallbackAsync()
 {
+	bool bUseAsync = false;
 	OnDataLoadingFinished.Broadcast();
 	if(bUseAsync)
 	(new FAutoDeleteAsyncTask<DataLoaderAsyncTask>(this))->StartBackgroundTask();
