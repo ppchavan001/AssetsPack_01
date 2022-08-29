@@ -50,7 +50,7 @@ enum class EDataFactoryLogVerbosity : uint8
 		VeryVerbose
 
 };
-
+#define GETENUMSTRING(etype, evalue) ( (FindObject(ANY_PACKAGE, TEXT(etype), true) != nullptr) ? FindObject(ANY_PACKAGE, TEXT(etype), true)->GetEnumName((int32)evalue) : FString("Invalid - are you sure enum uses UENUM() macro?") )
 
 DECLARE_LOG_CATEGORY_EXTERN(DataFactoryLog, Log, All);
 

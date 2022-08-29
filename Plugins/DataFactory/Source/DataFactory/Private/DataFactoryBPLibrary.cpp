@@ -14,6 +14,7 @@
 #include "Misc/CString.h"
 #include "GameFramework/PlayerInput.h"
 #include "GameFramework/InputSettings.h"
+#include "Classes/EditorStyleSettings.h"
 
 
 DEFINE_LOG_CATEGORY(DataFactoryLog);
@@ -103,7 +104,6 @@ void UDataFactoryBPLibrary::DF_PrintString(const UObject* WorldContextObject, co
 
 	if (bPrintToLog)
 	{
-		//UE_LOG(DataFactoryLog, (ELogVerbosity::Type)LogVerbosity, TEXT("%s"), *FinalLogString);
 		GLog->Log(DataFactoryLog.GetCategoryName(), (ELogVerbosity::Type)(LogVerbosity), &FinalLogString[0]);
 	}
 
@@ -117,8 +117,40 @@ void UDataFactoryBPLibrary::DF_PrintString(const UObject* WorldContextObject, co
 				GConfig->GetFloat(TEXT("Kismet"), TEXT("PrintStringDuration"), Duration, GEngineIni);
 			}
 
-			FColor OnScreenTextColor = FColor::Blue;
-			GEngine->AddOnScreenDebugMessage((uint64)-1, Duration, OnScreenTextColor, FinalDisplayString);
+			const UEditorStyleSettings* EditorSettings = GetDefault<UEditorStyleSettings>();
+			
+			FLinearColor OnScreenTextColor = FColor::White;
+
+			if(EditorSettings)
+			switch (LogVerbosity)
+			{
+			case EDataFactoryLogVerbosity::NoLogging:
+				OnScreenTextColor = EditorSettings->LogNormalColor;
+				break;
+			case EDataFactoryLogVerbosity::Fatal:
+				OnScreenTextColor = EditorSettings->LogErrorColor;
+				break;
+			case EDataFactoryLogVerbosity::Error:
+				OnScreenTextColor = EditorSettings->LogErrorColor;
+				break;
+			case EDataFactoryLogVerbosity::Warning:
+				OnScreenTextColor = EditorSettings->LogWarningColor;
+				break;
+			case EDataFactoryLogVerbosity::Display:
+				OnScreenTextColor = EditorSettings->LogNormalColor;
+				break;
+			case EDataFactoryLogVerbosity::Log:
+				OnScreenTextColor = EditorSettings->LogNormalColor;
+				break;
+			case EDataFactoryLogVerbosity::Verbose:
+				OnScreenTextColor = EditorSettings->LogNormalColor;
+				break;
+			case EDataFactoryLogVerbosity::VeryVerbose:
+				OnScreenTextColor = EditorSettings->LogNormalColor;
+				break;
+			}
+
+			GEngine->AddOnScreenDebugMessage((uint64)-1, Duration, OnScreenTextColor.ToFColor(true), FinalDisplayString);
 		}
 		else
 		{
