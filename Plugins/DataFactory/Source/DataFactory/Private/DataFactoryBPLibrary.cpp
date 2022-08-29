@@ -44,14 +44,15 @@ void UDataFactoryBPLibrary::SetFPropertyByName(UObject* Object, FName NameOfTheP
 		else
 		{
 			UE_LOG(DataFactoryLog, Verbose,
-				   TEXT("DataFactoryBPLibrary.cpp : SetFPropertyByName : Couldn't find property name = %s."), 
-				   *(NameOfThePropertyToUpdate.ToString()));
+				   TEXT("%s : %s : %s : Couldn't find property name = %s."), 
+				   *CurrentFileName, *FString(__func__), __LINE__, *(NameOfThePropertyToUpdate.ToString()));
 		}
 	}
 	else
 	{
 		UE_LOG(DataFactoryLog, Warning,
-			   TEXT("DataFactoryBPLibrary.cpp : SetFPropertyByName : Invalid object provided."));
+			   TEXT("%s : %s : %s : Invalid object provided."),
+			   *CurrentFileName, *FString(__func__), __LINE__);
 	}
 
 
@@ -154,7 +155,8 @@ void UDataFactoryBPLibrary::DF_PrintString(const UObject* WorldContextObject, co
 		}
 		else
 		{
-			UE_LOG(DataFactoryLog, VeryVerbose, TEXT("Screen messages disabled (!GAreScreenMessagesEnabled).  Cannot print to screen."));
+			UE_LOG(DataFactoryLog, VeryVerbose, TEXT("%s : %s : %s : Screen messages disabled (!GAreScreenMessagesEnabled).  Cannot print to screen."),
+				   *CurrentFileName, *FString(__func__), __LINE__);
 		}
 	}
 }
@@ -577,21 +579,23 @@ void UDataFactoryBPLibrary::SetFPropertyValueInternal(FProperty* property, void*
 
 
 			UE_LOG(DataFactoryLog, Warning, 
-				   TEXT("DataFactoryBPLibrary.cpp : SetFPropertyValueInternal : Tried to set value of unsupported struct type = %s , Property name = %s"), 
+				   TEXT("%s : %s : %s : Tried to set value of unsupported struct type = %s , Property name = %s"), 
+				   *CurrentFileName, *FString(__func__), __LINE__,
 				   *StructTypeName, *(NameOfThePropertyToUpdate.ToString()));
 
 			return;
 		}
 
-		UE_LOG(DataFactoryLog, Warning, TEXT("DataFactoryBPLibrary.cpp : SetFPropertyValueInternal : Tried to set value of unsupported type. Property Name = %s"), *(NameOfThePropertyToUpdate.ToString()));
+		UE_LOG(DataFactoryLog, Warning, TEXT("%s : %s : %s : Tried to set value of unsupported type. Property Name = %s"),
+			   *CurrentFileName, *FString(__func__), __LINE__, *(NameOfThePropertyToUpdate.ToString()));
 
 		
 	}
 
 	
 	UE_LOG(DataFactoryLog, Verbose, 
-		   TEXT("DataFactoryBPLibrary.cpp : SetFPropertyValueInternal : The property or the object provided is invalid. DataToSet = %s"),
-		   *(DataToSet));
+		   TEXT("%s : %s : %s : The property or the object provided is invalid. DataToSet = %s"),
+		   *CurrentFileName, *FString(__func__), __LINE__, *(DataToSet));
 
 }
 
@@ -627,7 +631,7 @@ bool UDataFactoryBPLibrary::AddInputBinding(UObject* Object,
 		UInputSettings* InputSettings = UInputSettings::GetInputSettings();
 		if (!InputSettings)
 		{
-			UE_LOG(DataFactoryLog, Error, TEXT("%s::%s::%d : Couldn't find Input settings for Action : %s!"),
+			UE_LOG(DataFactoryLog, Error, TEXT("%s:%s:%d: Couldn't find Input settings for Action : %s!"),
 				   *CurrentFileName, *FString(__func__), __LINE__, *(SourceName.ToString()));
 
 			return false;
@@ -636,7 +640,7 @@ bool UDataFactoryBPLibrary::AddInputBinding(UObject* Object,
 		// Proceed only if a function with the FunctionName exists on the provided Object
 		if (!(Object->GetClass()->FindFunctionByName(FunctionName)))
 		{
-			UE_LOG(DataFactoryLog, Error, TEXT("%s::%s::%d : Object doesn't have the specified function : %s, for binding : %s!"),
+			UE_LOG(DataFactoryLog, Error, TEXT("%s:%s:%d: Object doesn't have the specified function : %s, for binding : %s!"),
 				   *CurrentFileName, *FString(__func__), __LINE__, *(FunctionName.ToString()) , *(SourceName.ToString()));
 
 			return false;
@@ -664,7 +668,7 @@ bool UDataFactoryBPLibrary::AddInputBinding(UObject* Object,
 		if (!ActionPresentInSettings)
 		{
 
-			UE_LOG(DataFactoryLog, Error, TEXT("%s::%s::%d : Action name : %s, not present in InputSettings!"),
+			UE_LOG(DataFactoryLog, Error, TEXT("%s:%s:%d: Action name : %s, not present in InputSettings!"),
 				   *CurrentFileName, *FString(__func__), __LINE__, *(SourceName.ToString()));
 
 			return false;
@@ -685,7 +689,7 @@ bool UDataFactoryBPLibrary::AddInputBinding(UObject* Object,
 			}
 			else
 			{
-				UE_LOG(DataFactoryLog, Error, TEXT("%s::%s::%d : InputComponent not found on the player0! Returning false for function: %s, action : %s"),
+				UE_LOG(DataFactoryLog, Error, TEXT("%s:%s:%d : InputComponent not found on the player0! Returning false for function: %s, action : %s"),
 					   *CurrentFileName, *FString(__func__), __LINE__, *(FunctionName.ToString()), *(SourceName.ToString()));
 
 				return false;
@@ -714,7 +718,7 @@ bool UDataFactoryBPLibrary::AddInputBinding(UObject* Object,
 
 	}
 
-	UE_LOG(DataFactoryLog, Error, TEXT("%s::%s::%d : Invalid actor or world or player0 controller!"),
+	UE_LOG(DataFactoryLog, Error, TEXT("%s:%s:%d : Invalid actor or world or player0 controller!"),
 		   *CurrentFileName, *FString(__func__), __LINE__);
 	return false;
 }
@@ -754,7 +758,7 @@ void UDataFactoryBPLibrary::BindActionInputInternal(UInputComponent* InputCompon
 	}
 
 
-	UE_LOG(DataFactoryLog, Log, TEXT("%s::%s::%d : Bound function : %s to ActionMapping: %s "),
+	UE_LOG(DataFactoryLog, Log, TEXT("%s:%s:%d: Bound function : %s to ActionMapping: %s "),
 		   *CurrentFileName, *FString(__func__), __LINE__, *(FunctionName.ToString()), *(ActionName.ToString()));
 
 }
@@ -792,7 +796,7 @@ void UDataFactoryBPLibrary::BindAxisInputInternal(UInputComponent* InputComponen
 
 
 
-	UE_LOG(DataFactoryLog, Log, TEXT("%s::%s::%d : Bound function : %s to AxisMapping: %s "),
+	UE_LOG(DataFactoryLog, Log, TEXT("%s:%s:%d : Bound function : %s to AxisMapping: %s "),
 		   *CurrentFileName, *FString(__func__), __LINE__, *(FunctionName.ToString()), *(AxisName.ToString()));
 }
 
@@ -827,7 +831,7 @@ void UDataFactoryBPLibrary::BindKeyInputInternal(UInputComponent* InputComponent
 	}
 
 
-	UE_LOG(DataFactoryLog, Log, TEXT("%s::%s::%d : Bound function : %s to Key: %s "),
+	UE_LOG(DataFactoryLog, Log, TEXT("%s:%s:%d: Bound function : %s to Key: %s "),
 		   *CurrentFileName, *FString(__func__), __LINE__, *(FunctionName.ToString()), *(KeyName.ToString()));
 }
 
