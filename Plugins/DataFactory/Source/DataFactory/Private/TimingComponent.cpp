@@ -24,17 +24,11 @@ void UTimingComponent::DestroyComponent(bool bPromoteChildren /*= false*/)
 	FinalDisplayString += DeltaTime.ToString();
 	FinalDisplayString += LogParameters.Postfix;
 
-	if (LogParameters.bPrintToLog)
-	{
-		GLog->Log(DataFactoryLog.GetCategoryName(), (ELogVerbosity::Type)(LogParameters.LogVerbosity), &FinalDisplayString[0]);
-	}
-
-	if (this->GetWorld() && this->GetWorld()->GetFirstPlayerController())
-	{
-		if (GEngine)
-			GEngine->AddOnScreenDebugMessage(-1, LogParameters.TimeToDisplayMessageOnScreen,
-											 LogParameters.OnScreenMessageColor.ToFColor(true), FinalDisplayString);
-	}
+	UDataFactoryBPLibrary::DF_PrintString(this, FinalDisplayString,
+										  LogParameters.LogVerbosity,
+										  LogParameters.bPrintToScreen,
+										  LogParameters.bPrintToScreen,
+										  LogParameters.TimeToDisplayMessageOnScreen);
 }
 
 // Called when the game starts

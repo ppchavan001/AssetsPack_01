@@ -35,7 +35,7 @@ struct FLogParameters
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (ExposeOnSpawn = "true"), AdvancedDisplay)
 		EDataFactoryLogVerbosity LogVerbosity = EDataFactoryLogVerbosity::Log;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (ExposeOnSpawn = "true"))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (ExposeOnSpawn = "true", DeprecatedProperty))
 		FLinearColor OnScreenMessageColor = FLinearColor::Yellow;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (ExposeOnSpawn = "true"))
