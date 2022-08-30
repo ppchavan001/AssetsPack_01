@@ -846,3 +846,27 @@ bool UDataFactoryBPLibrary::ReadLinesFromFile(const FString FileName, TArray<FSt
 	return FFileHelper::LoadFileToStringArray(LinesOut, &FileName[0]);
 }
 
+FString UDataFactoryBPLibrary::GetAppInfo(FString Separator /*= ""*/)
+{
+
+	FString str = "";
+
+	if (FApp::GetBuildTargetType() == EBuildTargetType::Program)
+	{
+		str += FApp::GetName();
+	}
+	else
+	{
+		str += FApp::GetProjectName();
+	}
+
+	str += Separator;
+	str += LexToString(FApp::GetBuildConfiguration());
+
+
+	str += Separator;
+	str += LexToString(FApp::GetBuildTargetType());
+
+	return str;
+}
+

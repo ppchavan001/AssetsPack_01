@@ -157,6 +157,8 @@ class UDataFactoryBPLibrary : public UBlueprintFunctionLibrary
 	UFUNCTION(BlueprintGetter, Category = "DataFactory | Import/ Export")
 		static bool ReadLinesFromFile(const FString FileName, TArray<FString>& LinesOut);
 
+	UFUNCTION(BlueprintPure)
+	static FString GetAppInfo(FString Separator = "");
 
 
 };

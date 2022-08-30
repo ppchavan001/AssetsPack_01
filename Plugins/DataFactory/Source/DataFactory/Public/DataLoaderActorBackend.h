@@ -34,6 +34,7 @@ public:
 	// Sets default values for this actor's properties
 	ADataLoaderActorBackend();
 
+	// Not using async callback currently
 	UFUNCTION(BlueprintCallable)
 	void PostDataLoadingCallbackAsync();
 
@@ -41,8 +42,6 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void GetAllObjectsWithTagCached(TArray<UObject*>& OutActors, const FName Tag, bool bForceRecache = false);
 
-	UFUNCTION(BlueprintPure)
-	FString GetEnviornmentInfo(FString Separator = "");
 	
 
 protected:
