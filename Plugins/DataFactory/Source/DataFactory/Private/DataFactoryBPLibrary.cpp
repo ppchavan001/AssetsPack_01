@@ -279,12 +279,15 @@ void UDataFactoryBPLibrary::SetFPropertyValueInternal(FProperty* property, void*
 			// Build CSV array
 			TArray<FString> DataArray;
 			DataToSet.ParseIntoArray(DataArray, *FString(","), false);
-
+			
 
 			FScriptArrayHelper_InContainer Helper(ArrayProperty, Object);
-
 			// Clear old values
 			Helper.EmptyValues(DataArray.Num());
+
+
+			// if no values are provided for storing, after clearing previous values, return
+			if (DataArray.Num() == 0) return;
 
 			// Add empty values for assignment
 			Helper.AddValues(DataArray.Num());
