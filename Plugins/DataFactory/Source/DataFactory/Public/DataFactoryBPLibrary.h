@@ -116,7 +116,7 @@ class UDataFactoryBPLibrary : public UBlueprintFunctionLibrary
 
 	*/
 	UFUNCTION(BlueprintCallable, Category = "DataFactory | General", meta = (DisplayName = "Set Property Value By Name"))
-		static void SetFPropertyByName(UObject* Object, FName NameOfThePropertyToUpdate, const FString DataToSet);
+		static void SetFPropertyByName(UObject* Object, FName NameOfThePropertyToUpdate, const FString DataToSet, const bool UpdateClassDefaults = false);
 
 
 	// Called from SetFPropertyByName

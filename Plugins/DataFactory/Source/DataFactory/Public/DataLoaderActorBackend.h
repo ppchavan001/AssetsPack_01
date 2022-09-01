@@ -86,7 +86,8 @@ private:
 	UFUNCTION(BlueprintCallable)
 		void UpdatePropertyOnTargetObjects(const TArray<UObject*>& TargetObjects, 
 										   const FName NameOfThePropertyToUpdate, 
-										   const FString& DataToSet);
+										   const FString& DataToSet,
+										   const bool UpdateClassDefaults = false);
 
 
 	UFUNCTION(BlueprintPure)

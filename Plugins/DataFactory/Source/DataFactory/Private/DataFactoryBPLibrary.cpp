@@ -28,14 +28,17 @@ UDataFactoryBPLibrary::UDataFactoryBPLibrary(const FObjectInitializer& ObjectIni
 }
 
 
-void UDataFactoryBPLibrary::SetFPropertyByName(UObject* Object, FName NameOfThePropertyToUpdate, const FString DataToSet)
+void UDataFactoryBPLibrary::SetFPropertyByName(UObject* Object, 
+											   FName NameOfThePropertyToUpdate, 
+											   const FString DataToSet, 
+											   const bool UpdateClassDefaults /*= false*/)
 {
 
 	if (Object)
 	{
-		UClass* _Class = Object->GetClass();
+		UClass* Class = Object->GetClass();
 
-		FProperty* property = _Class->FindPropertyByName(NameOfThePropertyToUpdate);
+		FProperty* property = Class->FindPropertyByName(NameOfThePropertyToUpdate);
 
 		if (property)
 		{
@@ -44,7 +47,7 @@ void UDataFactoryBPLibrary::SetFPropertyByName(UObject* Object, FName NameOfTheP
 		else
 		{
 			UE_LOG(DataFactoryLog, Verbose,
-				   TEXT("%s : %s : %s : Couldn't find property name = %s."), 
+				   TEXT("%s : %s : %s : Couldn't find property name = %s."),
 				   *CurrentFileName, *FString(__func__), __LINE__, *(NameOfThePropertyToUpdate.ToString()));
 		}
 	}
