@@ -116,7 +116,7 @@ class UDataFactoryBPLibrary : public UBlueprintFunctionLibrary
 
 	*/
 	UFUNCTION(BlueprintCallable, Category = "DataFactory | General", meta = (DisplayName = "Set Property Value By Name"))
-		static void SetFPropertyByName(UObject* Object, FName NameOfThePropertyToUpdate, const FString DataToSet, const bool UpdateClassDefaults = false);
+		static void SetFPropertyByName(UObject* Object, FName NameOfThePropertyToUpdate, const FString DataToSet);
 
 
 	// Called from SetFPropertyByName
@@ -125,6 +125,8 @@ class UDataFactoryBPLibrary : public UBlueprintFunctionLibrary
 	UFUNCTION(BlueprintPure, meta = (DisplayName = "Get Property Class Name"), Category = "DataFactory | General")
 		static FString GetFPropertyClassName(UObject* Object, FName PropertyName);
 
+	// returns uclass* from the AssetRegistry with name 
+	static UClass* GetClassWithName(const FName NameOfTheClass);
 
 	/// <summary>
 	// Removes existing action/axis/key bindings and binds the function to it.

@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "DataFactoryBPLibrary.h"
 #include "DataLoaderActorBackend.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnDataLoadingFinished);
@@ -86,13 +87,20 @@ private:
 	UFUNCTION(BlueprintCallable)
 		void UpdatePropertyOnTargetObjects(const TArray<UObject*>& TargetObjects, 
 										   const FName NameOfThePropertyToUpdate, 
-										   const FString& DataToSet,
-										   const bool UpdateClassDefaults = false);
+										   const FString& DataToSet);
+
+	void UpdateInputBinding(const FString& DataToSet, const TArray<UObject*>& TargetObjects, EInputBindingSupportedTypes InputBindingType);
+
+
+	UFUNCTION(BlueprintCallable)
+		void UpdateClassDefaults(const TArray<FName>& ClassNames,
+										   const FName NameOfThePropertyToUpdate,
+										   const FString& DataToSet);
 
 
 	UFUNCTION(BlueprintPure)
 		TArray<UObject*> GetTargetObjectsBackend(const TArray<UObject*> TargetObjectsOut);
 
 
-
+	EInputBindingSupportedTypes GetInputBindingType(const FName NameOfThePropertyToUpdate);
 };

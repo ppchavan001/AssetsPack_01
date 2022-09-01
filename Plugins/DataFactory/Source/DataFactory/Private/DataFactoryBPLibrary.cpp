@@ -15,7 +15,8 @@
 #include "GameFramework/PlayerInput.h"
 #include "GameFramework/InputSettings.h"
 #include "Classes/EditorStyleSettings.h"
-
+#include <IAssetRegistry.h>
+#include <AssetRegistryModule.h>
 
 DEFINE_LOG_CATEGORY(DataFactoryLog);
 
@@ -30,8 +31,7 @@ UDataFactoryBPLibrary::UDataFactoryBPLibrary(const FObjectInitializer& ObjectIni
 
 void UDataFactoryBPLibrary::SetFPropertyByName(UObject* Object, 
 											   FName NameOfThePropertyToUpdate, 
-											   const FString DataToSet, 
-											   const bool UpdateClassDefaults /*= false*/)
+											   const FString DataToSet)
 {
 
 	if (Object)
@@ -620,6 +620,27 @@ FString UDataFactoryBPLibrary::GetFPropertyClassName(UObject* Object, FName Prop
 
 	}
 	return FString("Invalid Object!");
+}
+
+UClass* UDataFactoryBPLibrary::GetClassWithName(const FName NameOfTheClass)
+{
+
+	FAssetRegistryModule& AssetRegistryModule = FModuleManager::LoadModuleChecked< FAssetRegistryModule >(FName("AssetRegistry"));
+	IAssetRegistry& AssetRegistry = AssetRegistryModule.Get();
+
+	TArray<FAssetData> AllAssets;
+	AssetRegistry.GetAllAssets(AllAssets);
+	
+	for (auto Asset : AllAssets)
+	{
+		if (Asset.AssetClass == NameOfTheClass)
+		{
+			return Asset.GetClass();
+		}
+	}
+
+	return NULL;
+	
 }
 
 #pragma optimize("", on)
