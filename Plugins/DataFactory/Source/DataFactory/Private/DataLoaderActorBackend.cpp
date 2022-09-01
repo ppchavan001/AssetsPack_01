@@ -142,6 +142,7 @@ void ADataLoaderActorBackend::BuildTagMap()
 	}
 }
 
+PRAGMA_DISABLE_OPTIMIZATION
 void ADataLoaderActorBackend::UpdatePropertyOnTargetObjects(const TArray<UObject*>& TargetObjects, 
 															const FName NameOfThePropertyToUpdate, 
 															const FString& DataToSet)
@@ -201,8 +202,7 @@ void ADataLoaderActorBackend::UpdateClassDefaults(const TArray<FName>& ClassName
 	{
 		UClass* Class = UDataFactoryBPLibrary::GetClassWithName(ClassName);
 		
-		if (Class)
-			ClassesToUpdate.Add(Class);
+		if (Class) ClassesToUpdate.Add(Class);
 	}
 
 
@@ -212,7 +212,18 @@ void ADataLoaderActorBackend::UpdateClassDefaults(const TArray<FName>& ClassName
 
 		for (auto* Class : ClassesToUpdate.Array())
 		{
-			auto Object = Class->GetDefaultObject();
+			UObject* Object = NULL;
+			if (dynamic_cast<UBlueprint*>(Class))
+			{
+				UBlueprint* bp = dynamic_cast<UBlueprint*>(Class);
+				if(bp->GeneratedClass)
+				Object = bp->GeneratedClass->GetDefaultObject();
+			}
+			else
+			{
+				Object = Class->GetDefaultObject();
+
+			}
 			UDataFactoryBPLibrary::SetFPropertyByName(Object, NameOfThePropertyToUpdate, DataToSet);
 		}
 

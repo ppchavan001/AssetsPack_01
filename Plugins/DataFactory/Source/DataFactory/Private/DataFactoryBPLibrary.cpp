@@ -622,6 +622,7 @@ FString UDataFactoryBPLibrary::GetFPropertyClassName(UObject* Object, FName Prop
 	return FString("Invalid Object!");
 }
 
+PRAGMA_DISABLE_OPTIMIZATION
 UClass* UDataFactoryBPLibrary::GetClassWithName(const FName NameOfTheClass)
 {
 
@@ -631,9 +632,10 @@ UClass* UDataFactoryBPLibrary::GetClassWithName(const FName NameOfTheClass)
 	TArray<FAssetData> AllAssets;
 	AssetRegistry.GetAllAssets(AllAssets);
 	
+
 	for (auto Asset : AllAssets)
 	{
-		if (Asset.AssetClass == NameOfTheClass)
+		if (Asset.AssetName == NameOfTheClass)
 		{
 			return Asset.GetClass();
 		}
