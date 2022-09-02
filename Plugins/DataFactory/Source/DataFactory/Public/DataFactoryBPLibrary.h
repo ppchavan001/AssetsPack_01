@@ -132,7 +132,7 @@ class UDataFactoryBPLibrary : public UBlueprintFunctionLibrary
 		static FString GetFPropertyClassName(UObject* Object, FName PropertyName);
 
 	// returns uclass* from the AssetRegistry with name 
-	static UObject* GetClassWithName(const FName NameOfTheClass);
+	static UObject* GetObjectWithName(const FName Name);
 
 	/// <summary>
 	// Removes existing action/axis/key bindings and binds the function to it.

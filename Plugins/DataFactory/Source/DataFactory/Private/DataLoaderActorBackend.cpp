@@ -200,7 +200,7 @@ void ADataLoaderActorBackend::UpdateClassDefaults(const TArray<FName>& ClassName
 	TSet<UObject*> ClassesToUpdate;
 	for (auto ClassName : ClassNames)
 	{
-		UObject* Class = UDataFactoryBPLibrary::GetClassWithName(ClassName);
+		UObject* Class = UDataFactoryBPLibrary::GetObjectWithName(ClassName);
 		
 		if (Class) ClassesToUpdate.Add(Class);
 	}

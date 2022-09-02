@@ -641,35 +641,28 @@ FString UDataFactoryBPLibrary::GetFPropertyClassName(UObject* Object, FName Prop
 	return FString("Invalid Object!");
 }
 
-PRAGMA_DISABLE_OPTIMIZATION
-UObject* UDataFactoryBPLibrary::GetClassWithName(const FName NameOfTheClass)
+UObject* UDataFactoryBPLibrary::GetObjectWithName(const FName Name)
 {
-
-	FAssetRegistryModule& AssetRegistryModule = FModuleManager::LoadModuleChecked< FAssetRegistryModule >(FName("AssetRegistry"));
-	IAssetRegistry& AssetRegistry = AssetRegistryModule.Get();
-
-	TArray<FAssetData> AllAssets;
-	AssetRegistry.GetAllAssets(AllAssets);
-
+	int32 i = 0;
 	for (TObjectIterator<UObject> It; It; ++It)
 	{
-		if (It->GetFName() == NameOfTheClass)
+		if (It->GetFName() == Name)
 		{
+			FString str = "total objects scanned : ";
+			str.AppendInt(i);
+			UDataFactoryBPLibrary::DF_PrintString(NULL, str, EDataFactoryLogVerbosity::Warning, true, true, 2.f);
+
 			return *It;
 		}
+
+		++i;
 	}
-	
+
+	FString str = "total objects scanned : ";
+	str.AppendInt(i);
+	UDataFactoryBPLibrary::DF_PrintString(NULL, str, EDataFactoryLogVerbosity::Warning, true, true, 2.f);
+
 	return NULL;
-
-
-	for (auto Asset : AllAssets)
-	{
-		if (Asset.AssetName == NameOfTheClass)
-		{
-			return Asset.GetClass();
-		}
-	}
-
 	
 }
 
