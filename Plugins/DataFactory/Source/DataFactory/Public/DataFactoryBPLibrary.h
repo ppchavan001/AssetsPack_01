@@ -82,8 +82,14 @@ class UDataFactoryBPLibrary : public UBlueprintFunctionLibrary
 							   bool bPrintToLog = true, 
 							   float Duration = 2.f);
 
+	UFUNCTION(BlueprintCallable, meta = (Keywords = "log print", DevelopmentOnly), Category = "DataFactory | Log")
+	static void DF_PrintClass(const UObject* WorldContextObject,
+								   EDataFactoryLogVerbosity LogVerbosity = EDataFactoryLogVerbosity::Log,
+								   bool bPrintToScreen = true,
+								   bool bPrintToLog = true,
+								   float Duration = 2.f);
 
-
+	
 	/*
 		Finds the property by name on the specified object and updates the value.
 
@@ -126,7 +132,7 @@ class UDataFactoryBPLibrary : public UBlueprintFunctionLibrary
 		static FString GetFPropertyClassName(UObject* Object, FName PropertyName);
 
 	// returns uclass* from the AssetRegistry with name 
-	static UClass* GetClassWithName(const FName NameOfTheClass);
+	static UObject* GetClassWithName(const FName NameOfTheClass);
 
 	/// <summary>
 	// Removes existing action/axis/key bindings and binds the function to it.

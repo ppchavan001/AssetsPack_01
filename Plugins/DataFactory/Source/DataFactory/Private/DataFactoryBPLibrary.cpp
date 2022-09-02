@@ -164,6 +164,25 @@ void UDataFactoryBPLibrary::DF_PrintString(const UObject* WorldContextObject, co
 	}
 }
 
+PRAGMA_DISABLE_OPTIMIZATION
+void UDataFactoryBPLibrary::DF_PrintClass(const UObject* WorldContextObject, EDataFactoryLogVerbosity LogVerbosity /*= EDataFactoryLogVerbosity::Log*/, bool bPrintToScreen /*= true*/, bool bPrintToLog /*= true*/, float Duration /*= 2.f*/)
+{
+	FString str = "";
+	auto* Class = WorldContextObject->GetClass();
+	str += Class->GetFName().ToString();
+	if(Class) auto* Class2 = dynamic_cast<UBlueprintGeneratedClass*>(Class);
+	if (Class)
+	{
+		auto* Class3 = dynamic_cast<UBlueprint*>(Class);
+
+		auto* Class5 = WorldContextObject->StaticClass();
+		if(Class3)
+		auto class4 = Class3->GeneratedClass.Get();
+		
+	}
+	DF_PrintString(WorldContextObject, str, LogVerbosity, bPrintToScreen, bPrintToLog, Duration);
+}
+
 void UDataFactoryBPLibrary::SetFPropertyValueInternal(FProperty* property, void* Object, const FString DataToSet, FName NameOfThePropertyToUpdate)
 {
 	// If property is valid for the object
@@ -623,7 +642,7 @@ FString UDataFactoryBPLibrary::GetFPropertyClassName(UObject* Object, FName Prop
 }
 
 PRAGMA_DISABLE_OPTIMIZATION
-UClass* UDataFactoryBPLibrary::GetClassWithName(const FName NameOfTheClass)
+UObject* UDataFactoryBPLibrary::GetClassWithName(const FName NameOfTheClass)
 {
 
 	FAssetRegistryModule& AssetRegistryModule = FModuleManager::LoadModuleChecked< FAssetRegistryModule >(FName("AssetRegistry"));
@@ -631,7 +650,17 @@ UClass* UDataFactoryBPLibrary::GetClassWithName(const FName NameOfTheClass)
 
 	TArray<FAssetData> AllAssets;
 	AssetRegistry.GetAllAssets(AllAssets);
+
+	for (TObjectIterator<UObject> It; It; ++It)
+	{
+		if (It->GetFName() == NameOfTheClass)
+		{
+			return *It;
+		}
+	}
 	
+	return NULL;
+
 
 	for (auto Asset : AllAssets)
 	{
@@ -641,7 +670,6 @@ UClass* UDataFactoryBPLibrary::GetClassWithName(const FName NameOfTheClass)
 		}
 	}
 
-	return NULL;
 	
 }
 

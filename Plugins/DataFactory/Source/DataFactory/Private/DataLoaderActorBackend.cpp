@@ -142,7 +142,7 @@ void ADataLoaderActorBackend::BuildTagMap()
 	}
 }
 
-PRAGMA_DISABLE_OPTIMIZATION
+
 void ADataLoaderActorBackend::UpdatePropertyOnTargetObjects(const TArray<UObject*>& TargetObjects, 
 															const FName NameOfThePropertyToUpdate, 
 															const FString& DataToSet)
@@ -197,10 +197,10 @@ void ADataLoaderActorBackend::UpdateClassDefaults(const TArray<FName>& ClassName
 
 	EInputBindingSupportedTypes InputBindingType = GetInputBindingType(NameOfThePropertyToUpdate);
 
-	TSet<UClass*> ClassesToUpdate;
+	TSet<UObject*> ClassesToUpdate;
 	for (auto ClassName : ClassNames)
 	{
-		UClass* Class = UDataFactoryBPLibrary::GetClassWithName(ClassName);
+		UObject* Class = UDataFactoryBPLibrary::GetClassWithName(ClassName);
 		
 		if (Class) ClassesToUpdate.Add(Class);
 	}
@@ -210,21 +210,13 @@ void ADataLoaderActorBackend::UpdateClassDefaults(const TArray<FName>& ClassName
 	if (InputBindingType == EInputBindingSupportedTypes::Invalid)
 	{
 
-		for (auto* Class : ClassesToUpdate.Array())
+		for (auto* Obj : ClassesToUpdate.Array())
 		{
-			UObject* Object = NULL;
-			if (dynamic_cast<UBlueprint*>(Class))
+			if (Obj)
 			{
-				UBlueprint* bp = dynamic_cast<UBlueprint*>(Class);
-				if(bp->GeneratedClass)
-				Object = bp->GeneratedClass->GetDefaultObject();
+				if(UClass* Class = Cast<UClass>(Obj))
+					UDataFactoryBPLibrary::SetFPropertyByName(Class->GetDefaultObject(), NameOfThePropertyToUpdate, DataToSet);
 			}
-			else
-			{
-				Object = Class->GetDefaultObject();
-
-			}
-			UDataFactoryBPLibrary::SetFPropertyByName(Object, NameOfThePropertyToUpdate, DataToSet);
 		}
 
 		return;
@@ -233,10 +225,16 @@ void ADataLoaderActorBackend::UpdateClassDefaults(const TArray<FName>& ClassName
 	{
 		TArray<UObject*> TargetObjects;
 
-		for (auto* Class : ClassesToUpdate.Array())
+		for (auto* Obj : ClassesToUpdate.Array())
 		{
-			auto Object = Class->GetDefaultObject();
-			TargetObjects.Add(Object);
+			if (Obj)
+			{
+				if (UClass* Class = Cast<UClass>(Obj))
+				{
+					auto Object = Class->GetDefaultObject();
+					TargetObjects.Add(Object);
+				}
+			}
 		}
 		
 		UpdateInputBinding(DataToSet, TargetObjects, InputBindingType);
