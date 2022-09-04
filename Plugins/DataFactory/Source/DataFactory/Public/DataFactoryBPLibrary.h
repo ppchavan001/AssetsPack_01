@@ -131,8 +131,13 @@ class UDataFactoryBPLibrary : public UBlueprintFunctionLibrary
 	UFUNCTION(BlueprintPure, meta = (DisplayName = "Get Property Class Name"), Category = "DataFactory | General")
 		static FString GetFPropertyClassName(UObject* Object, FName PropertyName);
 
-	// returns uclass* from the AssetRegistry with name 
+	// returns object with name
 	static UObject* GetObjectWithName(const FName Name);
+
+	// Get all objects with one of the names in the set
+	// if you are calling "GetObjectWithName" multiple times with different names, 
+	// you can use this as an optimization
+	static TSet<UObject*> GetObjectsWithNames(const TSet<FName>& ObjectNames);
 
 	/// <summary>
 	// Removes existing action/axis/key bindings and binds the function to it.

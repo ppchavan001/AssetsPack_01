@@ -192,19 +192,12 @@ void ADataLoaderActorBackend::UpdateInputBinding(const FString& DataToSet, const
 
 }
 
-void ADataLoaderActorBackend::UpdateClassDefaults(const TArray<FName>& ClassNames, const FName NameOfThePropertyToUpdate, const FString& DataToSet)
+void ADataLoaderActorBackend::UpdateClassDefaults(const TSet<FName>& ClassNames, const FName NameOfThePropertyToUpdate, const FString& DataToSet)
 {
 
 	EInputBindingSupportedTypes InputBindingType = GetInputBindingType(NameOfThePropertyToUpdate);
 
-	TSet<UObject*> ClassesToUpdate;
-	for (auto ClassName : ClassNames)
-	{
-		UObject* Class = UDataFactoryBPLibrary::GetObjectWithName(ClassName);
-		
-		if (Class) ClassesToUpdate.Add(Class);
-	}
-
+	TSet<UObject*> ClassesToUpdate = UDataFactoryBPLibrary::GetObjectsWithNames(ClassNames);
 
 	// Update objects and return
 	if (InputBindingType == EInputBindingSupportedTypes::Invalid)
@@ -225,7 +218,7 @@ void ADataLoaderActorBackend::UpdateClassDefaults(const TArray<FName>& ClassName
 	{
 		TArray<UObject*> TargetObjects;
 
-		for (auto* Obj : ClassesToUpdate.Array())
+		for (auto* Obj : ClassesToUpdate)
 		{
 			if (Obj)
 			{

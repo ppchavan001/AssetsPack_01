@@ -93,7 +93,7 @@ private:
 
 
 	UFUNCTION(BlueprintCallable)
-		void UpdateClassDefaults(const TArray<FName>& ClassNames,
+		void UpdateClassDefaults(const TSet<FName>& ClassNames,
 										   const FName NameOfThePropertyToUpdate,
 										   const FString& DataToSet);
 

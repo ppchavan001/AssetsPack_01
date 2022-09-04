@@ -666,6 +666,30 @@ UObject* UDataFactoryBPLibrary::GetObjectWithName(const FName Name)
 	
 }
 
+TSet<UObject*> UDataFactoryBPLibrary::GetObjectsWithNames(const TSet<FName>& ObjectNames)
+{
+	int32 i = 0;
+	TSet<UObject*> SetOfObjects;
+
+	if (ObjectNames.Num() < 1) return SetOfObjects;
+
+	for (TObjectIterator<UObject> It; It; ++It)
+	{
+		if (ObjectNames.Contains(It->GetFName()))
+		{
+			SetOfObjects.Add(*It);
+		}
+
+		++i;
+	}
+
+	FString str = "total objects scanned : ";
+	str.AppendInt(i);
+	UDataFactoryBPLibrary::DF_PrintString(NULL, str, EDataFactoryLogVerbosity::Warning, true, true, 2.f);
+
+	return SetOfObjects;
+}
+
 #pragma optimize("", on)
 bool UDataFactoryBPLibrary::AddInputBinding(UObject* Object,
 											FName SourceName,
