@@ -602,11 +602,16 @@ void UDataFactoryBPLibrary::SetFPropertyValueInternal(FProperty* property, void*
 
 			}
 
+			DF_PrintString(NULL, (TEXT("%s : %s : %s : Tried to set value of unsupported struct type = %s , Property name = %s"),
+								  *CurrentFileName, *FString(__func__), __LINE__,
+								  *StructTypeName, *(NameOfThePropertyToUpdate.ToString())),
+						   EDataFactoryLogVerbosity::Warning,
+						   false, true);
 
-			UE_LOG(DataFactoryLog, Warning, 
-				   TEXT("%s : %s : %s : Tried to set value of unsupported struct type = %s , Property name = %s"), 
-				   *CurrentFileName, *FString(__func__), __LINE__,
-				   *StructTypeName, *(NameOfThePropertyToUpdate.ToString()));
+			//UE_LOG(DataFactoryLog, Warning, 
+			//	   TEXT("%s : %s : %s : Tried to set value of unsupported struct type = %s , Property name = %s"), 
+			//	   *CurrentFileName, *FString(__func__), __LINE__,
+			//	   *StructTypeName, *(NameOfThePropertyToUpdate.ToString()));
 
 			return;
 		}
