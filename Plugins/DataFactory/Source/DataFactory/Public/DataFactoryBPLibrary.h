@@ -139,6 +139,17 @@ class UDataFactoryBPLibrary : public UBlueprintFunctionLibrary
 	// you can use this as an optimization
 	static TSet<UObject*> GetObjectsWithNames(const TSet<FName>& ObjectNames);
 
+
+	UFUNCTION(BlueprintPure, Category = "DataFactory | General")
+		static TSet<UObject*> GetAllObjects()
+	{
+		TSet<UObject*> SetOfObjects;
+
+		for (TObjectIterator<UObject> It; It; ++It) SetOfObjects.Add(*It);
+			
+		return SetOfObjects;
+	}
+
 	/// <summary>
 	// Removes existing action/axis/key bindings and binds the function to it.
 	//	
