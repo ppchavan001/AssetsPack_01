@@ -164,7 +164,6 @@ void UDataFactoryBPLibrary::DF_PrintString(const UObject* WorldContextObject, co
 	}
 }
 
-PRAGMA_DISABLE_OPTIMIZATION
 void UDataFactoryBPLibrary::DF_PrintClass(const UObject* WorldContextObject, EDataFactoryLogVerbosity LogVerbosity /*= EDataFactoryLogVerbosity::Log*/, bool bPrintToScreen /*= true*/, bool bPrintToLog /*= true*/, float Duration /*= 2.f*/)
 {
 	FString str = "";
@@ -602,10 +601,13 @@ void UDataFactoryBPLibrary::SetFPropertyValueInternal(FProperty* property, void*
 
 			}
 
-			DF_PrintString(NULL, (TEXT("%s : %s : %s : Tried to set value of unsupported struct type = %s , Property name = %s"),
-								  *CurrentFileName, *FString(__func__), __LINE__,
-								  *StructTypeName, *(NameOfThePropertyToUpdate.ToString())),
-						   EDataFactoryLogVerbosity::Warning,
+			FString str = CurrentFileName + " : " + FString(__func__) + " : " +
+				"Tried to set value of unsupported struct type =" + StructTypeName + 
+				", Property name =" + NameOfThePropertyToUpdate.ToString();
+
+
+			DF_PrintString(NULL, str,
+						   EDataFactoryLogVerbosity::VeryVerbose,
 						   false, true);
 
 			//UE_LOG(DataFactoryLog, Warning, 
@@ -673,7 +675,6 @@ UObject* UDataFactoryBPLibrary::GetObjectWithName(const FName Name)
 
 TSet<UObject*> UDataFactoryBPLibrary::GetObjectsWithNames(const TSet<FName>& ObjectNames)
 {
-	int32 i = 0;
 	TSet<UObject*> SetOfObjects;
 
 	if (ObjectNames.Num() < 1) return SetOfObjects;
@@ -685,17 +686,11 @@ TSet<UObject*> UDataFactoryBPLibrary::GetObjectsWithNames(const TSet<FName>& Obj
 			SetOfObjects.Add(*It);
 		}
 
-		++i;
 	}
-
-	FString str = "total objects scanned : ";
-	str.AppendInt(i);
-	UDataFactoryBPLibrary::DF_PrintString(NULL, str, EDataFactoryLogVerbosity::Warning, true, true, 2.f);
 
 	return SetOfObjects;
 }
 
-#pragma optimize("", on)
 bool UDataFactoryBPLibrary::AddInputBinding(UObject* Object,
 											FName SourceName,
 											FName FunctionName,
@@ -914,7 +909,6 @@ void UDataFactoryBPLibrary::BindKeyInputInternal(UInputComponent* InputComponent
 		   *CurrentFileName, *FString(__func__), __LINE__, *(FunctionName.ToString()), *(KeyName.ToString()));
 }
 
-#pragma optimize("", on)
 
 bool UDataFactoryBPLibrary::WriteStringToFile(const FString FileName, const FString DataToWrite)
 {

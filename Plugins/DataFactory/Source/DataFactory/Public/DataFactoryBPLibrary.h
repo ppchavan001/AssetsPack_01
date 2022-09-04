@@ -141,13 +141,12 @@ class UDataFactoryBPLibrary : public UBlueprintFunctionLibrary
 
 
 	UFUNCTION(BlueprintPure, Category = "DataFactory | General")
-		static TSet<UObject*> GetAllObjects()
+		static void GetAllObjects(TSet<UObject*>& SetOfObjectsOut)
 	{
-		TSet<UObject*> SetOfObjects;
+		SetOfObjectsOut.Empty();
 
-		for (TObjectIterator<UObject> It; It; ++It) SetOfObjects.Add(*It);
+		for (TObjectIterator<UObject> It; It; ++It) SetOfObjectsOut.Add(*It);
 			
-		return SetOfObjects;
 	}
 
 	/// <summary>
