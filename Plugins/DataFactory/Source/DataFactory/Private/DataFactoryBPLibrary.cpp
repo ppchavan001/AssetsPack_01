@@ -19,8 +19,9 @@
 #include <AssetRegistryModule.h>
 
 DEFINE_LOG_CATEGORY(DataFactoryLog);
-FString FilePath = FString(__FILE__);
-FString CurrentFileName = FilePath.RightChop(FilePath.Find(&FString("\\")[0], ESearchCase::IgnoreCase, ESearchDir::FromEnd) + 1);
+
+#define  FilePath FString(__FILE__)
+#define  CurrentFileName (FilePath.Replace(TEXT("/"), TEXT("\\"))).RightChop(FilePath.Find(&FString("\\")[0], ESearchCase::IgnoreCase, ESearchDir::FromEnd) + 1)
 
 UDataFactoryBPLibrary::UDataFactoryBPLibrary(const FObjectInitializer& ObjectInitializer)
 : Super(ObjectInitializer)
