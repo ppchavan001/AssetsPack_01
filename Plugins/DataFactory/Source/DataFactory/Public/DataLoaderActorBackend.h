@@ -67,6 +67,11 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Parameters | Tags")
 		FName KeyBindingTag = "SetKeyBinding";
 
+
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+		TArray<UObject*> TargetObjectsBackend;
+
 private:
 	// stores set of actors/components a the tag
 	TMap<FName, TSet<UObject*>> TagMapOfObjects;
@@ -100,7 +105,6 @@ private:
 
 	UFUNCTION(BlueprintPure)
 		TArray<UObject*> GetTargetObjectsBackend(const TArray<UObject*> TargetObjectsOut);
-
 
 	EInputBindingSupportedTypes GetInputBindingType(const FName NameOfThePropertyToUpdate);
 };
