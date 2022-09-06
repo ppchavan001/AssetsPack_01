@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "DataFactoryBPLibrary.h"
 #include "DataLoaderActorBackend.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnDataLoadingFinished);
@@ -34,15 +35,15 @@ public:
 	// Sets default values for this actor's properties
 	ADataLoaderActorBackend();
 
+	// Not using async callback currently
 	UFUNCTION(BlueprintCallable)
-	void PostDataLoadingCallbackAsync(bool bUseAsync = false);
+	void PostDataLoadingCallbackAsync();
 
 
 	UFUNCTION(BlueprintCallable)
 	void GetAllObjectsWithTagCached(TArray<UObject*>& OutActors, const FName Tag, bool bForceRecache = false);
 
-	//UFUNCTION(BlueprintCallable)
-	//void GetActorsWithTag(Fs);
+	
 
 protected:
 	// Called when the game starts or when spawned
@@ -66,6 +67,11 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Parameters | Tags")
 		FName KeyBindingTag = "SetKeyBinding";
 
+
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+		TArray<UObject*> TargetObjectsBackend;
+
 private:
 	// stores set of actors/components a the tag
 	TMap<FName, TSet<UObject*>> TagMapOfObjects;
@@ -88,10 +94,17 @@ private:
 										   const FName NameOfThePropertyToUpdate, 
 										   const FString& DataToSet);
 
+	void UpdateInputBinding(const FString& DataToSet, const TArray<UObject*>& TargetObjects, EInputBindingSupportedTypes InputBindingType);
+
+
+	UFUNCTION(BlueprintCallable)
+		void UpdateClassDefaults(const TSet<FName>& ClassNames,
+										   const FName NameOfThePropertyToUpdate,
+										   const FString& DataToSet);
+
 
 	UFUNCTION(BlueprintPure)
 		TArray<UObject*> GetTargetObjectsBackend(const TArray<UObject*> TargetObjectsOut);
 
-
-
+	EInputBindingSupportedTypes GetInputBindingType(const FName NameOfThePropertyToUpdate);
 };

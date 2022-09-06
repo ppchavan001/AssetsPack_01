@@ -8,6 +8,7 @@
 #include "Async/AsyncWork.h"
 #include <DataFactory/Public/DataFactoryBPLibrary.h>
 
+
 class DataLoaderAsyncTask : public FNonAbandonableTask
 {
 	friend class FAutoDeleteAsyncTask<DataLoaderAsyncTask>;
@@ -54,8 +55,9 @@ ADataLoaderActorBackend::ADataLoaderActorBackend()
 
 }
 
-void ADataLoaderActorBackend::PostDataLoadingCallbackAsync(bool bUseAsync /*= false*/)
+void ADataLoaderActorBackend::PostDataLoadingCallbackAsync()
 {
+	bool bUseAsync = false;
 	OnDataLoadingFinished.Broadcast();
 	if(bUseAsync)
 	(new FAutoDeleteAsyncTask<DataLoaderAsyncTask>(this))->StartBackgroundTask();
@@ -93,6 +95,8 @@ void ADataLoaderActorBackend::GetAllObjectsWithTagCached(TArray<UObject*>& OutAc
 		OutActors = TagMapOfObjects[Tag].Array();
 	}
 }
+
+
 
 // Called when the game starts or when spawned
 void ADataLoaderActorBackend::BeginPlay()
@@ -138,17 +142,15 @@ void ADataLoaderActorBackend::BuildTagMap()
 	}
 }
 
+
 void ADataLoaderActorBackend::UpdatePropertyOnTargetObjects(const TArray<UObject*>& TargetObjects, 
 															const FName NameOfThePropertyToUpdate, 
 															const FString& DataToSet)
 {
-	EInputBindingSupportedTypes InputBindingType = EInputBindingSupportedTypes::Invalid;
+	EInputBindingSupportedTypes InputBindingType = GetInputBindingType(NameOfThePropertyToUpdate);
 
-
-	if (NameOfThePropertyToUpdate == ActionBindingTag) InputBindingType = EInputBindingSupportedTypes::ActionBinding;
-	else if (NameOfThePropertyToUpdate == AxisBindingTag) InputBindingType = EInputBindingSupportedTypes::AxisBinding;
-	else if (NameOfThePropertyToUpdate == KeyBindingTag) InputBindingType = EInputBindingSupportedTypes::KeyBinding;
-
+	
+	// Update objects and return
 	if (InputBindingType == EInputBindingSupportedTypes::Invalid)
 	{
 		for (auto Object : GetTargetObjectsBackend(TargetObjects))
@@ -158,12 +160,21 @@ void ADataLoaderActorBackend::UpdatePropertyOnTargetObjects(const TArray<UObject
 
 		return;
 	}
+	else
+	{
+		UpdateInputBinding(DataToSet, TargetObjects, InputBindingType);
+		return;
+	}
+}
+
+void ADataLoaderActorBackend::UpdateInputBinding(const FString& DataToSet, const TArray<UObject*>& TargetObjects, EInputBindingSupportedTypes InputBindingType)
+{
 
 	/*
 	*  Ex NameOfThePropertyToUpdate = DataToSet.
-		SetActionBinding = Jump, TestEvent, 1
-		SetKeyBinding= L, LoadFile, 1
-		SetAxisBinding = MoveTest, TestEvent1
+	SetActionBinding = Jump, TestEvent, 1
+	SetKeyBinding= L, LoadFile, 1
+	SetAxisBinding = MoveTest, TestEvent1
 	*/
 	TArray<FString> InputKeys;
 	DataToSet.ParseIntoArray(InputKeys, &FString(",")[0], false);
@@ -179,6 +190,50 @@ void ADataLoaderActorBackend::UpdatePropertyOnTargetObjects(const TArray<UObject
 											   static_cast<EInputEvent>(FCString::Atoi(&InputKeys[2][0])));
 	}
 
+}
+
+void ADataLoaderActorBackend::UpdateClassDefaults(const TSet<FName>& ClassNames, const FName NameOfThePropertyToUpdate, const FString& DataToSet)
+{
+
+	EInputBindingSupportedTypes InputBindingType = GetInputBindingType(NameOfThePropertyToUpdate);
+
+	TSet<UObject*> ClassesToUpdate = UDataFactoryBPLibrary::GetObjectsWithNames(ClassNames);
+
+	// Update objects and return
+	if (InputBindingType == EInputBindingSupportedTypes::Invalid)
+	{
+
+		for (auto* Obj : ClassesToUpdate.Array())
+		{
+			if (Obj)
+			{
+				if(UClass* Class = Cast<UClass>(Obj))
+					UDataFactoryBPLibrary::SetFPropertyByName(Class->GetDefaultObject(), NameOfThePropertyToUpdate, DataToSet);
+			}
+		}
+
+		return;
+	}
+	else
+	{
+		TArray<UObject*> TargetObjects;
+
+		for (auto* Obj : ClassesToUpdate)
+		{
+			if (Obj)
+			{
+				if (UClass* Class = Cast<UClass>(Obj))
+				{
+					auto Object = Class->GetDefaultObject();
+					TargetObjects.Add(Object);
+				}
+			}
+		}
+		
+		UpdateInputBinding(DataToSet, TargetObjects, InputBindingType);
+		
+		return;
+	}
 
 }
 
@@ -189,5 +244,16 @@ TArray<UObject*> ADataLoaderActorBackend::GetTargetObjectsBackend(const TArray<U
 	TArray<UObject*> Arr;
 	Arr.Add(this);
 	return Arr;
+}
+
+EInputBindingSupportedTypes ADataLoaderActorBackend::GetInputBindingType(const FName NameOfThePropertyToUpdate)
+{
+	EInputBindingSupportedTypes InputBindingType = EInputBindingSupportedTypes::Invalid;
+
+	if (NameOfThePropertyToUpdate == ActionBindingTag) InputBindingType = EInputBindingSupportedTypes::ActionBinding;
+	else if (NameOfThePropertyToUpdate == AxisBindingTag) InputBindingType = EInputBindingSupportedTypes::AxisBinding;
+	else if (NameOfThePropertyToUpdate == KeyBindingTag) InputBindingType = EInputBindingSupportedTypes::KeyBinding;
+
+	return InputBindingType;
 }
 

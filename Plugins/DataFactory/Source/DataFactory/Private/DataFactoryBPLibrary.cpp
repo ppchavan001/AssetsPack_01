@@ -14,11 +14,14 @@
 #include "Misc/CString.h"
 #include "GameFramework/PlayerInput.h"
 #include "GameFramework/InputSettings.h"
-
+#include "Classes/EditorStyleSettings.h"
+#include <IAssetRegistry.h>
+#include <AssetRegistryModule.h>
 
 DEFINE_LOG_CATEGORY(DataFactoryLog);
 
-FString CurrentFileName = FString(__FILE__).RightChop(FString(__FILE__).Find(&FString("\\")[0], ESearchCase::IgnoreCase, ESearchDir::FromEnd) + 1);
+#define  FilePath FString(__FILE__)
+#define  CurrentFileName (FilePath.Replace(TEXT("/"), TEXT("\\"))).RightChop(FilePath.Find(&FString("\\")[0], ESearchCase::IgnoreCase, ESearchDir::FromEnd) + 1)
 
 UDataFactoryBPLibrary::UDataFactoryBPLibrary(const FObjectInitializer& ObjectInitializer)
 : Super(ObjectInitializer)
@@ -27,14 +30,16 @@ UDataFactoryBPLibrary::UDataFactoryBPLibrary(const FObjectInitializer& ObjectIni
 }
 
 
-void UDataFactoryBPLibrary::SetFPropertyByName(UObject* Object, FName NameOfThePropertyToUpdate, const FString DataToSet)
+void UDataFactoryBPLibrary::SetFPropertyByName(UObject* Object, 
+											   FName NameOfThePropertyToUpdate, 
+											   const FString DataToSet)
 {
 
 	if (Object)
 	{
-		UClass* _Class = Object->GetClass();
+		UClass* Class = Object->GetClass();
 
-		FProperty* property = _Class->FindPropertyByName(NameOfThePropertyToUpdate);
+		FProperty* property = Class->FindPropertyByName(NameOfThePropertyToUpdate);
 
 		if (property)
 		{
@@ -42,17 +47,16 @@ void UDataFactoryBPLibrary::SetFPropertyByName(UObject* Object, FName NameOfTheP
 		}
 		else
 		{
-			return;
-			// causing performance issues with logging with Everything!
-			UE_LOG(DataFactoryLog, Warning, 
-				   TEXT("DataFactoryBPLibrary.cpp : SetFPropertyByName : Couldn't find property name = %s."), 
-				   *(NameOfThePropertyToUpdate.ToString()));
+			UE_LOG(DataFactoryLog, Verbose,
+				   TEXT("%s : %s : %s : Couldn't find property name = %s."),
+				   *CurrentFileName, *FString(__func__), __LINE__, *(NameOfThePropertyToUpdate.ToString()));
 		}
 	}
 	else
 	{
 		UE_LOG(DataFactoryLog, Warning,
-			   TEXT("DataFactoryBPLibrary.cpp : SetFPropertyByName : Invalid object provided."));
+			   TEXT("%s : %s : %s : Invalid object provided."),
+			   *CurrentFileName, *FString(__func__), __LINE__);
 	}
 
 
@@ -67,6 +71,117 @@ FKey UDataFactoryBPLibrary::GetKeyFromName(FName name)
 
 }
 
+
+void UDataFactoryBPLibrary::DF_PrintString(const UObject* WorldContextObject, const FString InString /*= ""*/, EDataFactoryLogVerbosity LogVerbosity, bool bPrintToScreen /*= true*/, bool bPrintToLog /*= true*/, float Duration /*= 2.f*/)
+{
+	UWorld* World = GEngine->GetWorldFromContextObject(WorldContextObject, EGetWorldErrorMode::ReturnNull);
+	FString Prefix;
+	if (World)
+	{
+		if (World->WorldType == EWorldType::PIE)
+		{
+			switch (World->GetNetMode())
+			{
+			case NM_Client:
+				// GPlayInEditorID 0 is always the server, so 1 will be first client.
+				// You want to keep this logic in sync with GeneratePIEViewportWindowTitle and UpdatePlayInEditorWorldDebugString
+				Prefix = FString::Printf(TEXT("Client %d: "), GPlayInEditorID);
+				break;
+			case NM_DedicatedServer:
+			case NM_ListenServer:
+				Prefix = FString::Printf(TEXT("Server: "));
+				break;
+			case NM_Standalone:
+				break;
+			}
+		}
+	}
+
+	const FString FinalDisplayString = Prefix + InString;
+	FString FinalLogString = FinalDisplayString;
+
+	static const FBoolConfigValueHelper DisplayPrintStringSource(TEXT("Kismet"), TEXT("bLogPrintStringSource"), GEngineIni);
+	if (DisplayPrintStringSource)
+	{
+		const FString SourceObjectPrefix = FString::Printf(TEXT("[%s] "), *GetNameSafe(WorldContextObject));
+		FinalLogString = SourceObjectPrefix + FinalLogString;
+	}
+
+	if (bPrintToLog)
+	{
+		GLog->Log(DataFactoryLog.GetCategoryName(), (ELogVerbosity::Type)(LogVerbosity), &FinalLogString[0]);
+	}
+
+	// Also output to the screen, if possible
+	if (bPrintToScreen)
+	{
+		if (GAreScreenMessagesEnabled)
+		{
+			if (GConfig && Duration < 0)
+			{
+				GConfig->GetFloat(TEXT("Kismet"), TEXT("PrintStringDuration"), Duration, GEngineIni);
+			}
+
+			const UEditorStyleSettings* EditorSettings = GetDefault<UEditorStyleSettings>();
+			
+			FLinearColor OnScreenTextColor = FColor::White;
+
+			if(EditorSettings)
+			switch (LogVerbosity)
+			{
+			case EDataFactoryLogVerbosity::NoLogging:
+				OnScreenTextColor = EditorSettings->LogNormalColor;
+				break;
+			case EDataFactoryLogVerbosity::Fatal:
+				OnScreenTextColor = EditorSettings->LogErrorColor;
+				break;
+			case EDataFactoryLogVerbosity::Error:
+				OnScreenTextColor = EditorSettings->LogErrorColor;
+				break;
+			case EDataFactoryLogVerbosity::Warning:
+				OnScreenTextColor = EditorSettings->LogWarningColor;
+				break;
+			case EDataFactoryLogVerbosity::Display:
+				OnScreenTextColor = EditorSettings->LogNormalColor;
+				break;
+			case EDataFactoryLogVerbosity::Log:
+				OnScreenTextColor = EditorSettings->LogNormalColor;
+				break;
+			case EDataFactoryLogVerbosity::Verbose:
+				OnScreenTextColor = EditorSettings->LogNormalColor;
+				break;
+			case EDataFactoryLogVerbosity::VeryVerbose:
+				OnScreenTextColor = EditorSettings->LogNormalColor;
+				break;
+			}
+
+			GEngine->AddOnScreenDebugMessage((uint64)-1, Duration, OnScreenTextColor.ToFColor(true), FinalDisplayString);
+		}
+		else
+		{
+			UE_LOG(DataFactoryLog, VeryVerbose, TEXT("%s : %s : %s : Screen messages disabled (!GAreScreenMessagesEnabled).  Cannot print to screen."),
+				   *CurrentFileName, *FString(__func__), __LINE__);
+		}
+	}
+}
+
+void UDataFactoryBPLibrary::DF_PrintClass(const UObject* WorldContextObject, EDataFactoryLogVerbosity LogVerbosity /*= EDataFactoryLogVerbosity::Log*/, bool bPrintToScreen /*= true*/, bool bPrintToLog /*= true*/, float Duration /*= 2.f*/)
+{
+	FString str = "";
+	auto* Class = WorldContextObject->GetClass();
+	str += Class->GetFName().ToString();
+	if(Class) auto* Class2 = dynamic_cast<UBlueprintGeneratedClass*>(Class);
+	if (Class)
+	{
+		auto* Class3 = dynamic_cast<UBlueprint*>(Class);
+
+		auto* Class5 = WorldContextObject->StaticClass();
+		if(Class3)
+		auto class4 = Class3->GeneratedClass.Get();
+		
+	}
+	DF_PrintString(WorldContextObject, str, LogVerbosity, bPrintToScreen, bPrintToLog, Duration);
+}
 
 void UDataFactoryBPLibrary::SetFPropertyValueInternal(FProperty* property, void* Object, const FString DataToSet, FName NameOfThePropertyToUpdate)
 {
@@ -186,12 +301,15 @@ void UDataFactoryBPLibrary::SetFPropertyValueInternal(FProperty* property, void*
 			// Build CSV array
 			TArray<FString> DataArray;
 			DataToSet.ParseIntoArray(DataArray, *FString(","), false);
-
+			
 
 			FScriptArrayHelper_InContainer Helper(ArrayProperty, Object);
-
 			// Clear old values
 			Helper.EmptyValues(DataArray.Num());
+
+
+			// if no values are provided for storing, after clearing previous values, return
+			if (DataArray.Num() == 0) return;
 
 			// Add empty values for assignment
 			Helper.AddValues(DataArray.Num());
@@ -484,23 +602,33 @@ void UDataFactoryBPLibrary::SetFPropertyValueInternal(FProperty* property, void*
 
 			}
 
+			FString str = CurrentFileName + " : " + FString(__func__) + " : " +
+				"Tried to set value of unsupported struct type =" + StructTypeName + 
+				", Property name =" + NameOfThePropertyToUpdate.ToString();
 
-			UE_LOG(DataFactoryLog, Warning, 
-				   TEXT("DataFactoryBPLibrary.cpp : SetFPropertyValueInternal : Tried to set value of unsupported struct type = %s , Property name = %s"), 
-				   *StructTypeName, *(NameOfThePropertyToUpdate.ToString()));
+
+			DF_PrintString(NULL, str,
+						   EDataFactoryLogVerbosity::VeryVerbose,
+						   false, true);
+
+			//UE_LOG(DataFactoryLog, Warning, 
+			//	   TEXT("%s : %s : %s : Tried to set value of unsupported struct type = %s , Property name = %s"), 
+			//	   *CurrentFileName, *FString(__func__), __LINE__,
+			//	   *StructTypeName, *(NameOfThePropertyToUpdate.ToString()));
 
 			return;
 		}
 
-		UE_LOG(DataFactoryLog, Warning, TEXT("DataFactoryBPLibrary.cpp : SetFPropertyValueInternal : Tried to set value of unsupported type. Property Name = %s"), *(NameOfThePropertyToUpdate.ToString()));
+		UE_LOG(DataFactoryLog, Warning, TEXT("%s : %s : %s : Tried to set value of unsupported type. Property Name = %s"),
+			   *CurrentFileName, *FString(__func__), __LINE__, *(NameOfThePropertyToUpdate.ToString()));
 
 		
 	}
 
 	
-	UE_LOG(DataFactoryLog, Warning, 
-		   TEXT("DataFactoryBPLibrary.cpp : SetFPropertyValueInternal : The property or the object provided is invalid. DataToSet = %s"),
-		   *(DataToSet));
+	UE_LOG(DataFactoryLog, Verbose, 
+		   TEXT("%s : %s : %s : The property or the object provided is invalid. DataToSet = %s"),
+		   *CurrentFileName, *FString(__func__), __LINE__, *(DataToSet));
 
 }
 
@@ -521,7 +649,49 @@ FString UDataFactoryBPLibrary::GetFPropertyClassName(UObject* Object, FName Prop
 	return FString("Invalid Object!");
 }
 
-#pragma optimize("", on)
+UObject* UDataFactoryBPLibrary::GetObjectWithName(const FName Name)
+{
+	int32 i = 0;
+	for (TObjectIterator<UObject> It; It; ++It)
+	{
+		if (It->GetFName() == Name)
+		{
+			FString str = "total objects scanned : ";
+			str.AppendInt(i);
+			UDataFactoryBPLibrary::DF_PrintString(NULL, str, EDataFactoryLogVerbosity::Warning, true, true, 2.f);
+
+			return *It;
+		}
+
+		++i;
+	}
+
+	FString str = "total objects scanned : ";
+	str.AppendInt(i);
+	UDataFactoryBPLibrary::DF_PrintString(NULL, str, EDataFactoryLogVerbosity::Warning, true, true, 2.f);
+
+	return NULL;
+	
+}
+
+TSet<UObject*> UDataFactoryBPLibrary::GetObjectsWithNames(const TSet<FName>& ObjectNames)
+{
+	TSet<UObject*> SetOfObjects;
+
+	if (ObjectNames.Num() < 1) return SetOfObjects;
+
+	for (TObjectIterator<UObject> It; It; ++It)
+	{
+		if (ObjectNames.Contains(It->GetFName()))
+		{
+			SetOfObjects.Add(*It);
+		}
+
+	}
+
+	return SetOfObjects;
+}
+
 bool UDataFactoryBPLibrary::AddInputBinding(UObject* Object,
 											FName SourceName,
 											FName FunctionName,
@@ -536,7 +706,7 @@ bool UDataFactoryBPLibrary::AddInputBinding(UObject* Object,
 		UInputSettings* InputSettings = UInputSettings::GetInputSettings();
 		if (!InputSettings)
 		{
-			UE_LOG(DataFactoryLog, Error, TEXT("%s::%s::%d : Couldn't find Input settings for Action : %s!"),
+			UE_LOG(DataFactoryLog, Error, TEXT("%s:%s:%d: Couldn't find Input settings for Action : %s!"),
 				   *CurrentFileName, *FString(__func__), __LINE__, *(SourceName.ToString()));
 
 			return false;
@@ -545,7 +715,7 @@ bool UDataFactoryBPLibrary::AddInputBinding(UObject* Object,
 		// Proceed only if a function with the FunctionName exists on the provided Object
 		if (!(Object->GetClass()->FindFunctionByName(FunctionName)))
 		{
-			UE_LOG(DataFactoryLog, Error, TEXT("%s::%s::%d : Object doesn't have the specified function : %s, for binding : %s!"),
+			UE_LOG(DataFactoryLog, Error, TEXT("%s:%s:%d: Object doesn't have the specified function : %s, for binding : %s!"),
 				   *CurrentFileName, *FString(__func__), __LINE__, *(FunctionName.ToString()) , *(SourceName.ToString()));
 
 			return false;
@@ -573,7 +743,7 @@ bool UDataFactoryBPLibrary::AddInputBinding(UObject* Object,
 		if (!ActionPresentInSettings)
 		{
 
-			UE_LOG(DataFactoryLog, Error, TEXT("%s::%s::%d : Action name : %s, not present in InputSettings!"),
+			UE_LOG(DataFactoryLog, Error, TEXT("%s:%s:%d: Action name : %s, not present in InputSettings!"),
 				   *CurrentFileName, *FString(__func__), __LINE__, *(SourceName.ToString()));
 
 			return false;
@@ -594,7 +764,7 @@ bool UDataFactoryBPLibrary::AddInputBinding(UObject* Object,
 			}
 			else
 			{
-				UE_LOG(DataFactoryLog, Error, TEXT("%s::%s::%d : InputComponent not found on the player0! Returning false for function: %s, action : %s"),
+				UE_LOG(DataFactoryLog, Error, TEXT("%s:%s:%d : InputComponent not found on the player0! Returning false for function: %s, action : %s"),
 					   *CurrentFileName, *FString(__func__), __LINE__, *(FunctionName.ToString()), *(SourceName.ToString()));
 
 				return false;
@@ -623,7 +793,7 @@ bool UDataFactoryBPLibrary::AddInputBinding(UObject* Object,
 
 	}
 
-	UE_LOG(DataFactoryLog, Error, TEXT("%s::%s::%d : Invalid actor or world or player0 controller!"),
+	UE_LOG(DataFactoryLog, Error, TEXT("%s:%s:%d : Invalid actor or world or player0 controller!"),
 		   *CurrentFileName, *FString(__func__), __LINE__);
 	return false;
 }
@@ -663,7 +833,7 @@ void UDataFactoryBPLibrary::BindActionInputInternal(UInputComponent* InputCompon
 	}
 
 
-	UE_LOG(DataFactoryLog, Log, TEXT("%s::%s::%d : Bound function : %s to ActionMapping: %s "),
+	UE_LOG(DataFactoryLog, Log, TEXT("%s:%s:%d: Bound function : %s to ActionMapping: %s "),
 		   *CurrentFileName, *FString(__func__), __LINE__, *(FunctionName.ToString()), *(ActionName.ToString()));
 
 }
@@ -701,7 +871,7 @@ void UDataFactoryBPLibrary::BindAxisInputInternal(UInputComponent* InputComponen
 
 
 
-	UE_LOG(DataFactoryLog, Log, TEXT("%s::%s::%d : Bound function : %s to AxisMapping: %s "),
+	UE_LOG(DataFactoryLog, Log, TEXT("%s:%s:%d : Bound function : %s to AxisMapping: %s "),
 		   *CurrentFileName, *FString(__func__), __LINE__, *(FunctionName.ToString()), *(AxisName.ToString()));
 }
 
@@ -736,18 +906,41 @@ void UDataFactoryBPLibrary::BindKeyInputInternal(UInputComponent* InputComponent
 	}
 
 
-	UE_LOG(DataFactoryLog, Log, TEXT("%s::%s::%d : Bound function : %s to Key: %s "),
+	UE_LOG(DataFactoryLog, Log, TEXT("%s:%s:%d: Bound function : %s to Key: %s "),
 		   *CurrentFileName, *FString(__func__), __LINE__, *(FunctionName.ToString()), *(KeyName.ToString()));
 }
 
-#pragma optimize("", on)
 
 bool UDataFactoryBPLibrary::WriteStringToFile(const FString FileName, const FString DataToWrite)
 {
-	return FFileHelper::SaveStringToFile(DataToWrite, &FileName[0]);
+	return FFileHelper::SaveStringToFile(DataToWrite, &FileName[0], FFileHelper::EEncodingOptions::ForceUTF8);
 }
 bool UDataFactoryBPLibrary::ReadLinesFromFile(const FString FileName, TArray<FString>& LinesOut)
 {
 	return FFileHelper::LoadFileToStringArray(LinesOut, &FileName[0]);
+}
+
+FString UDataFactoryBPLibrary::GetAppInfo(FString Separator /*= ""*/)
+{
+
+	FString str = "";
+
+	if (FApp::GetBuildTargetType() == EBuildTargetType::Program)
+	{
+		str += FApp::GetName();
+	}
+	else
+	{
+		str += FApp::GetProjectName();
+	}
+
+	str += Separator;
+	str += LexToString(FApp::GetBuildConfiguration());
+
+
+	str += Separator;
+	str += LexToString(FApp::GetBuildTargetType());
+
+	return str;
 }
 

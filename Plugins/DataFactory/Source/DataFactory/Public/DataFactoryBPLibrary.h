@@ -47,9 +47,10 @@ enum class EDataFactoryLogVerbosity : uint8
 		* Prints a verbose message to a log file (if VeryVerbose logging is enabled,
 		* usually used for detailed logging that would otherwise spam output)
 		*/
-		VeryVerbose,
+		VeryVerbose
 
 };
+#define GETENUMSTRING(etype, evalue) ( (FindObject(ANY_PACKAGE, TEXT(etype), true) != nullptr) ? FindObject(ANY_PACKAGE, TEXT(etype), true)->GetEnumName((int32)evalue) : FString("Invalid - are you sure enum uses UENUM() macro?") )
 
 DECLARE_LOG_CATEGORY_EXTERN(DataFactoryLog, Log, All);
 
@@ -69,11 +70,26 @@ class UDataFactoryBPLibrary : public UBlueprintFunctionLibrary
 	GENERATED_UCLASS_BODY()
 
 
-		UFUNCTION(BlueprintPure, meta = (DisplayName = "Get Key From Name", Keywords = "Get Key From Name"), Category = "ExposeRuntimeFunctions | Input")
+		UFUNCTION(BlueprintPure, meta = (DisplayName = "Get Key From Name", Keywords = "Get Key From Name"), Category = "DataFactory | Input")
 		static FKey GetKeyFromName(FName name);
+		
 
+	UFUNCTION(BlueprintCallable, meta = (WorldContext = "WorldContextObject", CallableWithoutWorldContext, Keywords = "log print", AdvancedDisplay = "2", DevelopmentOnly), Category = "DataFactory | Log")
+	static void DF_PrintString(const UObject* WorldContextObject, 
+							   const FString InString = "", 
+							   EDataFactoryLogVerbosity LogVerbosity = EDataFactoryLogVerbosity::Log,
+							   bool bPrintToScreen = true, 
+							   bool bPrintToLog = true, 
+							   float Duration = 2.f);
 
+	UFUNCTION(BlueprintCallable, meta = (Keywords = "log print", DevelopmentOnly), Category = "DataFactory | Log")
+	static void DF_PrintClass(const UObject* WorldContextObject,
+								   EDataFactoryLogVerbosity LogVerbosity = EDataFactoryLogVerbosity::Log,
+								   bool bPrintToScreen = true,
+								   bool bPrintToLog = true,
+								   float Duration = 2.f);
 
+	
 	/*
 		Finds the property by name on the specified object and updates the value.
 
@@ -112,9 +128,26 @@ class UDataFactoryBPLibrary : public UBlueprintFunctionLibrary
 	// Called from SetFPropertyByName
 	static void SetFPropertyValueInternal(FProperty* property, void* Object, const FString DataToSet, FName NameOfThePropertyToUpdate);
 
-	UFUNCTION(BlueprintCallable, meta = (DisplayName = "Get Property Class Name"), Category = "DataFactory | General")
+	UFUNCTION(BlueprintPure, meta = (DisplayName = "Get Property Class Name"), Category = "DataFactory | General")
 		static FString GetFPropertyClassName(UObject* Object, FName PropertyName);
 
+	// returns object with name
+	static UObject* GetObjectWithName(const FName Name);
+
+	// Get all objects with one of the names in the set
+	// if you are calling "GetObjectWithName" multiple times with different names, 
+	// you can use this as an optimization
+	static TSet<UObject*> GetObjectsWithNames(const TSet<FName>& ObjectNames);
+
+
+	UFUNCTION(BlueprintPure, Category = "DataFactory | General")
+		static void GetAllObjects(TSet<UObject*>& SetOfObjectsOut)
+	{
+		SetOfObjectsOut.Empty();
+
+		for (TObjectIterator<UObject> It; It; ++It) SetOfObjectsOut.Add(*It);
+			
+	}
 
 	/// <summary>
 	// Removes existing action/axis/key bindings and binds the function to it.
@@ -147,6 +180,8 @@ class UDataFactoryBPLibrary : public UBlueprintFunctionLibrary
 	UFUNCTION(BlueprintGetter, Category = "DataFactory | Import/ Export")
 		static bool ReadLinesFromFile(const FString FileName, TArray<FString>& LinesOut);
 
+	UFUNCTION(BlueprintPure)
+	static FString GetAppInfo(FString Separator = "");
 
 
 };
