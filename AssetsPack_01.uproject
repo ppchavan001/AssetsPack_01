@@ -2,5 +2,12 @@
 	"FileVersion": 3,
 	"EngineAssociation": "{961FF81E-42D2-D372-C199-C9895FF5331C}",
 	"Category": "",
-	"Description": ""
+	"Description": "",
+	"Modules": [
+		{
+			"Name": "AssetsPack_01",
+			"Type": "Runtime",
+			"LoadingPhase": "Default"
+		}
+	]
 }
