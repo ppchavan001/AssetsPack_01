@@ -9,5 +9,12 @@
 			"Type": "Runtime",
 			"LoadingPhase": "Default"
 		}
+	],
+	"Plugins": [
+		{
+			"Name": "ObjectDeliverer",
+			"Enabled": true,
+			"MarketplaceURL": "com.epicgames.launcher://ue/marketplace/content/c2612cff517c48bca7dd080299d97ca8"
+		}
 	]
 }
