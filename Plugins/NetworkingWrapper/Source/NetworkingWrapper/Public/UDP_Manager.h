@@ -17,12 +17,12 @@ class NETWORKINGWRAPPER_API IUDP_DataReceiverInterface {
 	GENERATED_BODY()
 
 public:
-	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "NETWORKINGWRAPPER | UDP")
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "NETWORKING_WRAPPER | UDP")
 		void OnUDP_StringDataReceived(const FString& Data);
 
 
-	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "NETWORKINGWRAPPER | UDP")
-		void OnUDP_ObjectReceived(UObject* Data);
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "NETWORKING_WRAPPER | UDP")
+		void OnUDP_ObjectReceived(const UObject* const Data, const UClass* const DataClass);
 };
 
 UCLASS()
@@ -42,6 +42,7 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
+	
 private:
 	UObjectDelivererManager* DeliveryManager = NULL;
 	UObjectDeliveryBoxUsingJson* DeliveryBox = NULL;

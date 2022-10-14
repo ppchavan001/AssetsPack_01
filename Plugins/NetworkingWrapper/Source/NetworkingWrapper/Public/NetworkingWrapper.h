@@ -12,4 +12,12 @@ public:
 	/** IModuleInterface implementation */
 	virtual void StartupModule() override;
 	virtual void ShutdownModule() override;
+
+	UFUNCTION(BlueprintCallable)
+	static UObject* String2UObject(const FString& string, UClass* classType);
+
+	UFUNCTION(BlueprintCallable)
+	FString UObject2String(const UObject* packet);
+
+
 };

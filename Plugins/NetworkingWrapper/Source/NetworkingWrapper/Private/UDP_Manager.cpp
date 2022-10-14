@@ -50,5 +50,5 @@ void AUDP_Manager::Tick(float DeltaTime)
 void AUDP_Manager::OnDataReceived(const UObjectDelivererProtocol* ClientSocket,
 	const TArray<uint8>& Buffer)
 {
-
+	
 }
