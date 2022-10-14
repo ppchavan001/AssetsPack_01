@@ -26,6 +26,11 @@ public class NetworkingWrapper : ModuleRules
 			new string[]
 			{
 				"Core",
+                     "Engine",
+                    "Sockets",
+                    "Networking",
+                    "Json",
+                "ObjectDeliverer"
 				// ... add other public dependencies that you statically link with here ...
 			}
 			);
@@ -37,7 +42,7 @@ public class NetworkingWrapper : ModuleRules
 				"CoreUObject",
 				"Engine",
 				"Slate",
-				"SlateCore",
+				"SlateCore"
 				// ... add private dependencies that you statically link with here ...	
 			}
 			);

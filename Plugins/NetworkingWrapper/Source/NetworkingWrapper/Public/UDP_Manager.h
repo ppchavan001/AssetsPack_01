@@ -4,9 +4,11 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include <ObjectDeliverer/Public/ObjectDelivererManager.h>
+#include <ObjectDeliverer/Public/DeliveryBox/ObjectDeliveryBoxUsingJson.h>
 #include "UDP_Manager.generated.h"
 
-UINTERFACE(MinimalAPI, Blueprintable)
+UINTERFACE(MinimalAPI)
 class UUDP_DataReceiverInterface : public UInterface {
 	GENERATED_BODY()
 };
@@ -15,12 +17,12 @@ class NETWORKINGWRAPPER_API IUDP_DataReceiverInterface {
 	GENERATED_BODY()
 
 public:
-	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent)
-	void OnUDP_StringDataReceived(FString& DataOut);
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "NETWORKINGWRAPPER | UDP")
+		void OnUDP_StringDataReceived(const FString& Data);
 
 
-	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent)
-	UObject* OnUDP_ObjectReceived();
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "NETWORKINGWRAPPER | UDP")
+		void OnUDP_ObjectReceived(UObject* Data);
 };
 
 UCLASS()
@@ -40,4 +42,14 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
+private:
+	UObjectDelivererManager* DeliveryManager = NULL;
+	UObjectDeliveryBoxUsingJson* DeliveryBox = NULL;
+
+	bool IsSender = true;
+	FString IP = "";
+	UINT Port = 12429;
+
+	void OnDataReceived(const UObjectDelivererProtocol* ClientSocket, const TArray<uint8>& Buffer);
+	
 };
