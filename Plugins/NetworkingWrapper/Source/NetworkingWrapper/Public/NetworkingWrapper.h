@@ -17,7 +17,7 @@ public:
 	static UObject* String2UObject(const FString& string, UClass* classType);
 
 	UFUNCTION(BlueprintCallable)
-	FString UObject2String(const UObject* packet);
+	static FString UObject2String(const UObject* packet);
 
 
 };

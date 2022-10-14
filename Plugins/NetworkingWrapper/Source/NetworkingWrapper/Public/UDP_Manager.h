@@ -42,14 +42,29 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
+	UFUNCTION(BlueprintCallable)
+	void SendStringData(const FString& Data);
 	
 private:
 	UObjectDelivererManager* DeliveryManager = NULL;
 	UObjectDeliveryBoxUsingJson* DeliveryBox = NULL;
 
+	UObjectDelivererProtocol* Protocol = NULL;
+	UPacketRule* PacketRule = NULL;
+
+	UPROPERTY(EditInstanceOnly)
 	bool IsSender = true;
+
+	UPROPERTY(EditInstanceOnly)
+	UClass* JsonObjectClass = NULL;
+
+	UPROPERTY(EditInstanceOnly)
 	FString IP = "";
-	UINT Port = 12429;
+
+	UPROPERTY(EditInstanceOnly)
+	int Port = 12429;
+
+
 
 	void OnDataReceived(const UObjectDelivererProtocol* ClientSocket, const TArray<uint8>& Buffer);
 	
