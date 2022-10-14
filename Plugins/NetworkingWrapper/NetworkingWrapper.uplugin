@@ -3,7 +3,7 @@
 	"Version": 1,
 	"VersionName": "1.0",
 	"FriendlyName": "NetworkingWrapper",
-	"Description": "Wrapper to help with networking",
+	"Description": "Wrapper to help with networking.",
 	"Category": "Other",
 	"CreatedBy": "ppchavan001",
 	"CreatedByURL": "ppchavan001.github.io",
@@ -19,6 +19,13 @@
 			"Name": "NetworkingWrapper",
 			"Type": "Runtime",
 			"LoadingPhase": "Default"
+		}
+	],
+	"Plugins": [
+		{
+			"Name": "ObjectDeliverer",
+			"Enabled": true,
+			"MarketplaceURL": "com.epicgames.launcher://ue/marketplace/content/c2612cff517c48bca7dd080299d97ca8"
 		}
 	]
 }
