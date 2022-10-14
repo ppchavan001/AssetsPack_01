@@ -44,6 +44,10 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void SendStringData(const FString& Data);
+
+
+	UFUNCTION(BlueprintCallable)
+	void SendObject(const UObject* Data);
 	
 private:
 	UObjectDelivererManager* DeliveryManager = NULL;

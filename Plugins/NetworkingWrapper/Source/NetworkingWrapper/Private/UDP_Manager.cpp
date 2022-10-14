@@ -13,6 +13,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "Utils/ODStringUtil.h"
 #include <Runtime/Engine/Public/EngineUtils.h>
+#include "NetworkingWrapper.h"
 
 // Sets default values
 AUDP_Manager::AUDP_Manager()
@@ -62,6 +63,11 @@ void AUDP_Manager::SendStringData(const FString& Data)
 	DeliveryManager->Send(buffer);
 }
 
+void AUDP_Manager::SendObject(const UObject* Data)
+{
+	this->SendStringData(FNetworkingWrapperModule::UObject2String(Data));
+}
+
 void AUDP_Manager::OnDataReceived(const UObjectDelivererProtocol* ClientSocket, const TArray<uint8>& Buffer)
 {
 	TArray<AActor*> ActorsWithInterface;
@@ -69,9 +75,21 @@ void AUDP_Manager::OnDataReceived(const UObjectDelivererProtocol* ClientSocket, 
 
 	FString ReceivedString = UODStringUtil::BufferToString(Buffer);
 
-	for (AActor* Actor : ActorsWithInterface)
+	UObject* JsonObj = FNetworkingWrapperModule::String2UObject(ReceivedString, JsonObjectClass);
+
+	if (JsonObj)
 	{
-		IUDP_DataReceiverInterface::Execute_OnUDP_StringDataReceived(Actor, ReceivedString);
+		for (AActor* Actor : ActorsWithInterface)
+		{
+			IUDP_DataReceiverInterface::Execute_OnUDP_ObjectReceived(Actor, JsonObj, JsonObjectClass);
+		}
+	}
+	else
+	{
+		for (AActor* Actor : ActorsWithInterface)
+		{
+			IUDP_DataReceiverInterface::Execute_OnUDP_StringDataReceived(Actor, ReceivedString);
+		}
 	}
 
 }
