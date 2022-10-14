@@ -25,8 +25,27 @@ public:
 		void OnUDP_ObjectReceived(const UObject* const Data, const UClass* const DataClass);
 };
 
+UINTERFACE(MinimalAPI)
+class UUDP_DataSenderInterface : public UInterface
+{
+	GENERATED_BODY()
+};
+
+class NETWORKINGWRAPPER_API IUDP_DataSenderInterface
+{
+	GENERATED_BODY()
+
+public:
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "NETWORKING_WRAPPER | UDP")
+		void UDP_SendString(const FString& Data);
+
+
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "NETWORKING_WRAPPER | UDP")
+		void UDP_SendObject(const UObject* const Data, const UClass* const DataClass);
+};
+
 UCLASS()
-class NETWORKINGWRAPPER_API AUDP_Manager : public AActor
+class NETWORKINGWRAPPER_API AUDP_Manager : public AActor, public IUDP_DataSenderInterface
 {
 	GENERATED_BODY()
 	
@@ -43,11 +62,11 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 	UFUNCTION(BlueprintCallable)
-	void SendStringData(const FString& Data);
+	void UDP_SendString(const FString& Data);
 
 
 	UFUNCTION(BlueprintCallable)
-	void SendObject(const UObject* Data);
+	void UDP_SendObject(const UObject* Data);
 	
 private:
 	UObjectDelivererManager* DeliveryManager = NULL;
