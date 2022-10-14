@@ -65,7 +65,7 @@ private:
 	int Port = 12429;
 
 
-
+	UFUNCTION()
 	void OnDataReceived(const UObjectDelivererProtocol* ClientSocket, const TArray<uint8>& Buffer);
 	
 };
