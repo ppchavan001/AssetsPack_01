@@ -38,11 +38,12 @@ void AUDP_Manager::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 }
 
-void AUDP_Manager::SetUpUDPManager(bool _IsSender /*= true*/, FString _IP /*= "localhost"*/, int _Port /*= 12429*/)
+void AUDP_Manager::SetUpUDPManager(bool _IsSender /*= true*/, FString _IP /*= "localhost"*/, int _Port /*= 12429*/, UClass* ObjectClass)
 {
 	IsSender = _IsSender;
 	IP = _IP;
 	Port = _Port;
+	JsonObjectClass = ObjectClass;
 
 
 	DeliveryManager = UObjectDelivererManager::CreateObjectDelivererManager(true);
@@ -88,7 +89,7 @@ void AUDP_Manager::UDP_SendString_Implementation(const FString& Data)
 	DeliveryManager->Send(buffer);
 }
 
-void AUDP_Manager::UDP_SendObject_Implementation(const UObject* const Data, const UClass* const DataClass)
+void AUDP_Manager::UDP_SendObject_Implementation(const UObject* const Data)
 {
 	if (!IsSender) return;
 

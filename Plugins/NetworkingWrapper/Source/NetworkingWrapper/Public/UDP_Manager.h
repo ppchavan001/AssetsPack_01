@@ -43,7 +43,7 @@ public:
 
 
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "NETWORKING_WRAPPER | UDP")
-		void UDP_SendObject(const UObject* const Data, const UClass* const DataClass);
+		void UDP_SendObject(const UObject* const Data);
 };
 
 UCLASS()
@@ -55,11 +55,9 @@ public:
 	// Sets default values for this actor's properties
 	AUDP_Manager();
 
-protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
@@ -68,10 +66,13 @@ public:
 
 
 	//UFUNCTION(BlueprintCallable)
-	void UDP_SendObject_Implementation(const UObject* const Data, const UClass* const DataClass);
+	void UDP_SendObject_Implementation(const UObject* const Data);
 
+	/*
+	* On object recived will only be triggered if this ObjectClass matches received string object class
+	*/
 	UFUNCTION(BlueprintCallable)
-		void SetUpUDPManager(bool _IsSender = true, FString _IP = "localhost", int _Port = 12429);
+		void SetUpUDPManager(bool _IsSender = true, FString _IP = "localhost", int _Port = 12429, UClass* ObjectClass = NULL);
 
 private:
 	UObjectDelivererManager* DeliveryManager = NULL;
