@@ -20,11 +20,11 @@ class NETWORKINGWRAPPER_API IUDP_DataReceiverInterface
 	GENERATED_BODY()
 
 public:
-	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "NETWORKING_WRAPPER | UDP")
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Networking Wrapper | UDP")
 		void OnUDP_StringDataReceived(const FString& Data);
 
 
-	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "NETWORKING_WRAPPER | UDP")
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Networking Wrapper | UDP")
 		void OnUDP_ObjectReceived(const UObject* const Data, const UClass* const DataClass);
 };
 
@@ -46,11 +46,11 @@ class NETWORKINGWRAPPER_API IUDP_DataSenderInterface
 	GENERATED_BODY()
 
 public:
-	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "NETWORKING_WRAPPER | UDP")
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Networking Wrapper | UDP")
 		void UDP_SendString(const FString& Data);
 
 
-	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "NETWORKING_WRAPPER | UDP")
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Networking Wrapper | UDP")
 		void UDP_SendObject(const UObject* const Data);
 };
 

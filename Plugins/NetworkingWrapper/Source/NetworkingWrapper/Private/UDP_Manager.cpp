@@ -15,6 +15,7 @@
 #include <Runtime/Engine/Public/EngineUtils.h>
 #include "NetworkingWrapper.h"
 #include "Logging/LogMacros.h"
+#include "NetworkingWrapperFunctionLibrary.h"
 
 // Sets default values
 AUDP_Manager::AUDP_Manager()
@@ -93,7 +94,7 @@ void AUDP_Manager::UDP_SendObject_Implementation(const UObject* const Data)
 {
 	if (!IsSender) return;
 
-	this->UDP_SendString_Implementation(FNetworkingWrapperModule::UObject2String(Data));
+	this->UDP_SendString_Implementation(UNetworkingWrapperFunctionLibrary::UObject2String(Data));
 }
 
 void AUDP_Manager::OnDataReceived(const UObjectDelivererProtocol* ClientSocket, const TArray<uint8>& Buffer)
@@ -106,7 +107,7 @@ void AUDP_Manager::OnDataReceived(const UObjectDelivererProtocol* ClientSocket, 
 
 	for (auto objClass : TargetObjectClass)
 	{
-		UObject* JsonObj = FNetworkingWrapperModule::String2UObject(ReceivedString, objClass);
+		UObject* JsonObj = UNetworkingWrapperFunctionLibrary::String2UObject(ReceivedString, objClass);
 
 		if (JsonObj)
 		{
