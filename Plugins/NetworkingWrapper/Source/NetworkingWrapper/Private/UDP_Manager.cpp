@@ -56,16 +56,20 @@ void AUDP_Manager::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 }
 
-void AUDP_Manager::UDP_SendString(const FString& Data)
+void AUDP_Manager::UDP_SendString_Implementation(const FString& Data)
 {
+	if (!IsSender) return;
+
 	TArray<uint8> buffer;
 	UODStringUtil::StringToBuffer(Data, buffer);
 	DeliveryManager->Send(buffer);
 }
 
-void AUDP_Manager::UDP_SendObject(const UObject* Data)
+void AUDP_Manager::UDP_SendObject_Implementation(const UObject* const Data, const UClass* const DataClass)
 {
-	this->UDP_SendString(FNetworkingWrapperModule::UObject2String(Data));
+	if (!IsSender) return;
+
+	this->UDP_SendString_Implementation(FNetworkingWrapperModule::UObject2String(Data));
 }
 
 void AUDP_Manager::OnDataReceived(const UObjectDelivererProtocol* ClientSocket, const TArray<uint8>& Buffer)

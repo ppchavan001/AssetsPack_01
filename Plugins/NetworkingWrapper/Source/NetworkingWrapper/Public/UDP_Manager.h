@@ -9,11 +9,13 @@
 #include "UDP_Manager.generated.h"
 
 UINTERFACE(MinimalAPI)
-class UUDP_DataReceiverInterface : public UInterface {
+class UUDP_DataReceiverInterface : public UInterface
+{
 	GENERATED_BODY()
 };
 
-class NETWORKINGWRAPPER_API IUDP_DataReceiverInterface {
+class NETWORKINGWRAPPER_API IUDP_DataReceiverInterface
+{
 	GENERATED_BODY()
 
 public:
@@ -48,8 +50,8 @@ UCLASS()
 class NETWORKINGWRAPPER_API AUDP_Manager : public AActor, public IUDP_DataSenderInterface
 {
 	GENERATED_BODY()
-	
-public:	
+
+public:
 	// Sets default values for this actor's properties
 	AUDP_Manager();
 
@@ -57,17 +59,17 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-public:	
+public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-	UFUNCTION(BlueprintCallable)
-	void UDP_SendString(const FString& Data);
+	//UFUNCTION(BlueprintCallable)
+	void UDP_SendString_Implementation(const FString& Data);
 
 
-	UFUNCTION(BlueprintCallable)
-	void UDP_SendObject(const UObject* Data);
-	
+	//UFUNCTION(BlueprintCallable)
+	void UDP_SendObject_Implementation(const UObject* const Data, const UClass* const DataClass);
+
 private:
 	UObjectDelivererManager* DeliveryManager = NULL;
 	UObjectDeliveryBoxUsingJson* DeliveryBox = NULL;
@@ -76,19 +78,19 @@ private:
 	UPacketRule* PacketRule = NULL;
 
 	UPROPERTY(EditInstanceOnly)
-	bool IsSender = true;
+		bool IsSender = true;
 
 	UPROPERTY(EditInstanceOnly)
-	UClass* JsonObjectClass = NULL;
+		UClass* JsonObjectClass = NULL;
 
 	UPROPERTY(EditInstanceOnly)
-	FString IP = "";
+		FString IP = "";
 
 	UPROPERTY(EditInstanceOnly)
-	int Port = 12429;
+		int Port = 12429;
 
 
 	UFUNCTION()
-	void OnDataReceived(const UObjectDelivererProtocol* ClientSocket, const TArray<uint8>& Buffer);
-	
+		void OnDataReceived(const UObjectDelivererProtocol* ClientSocket, const TArray<uint8>& Buffer);
+
 };
