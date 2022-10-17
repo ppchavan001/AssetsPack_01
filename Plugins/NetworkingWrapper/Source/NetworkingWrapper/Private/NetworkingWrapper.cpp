@@ -3,6 +3,7 @@
 #include "NetworkingWrapper.h"
 #include "Utils/JsonSerializer/ODJsonDeserializer.h"
 #include "Utils/JsonSerializer/ODJsonSerializer.h"
+#include "NetworkingInterface.h"
 
 #define LOCTEXT_NAMESPACE "FNetworkingWrapperModule"
 
