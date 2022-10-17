@@ -43,6 +43,16 @@ FString FNetworkingWrapperModule::UObject2String(const UObject* packet)
 	return OutputString;
 }
 
+void FNetworkingWrapperModule::UDP_SendString(const FString& Data)
+{
+
+}
+
+void FNetworkingWrapperModule::UDP_SendObject(const UObject* Data)
+{
+
+}
+
 #undef LOCTEXT_NAMESPACE
 	
 IMPLEMENT_MODULE(FNetworkingWrapperModule, NetworkingWrapper)
