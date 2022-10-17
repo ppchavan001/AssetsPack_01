@@ -14,13 +14,14 @@
 #include "Utils/ODStringUtil.h"
 #include <Runtime/Engine/Public/EngineUtils.h>
 #include "NetworkingWrapper.h"
+#include "Logging/LogMacros.h"
 
 // Sets default values
 AUDP_Manager::AUDP_Manager()
 {
 	// Set this actor to call Tick() every frame.  You can turn this off to
 	// improve performance if you don't need it.
-	PrimaryActorTick.bCanEverTick = true;
+	PrimaryActorTick.bCanEverTick = false;
 
 }
 
@@ -28,6 +29,20 @@ AUDP_Manager::AUDP_Manager()
 void AUDP_Manager::BeginPlay()
 {
 	Super::BeginPlay();
+
+}
+
+// Called every frame
+void AUDP_Manager::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+}
+
+void AUDP_Manager::SetUpUDPManager(bool _IsSender /*= true*/, FString _IP /*= "localhost"*/, int _Port /*= 12429*/)
+{
+	IsSender = _IsSender;
+	IP = _IP;
+	Port = _Port;
 
 
 	DeliveryManager = UObjectDelivererManager::CreateObjectDelivererManager(true);
@@ -48,17 +63,25 @@ void AUDP_Manager::BeginPlay()
 	DeliveryBox = UDeliveryBoxFactory::CreateObjectDeliveryBoxUsingJson(JsonObjectClass);
 
 	DeliveryManager->Start(Protocol, PacketRule, DeliveryBox);
-}
 
-// Called every frame
-void AUDP_Manager::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
+
+
 }
 
 void AUDP_Manager::UDP_SendString_Implementation(const FString& Data)
 {
+
+	// if this object is not a sender,
+	// return
 	if (!IsSender) return;
+
+	// if this object setup is not complete,
+	// return
+	if (!DeliveryManager)
+	{
+		UE_LOG(LogTemp, Error, TEXT("DeliveryManager is not setup! Please call SetUpUDPManager before sending/ receiving any data."));
+		return;
+	}
 
 	TArray<uint8> buffer;
 	UODStringUtil::StringToBuffer(Data, buffer);

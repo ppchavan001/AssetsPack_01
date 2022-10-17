@@ -70,6 +70,9 @@ public:
 	//UFUNCTION(BlueprintCallable)
 	void UDP_SendObject_Implementation(const UObject* const Data, const UClass* const DataClass);
 
+	UFUNCTION(BlueprintCallable)
+		void SetUpUDPManager(bool _IsSender = true, FString _IP = "localhost", int _Port = 12429);
+
 private:
 	UObjectDelivererManager* DeliveryManager = NULL;
 	UObjectDeliveryBoxUsingJson* DeliveryBox = NULL;
@@ -77,17 +80,13 @@ private:
 	UObjectDelivererProtocol* Protocol = NULL;
 	UPacketRule* PacketRule = NULL;
 
-	UPROPERTY(EditInstanceOnly)
-		bool IsSender = true;
+	bool IsSender = true;
 
-	UPROPERTY(EditInstanceOnly)
-		UClass* JsonObjectClass = NULL;
+	UClass* JsonObjectClass = NULL;
 
-	UPROPERTY(EditInstanceOnly)
-		FString IP = "";
+	FString IP = "";
 
-	UPROPERTY(EditInstanceOnly)
-		int Port = 12429;
+	int Port = 12429;
 
 
 	UFUNCTION()
