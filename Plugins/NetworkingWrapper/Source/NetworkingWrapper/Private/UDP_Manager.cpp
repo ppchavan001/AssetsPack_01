@@ -38,12 +38,12 @@ void AUDP_Manager::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 }
 
-void AUDP_Manager::SetUpUDPManager(bool _IsSender /*= true*/, FString _IP /*= "localhost"*/, int _Port /*= 12429*/, UClass* ObjectClass)
+void AUDP_Manager::SetUpUDPManager(TArray<UClass*> _TargetObjectClass, bool _IsSender /*= true*/, FString _IP /*= "localhost"*/, int _Port /*= 12429*/)
 {
 	IsSender = _IsSender;
 	IP = _IP;
 	Port = _Port;
-	JsonObjectClass = ObjectClass;
+	TargetObjectClass = _TargetObjectClass;
 
 
 	DeliveryManager = UObjectDelivererManager::CreateObjectDelivererManager(true);
@@ -61,7 +61,7 @@ void AUDP_Manager::SetUpUDPManager(bool _IsSender /*= true*/, FString _IP /*= "l
 	}
 
 	PacketRule = UPacketRuleFactory::CreatePacketRuleNodivision();
-	DeliveryBox = UDeliveryBoxFactory::CreateObjectDeliveryBoxUsingJson(JsonObjectClass);
+	DeliveryBox = UDeliveryBoxFactory::CreateUtf8StringDeliveryBox(); //UDeliveryBoxFactory::CreateObjectDeliveryBoxUsingJson(JsonObjectClass);
 
 	DeliveryManager->Start(Protocol, PacketRule, DeliveryBox);
 
@@ -103,21 +103,34 @@ void AUDP_Manager::OnDataReceived(const UObjectDelivererProtocol* ClientSocket, 
 
 	FString ReceivedString = UODStringUtil::BufferToString(Buffer);
 
-	UObject* JsonObj = FNetworkingWrapperModule::String2UObject(ReceivedString, JsonObjectClass);
 
-	if (JsonObj)
+	for (auto objClass : TargetObjectClass)
 	{
-		for (AActor* Actor : ActorsWithInterface)
+		UObject* JsonObj = FNetworkingWrapperModule::String2UObject(ReceivedString, objClass);
+
+		if (JsonObj)
 		{
-			IUDP_DataReceiverInterface::Execute_OnUDP_ObjectReceived(Actor, JsonObj, JsonObjectClass);
+			/*
+			* received json object
+			* call callback and return
+			*/
+
+			for (AActor* Actor : ActorsWithInterface)
+			{
+				IUDP_DataReceiverInterface::Execute_OnUDP_ObjectReceived(Actor, JsonObj, objClass);
+			}
+
+			return;
 		}
 	}
-	else
+
+	/*
+	* if couldn't cast to json obj,
+	* call string callback
+	*/
+	for (AActor* Actor : ActorsWithInterface)
 	{
-		for (AActor* Actor : ActorsWithInterface)
-		{
-			IUDP_DataReceiverInterface::Execute_OnUDP_StringDataReceived(Actor, ReceivedString);
-		}
+		IUDP_DataReceiverInterface::Execute_OnUDP_StringDataReceived(Actor, ReceivedString);
 	}
 
 }

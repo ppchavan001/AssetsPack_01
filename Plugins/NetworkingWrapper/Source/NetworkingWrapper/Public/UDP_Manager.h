@@ -6,6 +6,7 @@
 #include "GameFramework/Actor.h"
 #include <ObjectDeliverer/Public/ObjectDelivererManager.h>
 #include <ObjectDeliverer/Public/DeliveryBox/ObjectDeliveryBoxUsingJson.h>
+#include "DeliveryBox/Utf8StringDeliveryBox.h"
 #include "UDP_Manager.generated.h"
 
 UINTERFACE(MinimalAPI)
@@ -69,21 +70,21 @@ public:
 	void UDP_SendObject_Implementation(const UObject* const Data);
 
 	/*
-	* On object recived will only be triggered if this ObjectClass matches received string object class
+	* On object received will only be triggered if this ObjectClass matches received string object class
 	*/
 	UFUNCTION(BlueprintCallable)
-		void SetUpUDPManager(bool _IsSender = true, FString _IP = "localhost", int _Port = 12429, UClass* ObjectClass = NULL);
+		void SetUpUDPManager(TArray<UClass*> _TargetObjectClass, bool _IsSender = true, FString _IP = "localhost", int _Port = 12429);
 
 private:
 	UObjectDelivererManager* DeliveryManager = NULL;
-	UObjectDeliveryBoxUsingJson* DeliveryBox = NULL;
+	UUtf8StringDeliveryBox* DeliveryBox = NULL;
 
 	UObjectDelivererProtocol* Protocol = NULL;
 	UPacketRule* PacketRule = NULL;
 
 	bool IsSender = true;
 
-	UClass* JsonObjectClass = NULL;
+	TArray<UClass*> TargetObjectClass;
 
 	FString IP = "";
 
