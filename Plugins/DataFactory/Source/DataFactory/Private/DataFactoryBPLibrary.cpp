@@ -24,15 +24,15 @@ DEFINE_LOG_CATEGORY(DataFactoryLog);
 #define  CurrentFileName (FilePath.Replace(TEXT("/"), TEXT("\\"))).RightChop(FilePath.Find(&FString("\\")[0], ESearchCase::IgnoreCase, ESearchDir::FromEnd) + 1)
 
 UDataFactoryBPLibrary::UDataFactoryBPLibrary(const FObjectInitializer& ObjectInitializer)
-: Super(ObjectInitializer)
+	: Super(ObjectInitializer)
 {
 
 }
 
 
-void UDataFactoryBPLibrary::SetFPropertyByName(UObject* Object, 
-											   FName NameOfThePropertyToUpdate, 
-											   const FString DataToSet)
+void UDataFactoryBPLibrary::SetFPropertyByName(UObject* Object,
+	FName NameOfThePropertyToUpdate,
+	const FString DataToSet)
 {
 
 	if (Object)
@@ -48,15 +48,15 @@ void UDataFactoryBPLibrary::SetFPropertyByName(UObject* Object,
 		else
 		{
 			UE_LOG(DataFactoryLog, Verbose,
-				   TEXT("%s : %s : %s : Couldn't find property name = %s."),
-				   *CurrentFileName, *FString(__func__), __LINE__, *(NameOfThePropertyToUpdate.ToString()));
+				TEXT("%s : %s : %s : Couldn't find property name = %s."),
+				*CurrentFileName, *FString(__func__), __LINE__, *(NameOfThePropertyToUpdate.ToString()));
 		}
 	}
 	else
 	{
 		UE_LOG(DataFactoryLog, Warning,
-			   TEXT("%s : %s : %s : Invalid object provided."),
-			   *CurrentFileName, *FString(__func__), __LINE__);
+			TEXT("%s : %s : %s : Invalid object provided."),
+			*CurrentFileName, *FString(__func__), __LINE__);
 	}
 
 
@@ -123,44 +123,45 @@ void UDataFactoryBPLibrary::DF_PrintString(const UObject* WorldContextObject, co
 			}
 
 			const UEditorStyleSettings* EditorSettings = GetDefault<UEditorStyleSettings>();
+
+			FColor OnScreenTextColor = FColor::White;
+
+			if (EditorSettings)
+				switch (LogVerbosity)
+				{
+				case EDataFactoryLogVerbosity::NoLogging:
+					OnScreenTextColor = FColor(0,0,0,0);
+					break;
+				case EDataFactoryLogVerbosity::Fatal:
+					OnScreenTextColor = FColor(255, 0, 0, 255);
+					break;
+				case EDataFactoryLogVerbosity::Error:
+					OnScreenTextColor = FColor(255, 25, 25, 255);
+					break;
+				case EDataFactoryLogVerbosity::Warning:
+					OnScreenTextColor = FColor(230, 200, 0, 255);
+					break;
+				case EDataFactoryLogVerbosity::Display:
+					OnScreenTextColor = FColor(200, 200, 200, 255);
+					break;
+				case EDataFactoryLogVerbosity::Log:
+					OnScreenTextColor = FColor(180, 180, 180, 255);
+					break;
+				case EDataFactoryLogVerbosity::Verbose:
+					OnScreenTextColor = FColor(150, 150, 150, 255);
+					break;
+				case EDataFactoryLogVerbosity::VeryVerbose:
+					OnScreenTextColor = FColor(120, 120, 120, 255);
+					break;
+				}
+
 			
-			FLinearColor OnScreenTextColor = FColor::White;
-
-			if(EditorSettings)
-			switch (LogVerbosity)
-			{
-			case EDataFactoryLogVerbosity::NoLogging:
-				OnScreenTextColor = EditorSettings->LogNormalColor;
-				break;
-			case EDataFactoryLogVerbosity::Fatal:
-				OnScreenTextColor = EditorSettings->LogErrorColor;
-				break;
-			case EDataFactoryLogVerbosity::Error:
-				OnScreenTextColor = EditorSettings->LogErrorColor;
-				break;
-			case EDataFactoryLogVerbosity::Warning:
-				OnScreenTextColor = EditorSettings->LogWarningColor;
-				break;
-			case EDataFactoryLogVerbosity::Display:
-				OnScreenTextColor = EditorSettings->LogNormalColor;
-				break;
-			case EDataFactoryLogVerbosity::Log:
-				OnScreenTextColor = EditorSettings->LogNormalColor;
-				break;
-			case EDataFactoryLogVerbosity::Verbose:
-				OnScreenTextColor = EditorSettings->LogNormalColor;
-				break;
-			case EDataFactoryLogVerbosity::VeryVerbose:
-				OnScreenTextColor = EditorSettings->LogNormalColor;
-				break;
-			}
-
-			GEngine->AddOnScreenDebugMessage((uint64)-1, Duration, OnScreenTextColor.ToFColor(true), FinalDisplayString);
+			GEngine->AddOnScreenDebugMessage((uint64)-1, Duration, OnScreenTextColor, FinalDisplayString);
 		}
 		else
 		{
 			UE_LOG(DataFactoryLog, VeryVerbose, TEXT("%s : %s : %s : Screen messages disabled (!GAreScreenMessagesEnabled).  Cannot print to screen."),
-				   *CurrentFileName, *FString(__func__), __LINE__);
+				*CurrentFileName, *FString(__func__), __LINE__);
 		}
 	}
 }
@@ -170,15 +171,15 @@ void UDataFactoryBPLibrary::DF_PrintClass(const UObject* WorldContextObject, EDa
 	FString str = "";
 	auto* Class = WorldContextObject->GetClass();
 	str += Class->GetFName().ToString();
-	if(Class) auto* Class2 = dynamic_cast<UBlueprintGeneratedClass*>(Class);
+	if (Class) auto* Class2 = dynamic_cast<UBlueprintGeneratedClass*>(Class);
 	if (Class)
 	{
 		auto* Class3 = dynamic_cast<UBlueprint*>(Class);
 
 		auto* Class5 = WorldContextObject->StaticClass();
-		if(Class3)
-		auto class4 = Class3->GeneratedClass.Get();
-		
+		if (Class3)
+			auto class4 = Class3->GeneratedClass.Get();
+
 	}
 	DF_PrintString(WorldContextObject, str, LogVerbosity, bPrintToScreen, bPrintToLog, Duration);
 }
@@ -301,7 +302,7 @@ void UDataFactoryBPLibrary::SetFPropertyValueInternal(FProperty* property, void*
 			// Build CSV array
 			TArray<FString> DataArray;
 			DataToSet.ParseIntoArray(DataArray, *FString(","), false);
-			
+
 
 			FScriptArrayHelper_InContainer Helper(ArrayProperty, Object);
 			// Clear old values
@@ -409,76 +410,76 @@ void UDataFactoryBPLibrary::SetFPropertyValueInternal(FProperty* property, void*
 
 
 
-		/*-----------------------------------------------------------
-		|															|
-		|	Key Definitions	to lookup in loaded strings				|
-		|															|
-		-------------------------------------------------------------*/
+			/*-----------------------------------------------------------
+			|															|
+			|	Key Definitions	to lookup in loaded strings				|
+			|															|
+			-------------------------------------------------------------*/
 
 
 
-		// Update this value defending on the default value of the channel 
-		// ex Location = "0", scale = "1"
-		FString DefaultChannelValue = "This value should never be used! Replace with default value for the channel";
+			// Update this value defending on the default value of the channel 
+			// ex Location = "0", scale = "1"
+			FString DefaultChannelValue = "This value should never be used! Replace with default value for the channel";
 
-		// Return FString for specified channel
-		// If key is defined 
-		//		return value for key
-		// else 
-		//	if index is valid
-		//		return Value at index 
-		//	else 
-		//		return default value for channel
-		/* Equivalent to 
-		auto AssignChannelValue = [](FString Key, int32 Index, TMap<FString, FString> ChannelData, TArray<FString> CSVArray)
-		{
-
-			if (ChannelData.Contains(Key) && ChannelData[Key].Len() > 0)
+			// Return FString for specified channel
+			// If key is defined 
+			//		return value for key
+			// else 
+			//	if index is valid
+			//		return Value at index 
+			//	else 
+			//		return default value for channel
+			/* Equivalent to
+			auto AssignChannelValue = [](FString Key, int32 Index, TMap<FString, FString> ChannelData, TArray<FString> CSVArray)
 			{
-				return ChannelData[Key];
-			}
 
-			if (CSVArray.Num() > Index && !(CSVArray[Index].Contains(":")))
-			{
-				return CSVArray[Index];
-			}
+				if (ChannelData.Contains(Key) && ChannelData[Key].Len() > 0)
+				{
+					return ChannelData[Key];
+				}
 
-			return FString("0"); // DefaultChannelValue;
+				if (CSVArray.Num() > Index && !(CSVArray[Index].Contains(":")))
+				{
+					return CSVArray[Index];
+				}
+
+				return FString("0"); // DefaultChannelValue;
 
 
-		};*/
-		#define AssignChannelValue(Key, Index) (ChannelData.Contains(Key) && ChannelData[Key].Len() > 0) ? \
+			};*/
+#define AssignChannelValue(Key, Index) (ChannelData.Contains(Key) && ChannelData[Key].Len() > 0) ? \
 				 /* If contains valid key, return immediately */ ChannelData[Key] : \
 				/* if key is not present, if array contains valid value, return array val otherwise return default channel val. */ \
 				(CSVArray.Num() > Index && CSVArray[Index].Len() > 0 &&!(CSVArray[Index].Contains(":"))) ?  CSVArray[Index] : DefaultChannelValue
 
 
-		#define ColorR	"R"
-		#define ColorG 	"G"
-		#define ColorB 	"B"
-		#define ColorA 	"A"
+#define ColorR	"R"
+#define ColorG 	"G"
+#define ColorB 	"B"
+#define ColorA 	"A"
 
-		#define LocationX "LocX"
-		#define LocationY "LocY"
-		#define LocationZ "LocZ"
+#define LocationX "LocX"
+#define LocationY "LocY"
+#define LocationZ "LocZ"
 
 
-		#define RotationX "RotX"
-		#define RotationY "RotY"
-		#define RotationZ "RotZ"
-		#define RotationW "RotW"
+#define RotationX "RotX"
+#define RotationY "RotY"
+#define RotationZ "RotZ"
+#define RotationW "RotW"
 
-		#define ScaleX "ScaleX"
-		#define ScaleY "ScaleY"
-		#define ScaleZ "ScaleZ"
+#define ScaleX "ScaleX"
+#define ScaleY "ScaleY"
+#define ScaleZ "ScaleZ"
 
-		#define ImplementLocation(LocationXIndex, LocationYIndex, LocationZIndex) \
+#define ImplementLocation(LocationXIndex, LocationYIndex, LocationZIndex) \
 			FVector Location;\
 			Location.X = FCString::Atof(&(AssignChannelValue(LocationX, LocationXIndex))[0]);\
 			Location.Y = FCString::Atof(&(AssignChannelValue(LocationY, LocationYIndex))[0]);\
 			Location.Z = FCString::Atof(&(AssignChannelValue(LocationZ, LocationZIndex))[0]);
 
-		#define ImplementRotator(RotationXIndex, RotationYIndex, RotationZIndex, RotationWIndex) \
+#define ImplementRotator(RotationXIndex, RotationYIndex, RotationZIndex, RotationWIndex) \
 			FQuat Rotation;\
 			Rotation.X = FCString::Atof(&(AssignChannelValue(RotationX, RotationXIndex))[0]);\
 			Rotation.Y = FCString::Atof(&(AssignChannelValue(RotationY, RotationYIndex))[0]);\
@@ -486,15 +487,15 @@ void UDataFactoryBPLibrary::SetFPropertyValueInternal(FProperty* property, void*
 			Rotation.W = FCString::Atof(&(AssignChannelValue(RotationW, RotationWIndex))[0]);
 
 
-		//Reset warning for macros with multiple values
-		#pragma warning (default: 4003) 
+			//Reset warning for macros with multiple values
+#pragma warning (default: 4003) 
 
-			// ---------------------
-			// Setup End
-			// ---------------------
+	// ---------------------
+	// Setup End
+	// ---------------------
 
 
-			// Vector i.e location, scale, etc
+	// Vector i.e location, scale, etc
 			if (StructTypeName == "Vector")
 			{
 				DefaultChannelValue = "0";
@@ -528,7 +529,7 @@ void UDataFactoryBPLibrary::SetFPropertyValueInternal(FProperty* property, void*
 			// UInt8 for each channel
 			// hence limited to (0-255) range
 			//
-			
+
 			if (StructTypeName == "Color")
 			{
 
@@ -603,13 +604,13 @@ void UDataFactoryBPLibrary::SetFPropertyValueInternal(FProperty* property, void*
 			}
 
 			FString str = CurrentFileName + " : " + FString(__func__) + " : " +
-				"Tried to set value of unsupported struct type =" + StructTypeName + 
+				"Tried to set value of unsupported struct type =" + StructTypeName +
 				", Property name =" + NameOfThePropertyToUpdate.ToString();
 
 
 			DF_PrintString(NULL, str,
-						   EDataFactoryLogVerbosity::VeryVerbose,
-						   false, true);
+				EDataFactoryLogVerbosity::VeryVerbose,
+				false, true);
 
 			//UE_LOG(DataFactoryLog, Warning, 
 			//	   TEXT("%s : %s : %s : Tried to set value of unsupported struct type = %s , Property name = %s"), 
@@ -620,15 +621,15 @@ void UDataFactoryBPLibrary::SetFPropertyValueInternal(FProperty* property, void*
 		}
 
 		UE_LOG(DataFactoryLog, Warning, TEXT("%s : %s : %s : Tried to set value of unsupported type. Property Name = %s"),
-			   *CurrentFileName, *FString(__func__), __LINE__, *(NameOfThePropertyToUpdate.ToString()));
+			*CurrentFileName, *FString(__func__), __LINE__, *(NameOfThePropertyToUpdate.ToString()));
 
-		
+
 	}
 
-	
-	UE_LOG(DataFactoryLog, Verbose, 
-		   TEXT("%s : %s : %s : The property or the object provided is invalid. DataToSet = %s"),
-		   *CurrentFileName, *FString(__func__), __LINE__, *(DataToSet));
+
+	UE_LOG(DataFactoryLog, Verbose,
+		TEXT("%s : %s : %s : The property or the object provided is invalid. DataToSet = %s"),
+		*CurrentFileName, *FString(__func__), __LINE__, *(DataToSet));
 
 }
 
@@ -671,7 +672,7 @@ UObject* UDataFactoryBPLibrary::GetObjectWithName(const FName Name)
 	UDataFactoryBPLibrary::DF_PrintString(NULL, str, EDataFactoryLogVerbosity::Warning, true, true, 2.f);
 
 	return NULL;
-	
+
 }
 
 TSet<UObject*> UDataFactoryBPLibrary::GetObjectsWithNames(const TSet<FName>& ObjectNames)
@@ -693,11 +694,11 @@ TSet<UObject*> UDataFactoryBPLibrary::GetObjectsWithNames(const TSet<FName>& Obj
 }
 
 bool UDataFactoryBPLibrary::AddInputBinding(UObject* Object,
-											FName SourceName,
-											FName FunctionName,
-											EInputBindingSupportedTypes InputBindingType,
-											EInputEvent KeyEvent,
-											UInputComponent* InputComponent)
+	FName SourceName,
+	FName FunctionName,
+	EInputBindingSupportedTypes InputBindingType,
+	EInputEvent KeyEvent,
+	UInputComponent* InputComponent)
 {
 
 	if (Object && Object->GetWorld() && Object->GetWorld()->GetFirstPlayerController())
@@ -707,7 +708,7 @@ bool UDataFactoryBPLibrary::AddInputBinding(UObject* Object,
 		if (!InputSettings)
 		{
 			UE_LOG(DataFactoryLog, Error, TEXT("%s:%s:%d: Couldn't find Input settings for Action : %s!"),
-				   *CurrentFileName, *FString(__func__), __LINE__, *(SourceName.ToString()));
+				*CurrentFileName, *FString(__func__), __LINE__, *(SourceName.ToString()));
 
 			return false;
 		}
@@ -716,7 +717,7 @@ bool UDataFactoryBPLibrary::AddInputBinding(UObject* Object,
 		if (!(Object->GetClass()->FindFunctionByName(FunctionName)))
 		{
 			UE_LOG(DataFactoryLog, Error, TEXT("%s:%s:%d: Object doesn't have the specified function : %s, for binding : %s!"),
-				   *CurrentFileName, *FString(__func__), __LINE__, *(FunctionName.ToString()) , *(SourceName.ToString()));
+				*CurrentFileName, *FString(__func__), __LINE__, *(FunctionName.ToString()), *(SourceName.ToString()));
 
 			return false;
 		}
@@ -744,7 +745,7 @@ bool UDataFactoryBPLibrary::AddInputBinding(UObject* Object,
 		{
 
 			UE_LOG(DataFactoryLog, Error, TEXT("%s:%s:%d: Action name : %s, not present in InputSettings!"),
-				   *CurrentFileName, *FString(__func__), __LINE__, *(SourceName.ToString()));
+				*CurrentFileName, *FString(__func__), __LINE__, *(SourceName.ToString()));
 
 			return false;
 		}
@@ -765,7 +766,7 @@ bool UDataFactoryBPLibrary::AddInputBinding(UObject* Object,
 			else
 			{
 				UE_LOG(DataFactoryLog, Error, TEXT("%s:%s:%d : InputComponent not found on the player0! Returning false for function: %s, action : %s"),
-					   *CurrentFileName, *FString(__func__), __LINE__, *(FunctionName.ToString()), *(SourceName.ToString()));
+					*CurrentFileName, *FString(__func__), __LINE__, *(FunctionName.ToString()), *(SourceName.ToString()));
 
 				return false;
 			}
@@ -779,11 +780,11 @@ bool UDataFactoryBPLibrary::AddInputBinding(UObject* Object,
 		case EInputBindingSupportedTypes::ActionBinding:
 			BindActionInputInternal(InputComponent, SourceName, Object, FunctionName, KeyEvent);
 			break;
-	
+
 		case EInputBindingSupportedTypes::KeyBinding:
 			BindKeyInputInternal(InputComponent, SourceName, Object, FunctionName, KeyEvent);
 			break;
-		
+
 		case EInputBindingSupportedTypes::AxisBinding:
 			BindAxisInputInternal(InputComponent, SourceName, Object, FunctionName);
 			break;
@@ -794,15 +795,15 @@ bool UDataFactoryBPLibrary::AddInputBinding(UObject* Object,
 	}
 
 	UE_LOG(DataFactoryLog, Error, TEXT("%s:%s:%d : Invalid actor or world or player0 controller!"),
-		   *CurrentFileName, *FString(__func__), __LINE__);
+		*CurrentFileName, *FString(__func__), __LINE__);
 	return false;
 }
 
-void UDataFactoryBPLibrary::BindActionInputInternal(UInputComponent* InputComponent, 
-													const FName& ActionName, 
-													UObject* Object, 
-													FName& FunctionName, 
-													EInputEvent KeyEvent)
+void UDataFactoryBPLibrary::BindActionInputInternal(UInputComponent* InputComponent,
+	const FName& ActionName,
+	UObject* Object,
+	FName& FunctionName,
+	EInputEvent KeyEvent)
 {
 
 	// Searching for action on the InputComponent
@@ -818,9 +819,9 @@ void UDataFactoryBPLibrary::BindActionInputInternal(UInputComponent* InputCompon
 	}
 
 
-	if (ActionIndex > -1) 
+	if (ActionIndex > -1)
 		InputComponent->GetActionBinding(ActionIndex).ActionDelegate.GetDelegateForManualSet().BindUFunction(Object, FunctionName);
-		
+
 	else
 	{
 		// Action binding not found on the controller,
@@ -834,15 +835,15 @@ void UDataFactoryBPLibrary::BindActionInputInternal(UInputComponent* InputCompon
 
 
 	UE_LOG(DataFactoryLog, Log, TEXT("%s:%s:%d: Bound function : %s to ActionMapping: %s "),
-		   *CurrentFileName, *FString(__func__), __LINE__, *(FunctionName.ToString()), *(ActionName.ToString()));
+		*CurrentFileName, *FString(__func__), __LINE__, *(FunctionName.ToString()), *(ActionName.ToString()));
 
 }
 
 
-void UDataFactoryBPLibrary::BindAxisInputInternal(UInputComponent* InputComponent, 
-												  const FName& AxisName,
-												  UObject* Object, 
-												  FName& FunctionName)
+void UDataFactoryBPLibrary::BindAxisInputInternal(UInputComponent* InputComponent,
+	const FName& AxisName,
+	UObject* Object,
+	FName& FunctionName)
 {
 
 	// Searching for action on the InputComponent
@@ -872,7 +873,7 @@ void UDataFactoryBPLibrary::BindAxisInputInternal(UInputComponent* InputComponen
 
 
 	UE_LOG(DataFactoryLog, Log, TEXT("%s:%s:%d : Bound function : %s to AxisMapping: %s "),
-		   *CurrentFileName, *FString(__func__), __LINE__, *(FunctionName.ToString()), *(AxisName.ToString()));
+		*CurrentFileName, *FString(__func__), __LINE__, *(FunctionName.ToString()), *(AxisName.ToString()));
 }
 
 
@@ -883,7 +884,7 @@ void UDataFactoryBPLibrary::BindKeyInputInternal(UInputComponent* InputComponent
 	int32 KeyIndex = -1;
 	for (int32 i = 0; i < InputComponent->KeyBindings.Num(); ++i)
 	{
-		if (InputComponent->KeyBindings[i].Chord.GetKeyText().ToString() == KeyName.ToString() && 
+		if (InputComponent->KeyBindings[i].Chord.GetKeyText().ToString() == KeyName.ToString() &&
 			InputComponent->KeyBindings[i].KeyEvent == KeyEvent)
 		{
 			KeyIndex = i;
@@ -907,7 +908,7 @@ void UDataFactoryBPLibrary::BindKeyInputInternal(UInputComponent* InputComponent
 
 
 	UE_LOG(DataFactoryLog, Log, TEXT("%s:%s:%d: Bound function : %s to Key: %s "),
-		   *CurrentFileName, *FString(__func__), __LINE__, *(FunctionName.ToString()), *(KeyName.ToString()));
+		*CurrentFileName, *FString(__func__), __LINE__, *(FunctionName.ToString()), *(KeyName.ToString()));
 }
 
 
