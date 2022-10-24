@@ -17,7 +17,8 @@ class DataLoaderAsyncTask : public FNonAbandonableTask
 
 	DataLoaderAsyncTask(UObject* Object)
 		: WorldContextObject(Object)
-	{}
+	{
+	}
 
 	void DoWork()
 	{
@@ -50,7 +51,7 @@ class DataLoaderAsyncTask : public FNonAbandonableTask
 // Sets default values
 ADataLoaderActorBackend::ADataLoaderActorBackend()
 {
- 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
+	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
 }
@@ -59,8 +60,8 @@ void ADataLoaderActorBackend::PostDataLoadingCallbackAsync()
 {
 	bool bUseAsync = false;
 	OnDataLoadingFinished.Broadcast();
-	if(bUseAsync)
-	(new FAutoDeleteAsyncTask<DataLoaderAsyncTask>(this))->StartBackgroundTask();
+	if (bUseAsync)
+		(new FAutoDeleteAsyncTask<DataLoaderAsyncTask>(this))->StartBackgroundTask();
 
 	else if (UWorld* World = GetWorld())
 	{
@@ -102,7 +103,7 @@ void ADataLoaderActorBackend::GetAllObjectsWithTagCached(TArray<UObject*>& OutAc
 void ADataLoaderActorBackend::BeginPlay()
 {
 	Super::BeginPlay();
-	
+
 }
 
 // Called every frame
@@ -119,7 +120,7 @@ void ADataLoaderActorBackend::BuildTagMap()
 	if (World)
 	{
 		TagMapOfObjects.Reset();
-	
+
 		for (TActorIterator<AActor> It(World, AActor::StaticClass()); It; ++It)
 		{
 			AActor* Actor = *It;
@@ -143,13 +144,13 @@ void ADataLoaderActorBackend::BuildTagMap()
 }
 
 
-void ADataLoaderActorBackend::UpdatePropertyOnTargetObjects(const TArray<UObject*>& TargetObjects, 
-															const FName NameOfThePropertyToUpdate, 
-															const FString& DataToSet)
+void ADataLoaderActorBackend::UpdatePropertyOnTargetObjects(const TArray<UObject*>& TargetObjects,
+	const FName NameOfThePropertyToUpdate,
+	const FString& DataToSet)
 {
 	EInputBindingSupportedTypes InputBindingType = GetInputBindingType(NameOfThePropertyToUpdate);
 
-	
+
 	// Update objects and return
 	if (InputBindingType == EInputBindingSupportedTypes::Invalid)
 	{
@@ -184,10 +185,10 @@ void ADataLoaderActorBackend::UpdateInputBinding(const FString& DataToSet, const
 	for (auto Object : GetTargetObjectsBackend(TargetObjects))
 	{
 		UDataFactoryBPLibrary::AddInputBinding(Object,
-											   FName(*(InputKeys[0].TrimStartAndEnd())),
-											   FName(*(InputKeys[1].TrimStartAndEnd())),
-											   InputBindingType,
-											   static_cast<EInputEvent>(FCString::Atoi(&InputKeys[2][0])));
+			FName(*(InputKeys[0].TrimStartAndEnd())),
+			FName(*(InputKeys[1].TrimStartAndEnd())),
+			InputBindingType,
+			static_cast<EInputEvent>(FCString::Atoi(&InputKeys[2][0])));
 	}
 
 }
@@ -207,7 +208,7 @@ void ADataLoaderActorBackend::UpdateClassDefaults(const TSet<FName>& ClassNames,
 		{
 			if (Obj)
 			{
-				if(UClass* Class = Cast<UClass>(Obj))
+				if (UClass* Class = Cast<UClass>(Obj))
 					UDataFactoryBPLibrary::SetFPropertyByName(Class->GetDefaultObject(), NameOfThePropertyToUpdate, DataToSet);
 			}
 		}
@@ -229,9 +230,9 @@ void ADataLoaderActorBackend::UpdateClassDefaults(const TSet<FName>& ClassNames,
 				}
 			}
 		}
-		
+
 		UpdateInputBinding(DataToSet, TargetObjects, InputBindingType);
-		
+
 		return;
 	}
 

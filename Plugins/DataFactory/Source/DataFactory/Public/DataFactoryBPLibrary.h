@@ -69,27 +69,28 @@ class UDataFactoryBPLibrary : public UBlueprintFunctionLibrary
 {
 	GENERATED_UCLASS_BODY()
 
+public:
 
-		UFUNCTION(BlueprintPure, meta = (DisplayName = "Get Key From Name", Keywords = "Get Key From Name"), Category = "DataFactory | Input")
+	UFUNCTION(BlueprintPure, meta = (DisplayName = "Get Key From Name", Keywords = "Get Key From Name"), Category = "DataFactory | Input")
 		static FKey GetKeyFromName(FName name);
-		
+
 
 	UFUNCTION(BlueprintCallable, meta = (WorldContext = "WorldContextObject", CallableWithoutWorldContext, Keywords = "log print", AdvancedDisplay = "2", DevelopmentOnly), Category = "DataFactory | Log")
-	static void DF_PrintString(const UObject* WorldContextObject, 
-							   const FString InString = "", 
-							   EDataFactoryLogVerbosity LogVerbosity = EDataFactoryLogVerbosity::Log,
-							   bool bPrintToScreen = true, 
-							   bool bPrintToLog = true, 
-							   float Duration = 2.f);
+		static void DF_PrintString(const UObject* WorldContextObject,
+			const FString InString = "",
+			EDataFactoryLogVerbosity LogVerbosity = EDataFactoryLogVerbosity::Log,
+			bool bPrintToScreen = true,
+			bool bPrintToLog = true,
+			float Duration = 2.f);
 
 	UFUNCTION(BlueprintCallable, meta = (Keywords = "log print", DevelopmentOnly), Category = "DataFactory | Log")
-	static void DF_PrintClass(const UObject* WorldContextObject,
-								   EDataFactoryLogVerbosity LogVerbosity = EDataFactoryLogVerbosity::Log,
-								   bool bPrintToScreen = true,
-								   bool bPrintToLog = true,
-								   float Duration = 2.f);
+		static void DF_PrintClass(const UObject* WorldContextObject,
+			EDataFactoryLogVerbosity LogVerbosity = EDataFactoryLogVerbosity::Log,
+			bool bPrintToScreen = true,
+			bool bPrintToLog = true,
+			float Duration = 2.f);
 
-	
+
 	/*
 		Finds the property by name on the specified object and updates the value.
 
@@ -146,7 +147,7 @@ class UDataFactoryBPLibrary : public UBlueprintFunctionLibrary
 		SetOfObjectsOut.Empty();
 
 		for (TObjectIterator<UObject> It; It; ++It) SetOfObjectsOut.Add(*It);
-			
+
 	}
 
 	/// <summary>
@@ -163,11 +164,11 @@ class UDataFactoryBPLibrary : public UBlueprintFunctionLibrary
 	/// </summary>
 	UFUNCTION(BlueprintCallable, Category = "DataFactory | Controller")
 		static bool AddInputBinding(UObject* Object,
-									FName SourceName,
-									FName FunctionName,
-									EInputBindingSupportedTypes InputBindingType,
-									EInputEvent KeyEvent = IE_Released,
-									UInputComponent* InputComponent = nullptr);
+			FName SourceName,
+			FName FunctionName,
+			EInputBindingSupportedTypes InputBindingType,
+			EInputEvent KeyEvent = IE_Released,
+			UInputComponent* InputComponent = nullptr);
 
 	static void BindActionInputInternal(UInputComponent* InputComponent, const FName& ActionName, UObject* Object, FName& FunctionName, EInputEvent KeyEvent);
 	static void BindAxisInputInternal(UInputComponent* InputComponent, const FName& AxisName, UObject* Object, FName& FunctionName);
@@ -181,7 +182,7 @@ class UDataFactoryBPLibrary : public UBlueprintFunctionLibrary
 		static bool ReadLinesFromFile(const FString FileName, TArray<FString>& LinesOut);
 
 	UFUNCTION(BlueprintPure)
-	static FString GetAppInfo(FString Separator = "");
+		static FString GetAppInfo(FString Separator = "");
 
 
 };

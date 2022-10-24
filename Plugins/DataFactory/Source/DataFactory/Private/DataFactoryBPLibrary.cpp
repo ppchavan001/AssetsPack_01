@@ -82,17 +82,17 @@ void UDataFactoryBPLibrary::DF_PrintString(const UObject* WorldContextObject, co
 		{
 			switch (World->GetNetMode())
 			{
-			case NM_Client:
-				// GPlayInEditorID 0 is always the server, so 1 will be first client.
-				// You want to keep this logic in sync with GeneratePIEViewportWindowTitle and UpdatePlayInEditorWorldDebugString
-				Prefix = FString::Printf(TEXT("Client %d: "), GPlayInEditorID);
-				break;
-			case NM_DedicatedServer:
-			case NM_ListenServer:
-				Prefix = FString::Printf(TEXT("Server: "));
-				break;
-			case NM_Standalone:
-				break;
+				case NM_Client:
+					// GPlayInEditorID 0 is always the server, so 1 will be first client.
+					// You want to keep this logic in sync with GeneratePIEViewportWindowTitle and UpdatePlayInEditorWorldDebugString
+					Prefix = FString::Printf(TEXT("Client %d: "), GPlayInEditorID);
+					break;
+				case NM_DedicatedServer:
+				case NM_ListenServer:
+					Prefix = FString::Printf(TEXT("Server: "));
+					break;
+				case NM_Standalone:
+					break;
 			}
 		}
 	}
@@ -129,33 +129,33 @@ void UDataFactoryBPLibrary::DF_PrintString(const UObject* WorldContextObject, co
 			if (EditorSettings)
 				switch (LogVerbosity)
 				{
-				case EDataFactoryLogVerbosity::NoLogging:
-					OnScreenTextColor = FColor(0,0,0,0);
-					break;
-				case EDataFactoryLogVerbosity::Fatal:
-					OnScreenTextColor = FColor(255, 0, 0, 255);
-					break;
-				case EDataFactoryLogVerbosity::Error:
-					OnScreenTextColor = FColor(255, 25, 25, 255);
-					break;
-				case EDataFactoryLogVerbosity::Warning:
-					OnScreenTextColor = FColor(230, 200, 0, 255);
-					break;
-				case EDataFactoryLogVerbosity::Display:
-					OnScreenTextColor = FColor(200, 200, 200, 255);
-					break;
-				case EDataFactoryLogVerbosity::Log:
-					OnScreenTextColor = FColor(180, 180, 180, 255);
-					break;
-				case EDataFactoryLogVerbosity::Verbose:
-					OnScreenTextColor = FColor(150, 150, 150, 255);
-					break;
-				case EDataFactoryLogVerbosity::VeryVerbose:
-					OnScreenTextColor = FColor(120, 120, 120, 255);
-					break;
+					case EDataFactoryLogVerbosity::NoLogging:
+						OnScreenTextColor = FColor(0, 0, 0, 0);
+						break;
+					case EDataFactoryLogVerbosity::Fatal:
+						OnScreenTextColor = FColor(255, 0, 0, 255);
+						break;
+					case EDataFactoryLogVerbosity::Error:
+						OnScreenTextColor = FColor(255, 25, 25, 255);
+						break;
+					case EDataFactoryLogVerbosity::Warning:
+						OnScreenTextColor = FColor(230, 200, 0, 255);
+						break;
+					case EDataFactoryLogVerbosity::Display:
+						OnScreenTextColor = FColor(200, 200, 200, 255);
+						break;
+					case EDataFactoryLogVerbosity::Log:
+						OnScreenTextColor = FColor(180, 180, 180, 255);
+						break;
+					case EDataFactoryLogVerbosity::Verbose:
+						OnScreenTextColor = FColor(150, 150, 150, 255);
+						break;
+					case EDataFactoryLogVerbosity::VeryVerbose:
+						OnScreenTextColor = FColor(120, 120, 120, 255);
+						break;
 				}
 
-			
+
 			GEngine->AddOnScreenDebugMessage((uint64)-1, Duration, OnScreenTextColor, FinalDisplayString);
 		}
 		else
@@ -727,17 +727,17 @@ bool UDataFactoryBPLibrary::AddInputBinding(UObject* Object,
 		bool ActionPresentInSettings = false;
 		switch (InputBindingType)
 		{
-		case EInputBindingSupportedTypes::ActionBinding:
-			ActionPresentInSettings = InputSettings->DoesActionExist(SourceName);
-			break;
+			case EInputBindingSupportedTypes::ActionBinding:
+				ActionPresentInSettings = InputSettings->DoesActionExist(SourceName);
+				break;
 
-		case EInputBindingSupportedTypes::KeyBinding:
-			ActionPresentInSettings = true;
-			break;
+			case EInputBindingSupportedTypes::KeyBinding:
+				ActionPresentInSettings = true;
+				break;
 
-		case EInputBindingSupportedTypes::AxisBinding:
-			ActionPresentInSettings = InputSettings->DoesAxisExist(SourceName);
-			break;
+			case EInputBindingSupportedTypes::AxisBinding:
+				ActionPresentInSettings = InputSettings->DoesAxisExist(SourceName);
+				break;
 		}
 
 		if (!ActionPresentInSettings)
@@ -776,17 +776,17 @@ bool UDataFactoryBPLibrary::AddInputBinding(UObject* Object,
 
 		switch (InputBindingType)
 		{
-		case EInputBindingSupportedTypes::ActionBinding:
-			BindActionInputInternal(InputComponent, SourceName, Object, FunctionName, KeyEvent);
-			break;
+			case EInputBindingSupportedTypes::ActionBinding:
+				BindActionInputInternal(InputComponent, SourceName, Object, FunctionName, KeyEvent);
+				break;
 
-		case EInputBindingSupportedTypes::KeyBinding:
-			BindKeyInputInternal(InputComponent, SourceName, Object, FunctionName, KeyEvent);
-			break;
+			case EInputBindingSupportedTypes::KeyBinding:
+				BindKeyInputInternal(InputComponent, SourceName, Object, FunctionName, KeyEvent);
+				break;
 
-		case EInputBindingSupportedTypes::AxisBinding:
-			BindAxisInputInternal(InputComponent, SourceName, Object, FunctionName);
-			break;
+			case EInputBindingSupportedTypes::AxisBinding:
+				BindAxisInputInternal(InputComponent, SourceName, Object, FunctionName);
+				break;
 		}
 
 		return true;
