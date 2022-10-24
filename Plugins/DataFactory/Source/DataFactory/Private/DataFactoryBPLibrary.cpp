@@ -139,19 +139,19 @@ void UDataFactoryBPLibrary::DF_PrintString(const UObject* WorldContextObject, co
 						OnScreenTextColor = FColor(255, 25, 25, 255);
 						break;
 					case EDataFactoryLogVerbosity::Warning:
-						OnScreenTextColor = FColor(230, 200, 0, 255);
+						OnScreenTextColor = FColor(255, 255, 0, 255);
 						break;
 					case EDataFactoryLogVerbosity::Display:
-						OnScreenTextColor = FColor(200, 200, 200, 255);
+						OnScreenTextColor = FColor(255, 255, 255, 255);
 						break;
 					case EDataFactoryLogVerbosity::Log:
-						OnScreenTextColor = FColor(180, 180, 180, 255);
+						OnScreenTextColor = FColor(230, 230, 230, 255);
 						break;
 					case EDataFactoryLogVerbosity::Verbose:
-						OnScreenTextColor = FColor(150, 150, 150, 255);
+						OnScreenTextColor = FColor(200, 200, 200, 255);
 						break;
 					case EDataFactoryLogVerbosity::VeryVerbose:
-						OnScreenTextColor = FColor(120, 120, 120, 255);
+						OnScreenTextColor = FColor(150, 150, 150, 255);
 						break;
 				}
 
