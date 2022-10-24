@@ -14,7 +14,6 @@
 #include "Misc/CString.h"
 #include "GameFramework/PlayerInput.h"
 #include "GameFramework/InputSettings.h"
-#include "Classes/EditorStyleSettings.h"
 #include <IAssetRegistry.h>
 #include <AssetRegistryModule.h>
 
@@ -122,38 +121,36 @@ void UDataFactoryBPLibrary::DF_PrintString(const UObject* WorldContextObject, co
 				GConfig->GetFloat(TEXT("Kismet"), TEXT("PrintStringDuration"), Duration, GEngineIni);
 			}
 
-			const UEditorStyleSettings* EditorSettings = GetDefault<UEditorStyleSettings>();
 
 			FColor OnScreenTextColor = FColor::White;
 
-			if (EditorSettings)
-				switch (LogVerbosity)
-				{
-					case EDataFactoryLogVerbosity::NoLogging:
-						OnScreenTextColor = FColor(0, 0, 0, 0);
-						break;
-					case EDataFactoryLogVerbosity::Fatal:
-						OnScreenTextColor = FColor(255, 0, 0, 255);
-						break;
-					case EDataFactoryLogVerbosity::Error:
-						OnScreenTextColor = FColor(255, 25, 25, 255);
-						break;
-					case EDataFactoryLogVerbosity::Warning:
-						OnScreenTextColor = FColor(255, 255, 0, 255);
-						break;
-					case EDataFactoryLogVerbosity::Display:
-						OnScreenTextColor = FColor(255, 255, 255, 255);
-						break;
-					case EDataFactoryLogVerbosity::Log:
-						OnScreenTextColor = FColor(230, 230, 230, 255);
-						break;
-					case EDataFactoryLogVerbosity::Verbose:
-						OnScreenTextColor = FColor(200, 200, 200, 255);
-						break;
-					case EDataFactoryLogVerbosity::VeryVerbose:
-						OnScreenTextColor = FColor(150, 150, 150, 255);
-						break;
-				}
+			switch (LogVerbosity)
+			{
+				case EDataFactoryLogVerbosity::NoLogging:
+					OnScreenTextColor = FColor(0, 0, 0, 0);
+					break;
+				case EDataFactoryLogVerbosity::Fatal:
+					OnScreenTextColor = FColor(255, 0, 0, 255);
+					break;
+				case EDataFactoryLogVerbosity::Error:
+					OnScreenTextColor = FColor(255, 25, 25, 255);
+					break;
+				case EDataFactoryLogVerbosity::Warning:
+					OnScreenTextColor = FColor(255, 255, 0, 255);
+					break;
+				case EDataFactoryLogVerbosity::Display:
+					OnScreenTextColor = FColor(255, 255, 255, 255);
+					break;
+				case EDataFactoryLogVerbosity::Log:
+					OnScreenTextColor = FColor(230, 230, 230, 255);
+					break;
+				case EDataFactoryLogVerbosity::Verbose:
+					OnScreenTextColor = FColor(200, 200, 200, 255);
+					break;
+				case EDataFactoryLogVerbosity::VeryVerbose:
+					OnScreenTextColor = FColor(150, 150, 150, 255);
+					break;
+			}
 
 
 			GEngine->AddOnScreenDebugMessage((uint64)-1, Duration, OnScreenTextColor, FinalDisplayString);
