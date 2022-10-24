@@ -479,12 +479,11 @@ void UDataFactoryBPLibrary::SetFPropertyValueInternal(FProperty* property, void*
 			Location.Y = FCString::Atof(&(AssignChannelValue(LocationY, LocationYIndex))[0]);\
 			Location.Z = FCString::Atof(&(AssignChannelValue(LocationZ, LocationZIndex))[0]);
 
-#define ImplementRotator(RotationXIndex, RotationYIndex, RotationZIndex, RotationWIndex) \
-			FQuat Rotation;\
-			Rotation.X = FCString::Atof(&(AssignChannelValue(RotationX, RotationXIndex))[0]);\
-			Rotation.Y = FCString::Atof(&(AssignChannelValue(RotationY, RotationYIndex))[0]);\
-			Rotation.Z = FCString::Atof(&(AssignChannelValue(RotationZ, RotationZIndex))[0]);\
-			Rotation.W = FCString::Atof(&(AssignChannelValue(RotationW, RotationWIndex))[0]);
+#define ImplementRotator(RotationXIndex, RotationYIndex, RotationZIndex) \
+			FRotator Rotation;\
+			Rotation.Roll = FCString::Atof(&(AssignChannelValue(RotationX, 3))[0]);\
+			Rotation.Pitch = FCString::Atof(&(AssignChannelValue(RotationY, 4))[0]);\
+			Rotation.Yaw = FCString::Atof(&(AssignChannelValue(RotationZ, 5))[0]);\
 
 
 			//Reset warning for macros with multiple values
@@ -515,7 +514,7 @@ void UDataFactoryBPLibrary::SetFPropertyValueInternal(FProperty* property, void*
 			{
 				DefaultChannelValue = "0";
 
-				ImplementRotator(0, 1, 2, 3);
+				ImplementRotator(0, 1, 2);
 
 				StructProperty->CopyCompleteValue(StructProperty->ContainerPtrToValuePtr< void >(Object), &Rotation);
 
@@ -555,7 +554,9 @@ void UDataFactoryBPLibrary::SetFPropertyValueInternal(FProperty* property, void*
 				DefaultChannelValue = "0";
 
 				ImplementLocation(0, 1, 2);
-				ImplementRotator(3, 4, 5, 9);
+				ImplementRotator(3, 4, 5);
+
+				//Rotation.W = FCString::Atof(&(AssignChannelValue(RotationW, RotationWIndex))[0]);
 
 
 
@@ -568,9 +569,7 @@ void UDataFactoryBPLibrary::SetFPropertyValueInternal(FProperty* property, void*
 
 
 
-				FTransform Transform;
-				Transform.SetComponents(Rotation, Location, Scale);
-
+				FTransform Transform = FTransform(Rotation, Location, Scale);
 				StructProperty->CopyCompleteValue(StructProperty->ContainerPtrToValuePtr< void >(Object), &Transform);
 
 				return;
