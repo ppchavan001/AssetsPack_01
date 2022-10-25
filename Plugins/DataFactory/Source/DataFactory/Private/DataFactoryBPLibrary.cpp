@@ -322,11 +322,29 @@ void UDataFactoryBPLibrary::SetFPropertyValueInternal(FProperty* property, void*
 				void* ValuePtr = Helper.GetRawPtr(DynamicIndex);
 
 
-				// Data Cleaning and validation
+				/********************************************
+					Data Cleaning and validation
+				******************************************** */ 
 				FString Data = DataArray[DynamicIndex];
 				Data.TrimStartAndEndInline();
-				if (Data.Len() < 1)	Data = "0";
 
+				auto quote = FString("\"");
+				auto emptyStr = FString("");
+				
+				// if string is surrounded by quotes remove it
+				if (Data.StartsWith(quote))
+				{
+					Data.RemoveAt(0);
+				}
+
+				if (Data.EndsWith(quote))
+				{
+					Data.RemoveFromEnd(quote);
+				}
+
+				/*******************************************************/
+
+				if (Data.Len() < 1)	Data = "0";
 				SetFPropertyValueInternal(ArrayProperty->Inner, ValuePtr, Data, NameOfThePropertyToUpdate);
 
 			}
