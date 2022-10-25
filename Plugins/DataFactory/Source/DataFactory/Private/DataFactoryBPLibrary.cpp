@@ -935,6 +935,20 @@ bool UDataFactoryBPLibrary::ReadLinesFromFile(const FString FileName, TArray<FSt
 	return FFileHelper::LoadFileToStringArray(LinesOut, &FileName[0]);
 }
 
+void UDataFactoryBPLibrary::GetAllIndicesOfCharInString(const FString& String, const FString& Char, TArray<int32>& ArrOfIndices)
+{
+	ArrOfIndices.Empty();
+
+	for (int32 i = 0; i < String.Len(); ++i)
+	{
+		if (String[i] == Char[0])
+		{
+			ArrOfIndices.Add(i);
+		}
+	}
+
+}
+
 FString UDataFactoryBPLibrary::GetAppInfo(FString Separator /*= ""*/)
 {
 

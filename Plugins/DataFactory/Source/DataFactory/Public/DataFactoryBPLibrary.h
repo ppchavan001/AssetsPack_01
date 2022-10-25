@@ -181,6 +181,12 @@ public:
 	UFUNCTION(BlueprintGetter, Category = "DataFactory | Import/ Export")
 		static bool ReadLinesFromFile(const FString FileName, TArray<FString>& LinesOut);
 
+	/*
+	* Only checks for first Char in char for validation
+	*/
+	UFUNCTION(BlueprintPure, meta = (Keywords = "Final all char"))
+		static void GetAllIndicesOfCharInString(const FString& String, const FString& Char, TArray<int32>& ArrOfIndices);
+
 	UFUNCTION(BlueprintPure)
 		static FString GetAppInfo(FString Separator = "");
 
