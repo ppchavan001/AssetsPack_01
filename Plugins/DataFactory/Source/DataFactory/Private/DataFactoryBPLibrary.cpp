@@ -19,8 +19,8 @@
 
 DEFINE_LOG_CATEGORY(DFLOG);
 
-#define  FilePath FString(__FILE__)
-#define  CurrentFileName (FilePath.Replace(TEXT("/"), TEXT("\\"))).RightChop(FilePath.Find(&FString("\\")[0], ESearchCase::IgnoreCase, ESearchDir::FromEnd) + 1)
+#define  CurrentFileName FString("DataFactoryBPLibrary.cpp")
+
 
 UDataFactoryBPLibrary::UDataFactoryBPLibrary(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
