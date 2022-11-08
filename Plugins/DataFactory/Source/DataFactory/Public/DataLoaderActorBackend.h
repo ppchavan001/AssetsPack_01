@@ -72,6 +72,25 @@ public:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 		TArray<UObject*> TargetObjectsBackend;
 
+
+	UFUNCTION(BlueprintCallable)
+		void UpdatePropertyOnTargetObjects(const TArray<UObject*>& TargetObjects,
+			const FName NameOfThePropertyToUpdate,
+			const FString& DataToSet);
+
+	void UpdateInputBinding(const FString& DataToSet, const TArray<UObject*>& TargetObjects, EInputBindingSupportedTypes InputBindingType);
+
+
+	UFUNCTION(BlueprintCallable)
+		void UpdateClassDefaults(const TSet<FName>& ClassNames,
+			const FName NameOfThePropertyToUpdate,
+			const FString& DataToSet);
+
+
+	UFUNCTION(BlueprintPure)
+		TArray<UObject*> GetTargetObjectsBackend(const TArray<UObject*> TargetObjectsOut);
+
+
 private:
 	// stores set of actors/components a the tag
 	TMap<FName, TSet<UObject*>> TagMapOfObjects;
@@ -88,23 +107,6 @@ private:
 			TagMapOfObjects[Tag].Add(Object);
 		}
 	}
-
-	UFUNCTION(BlueprintCallable)
-		void UpdatePropertyOnTargetObjects(const TArray<UObject*>& TargetObjects, 
-										   const FName NameOfThePropertyToUpdate, 
-										   const FString& DataToSet);
-
-	void UpdateInputBinding(const FString& DataToSet, const TArray<UObject*>& TargetObjects, EInputBindingSupportedTypes InputBindingType);
-
-
-	UFUNCTION(BlueprintCallable)
-		void UpdateClassDefaults(const TSet<FName>& ClassNames,
-										   const FName NameOfThePropertyToUpdate,
-										   const FString& DataToSet);
-
-
-	UFUNCTION(BlueprintPure)
-		TArray<UObject*> GetTargetObjectsBackend(const TArray<UObject*> TargetObjectsOut);
 
 	EInputBindingSupportedTypes GetInputBindingType(const FName NameOfThePropertyToUpdate);
 };
