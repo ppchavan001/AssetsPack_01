@@ -8,6 +8,7 @@
 #include "DataLoaderActorBackend.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnDataLoadingFinished);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FPreMasterDataLoadingDelegate);
 DECLARE_DYNAMIC_DELEGATE(FAsyncPostLoadCallbackDelegate);
 
 UINTERFACE(MinimalAPI, Blueprintable, BlueprintType)
@@ -21,50 +22,62 @@ class IDataLoaderInterface
 	GENERATED_BODY()
 
 public:
-	/** Add interface function declarations here */
-	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category="DataFactory | Interface")
-	void PostDataLoadCallback();
+	/** Function called before any file processing has started.*/
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "DataFactory | Interface")
+		void PreMasterDataLoadCallback();
+
+
+	/** Function called after all data processing has finished and all target objects have received data from files.*/
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "DataFactory | Interface")
+		void PostDataLoadCallback();
 };
 
-UCLASS()
+UCLASS(Abstract)
 class DATAFACTORY_API ADataLoaderActorBackend : public AActor
 {
 	GENERATED_BODY()
-	
-public:	
+
+public:
 	// Sets default values for this actor's properties
 	ADataLoaderActorBackend();
 
 	// Not using async callback currently
+	// Global callback : everyone who implements this function will be called
+	// TODO : Targeted Object callback : call only modified objects.
 	UFUNCTION(BlueprintCallable)
-	void PostDataLoadingCallbackAsync();
-
+		void PostDataLoadingCallbackAsync();
 
 	UFUNCTION(BlueprintCallable)
-	void GetAllObjectsWithTagCached(TArray<UObject*>& OutActors, const FName Tag, bool bForceRecache = false);
+		void PreMasterDataLoadingCallback();
 
-	
+	UFUNCTION(BlueprintCallable)
+		void GetAllObjectsWithTagCached(TArray<UObject*>& OutActors, const FName Tag, bool bForceRecache = false);
+
+
 
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-public:	
+public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
 	UPROPERTY(BlueprintAssignable)
-	FOnDataLoadingFinished OnDataLoadingFinished;
+		FOnDataLoadingFinished OnDataLoadingFinished;
+
+	UPROPERTY(BlueprintAssignable)
+		FPreMasterDataLoadingDelegate PreMasterDataLoadingDelegate;
 
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Parameters | Tags")
-	FName ActionBindingTag = "SetActionBinding";
+		FName ActionBindingTag = "SetActionBinding";
 
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Parameters | Tags")
 		FName AxisBindingTag = "SetAxisBinding";
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Parameters | Tags")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Parameters | Tags")
 		FName KeyBindingTag = "SetKeyBinding";
 
 

@@ -3,11 +3,13 @@
 #include "DataFactoryBPLibrary.h"
 #include "DataFactory.h"
 
-
+#include "Engine/Engine.h"
 #include "UObject/PropertyAccessUtil.h"
 #include "UObject/UnrealType.h"
 #include "UObject/TextProperty.h"
-
+#include "EngineUtils.h"
+#include "Logging/LogCategory.h"
+#include "Logging/LogMacros.h"
 #include <string>
 #include <Misc/FileHelper.h>
 #include "Components/InputComponent.h"
@@ -16,10 +18,13 @@
 #include "GameFramework/InputSettings.h"
 #include <IAssetRegistry.h>
 #include <AssetRegistryModule.h>
+#include <Kismet/GameplayStatics.h>
 
-DEFINE_LOG_CATEGORY(DFLOG);
+//DEFINE_LOG_CATEGORY(DFLOG);
 
 #define  CurrentFileName FString("DataFactoryBPLibrary.cpp")
+
+DEFINE_LOG_CATEGORY_STATIC(DFLOG, Log, All);
 
 
 UDataFactoryBPLibrary::UDataFactoryBPLibrary(const FObjectInitializer& ObjectInitializer)
@@ -71,8 +76,17 @@ FKey UDataFactoryBPLibrary::GetKeyFromName(FName name)
 }
 
 
-void UDataFactoryBPLibrary::DF_PrintString(const UObject* WorldContextObject, const FString InString /*= ""*/, EDataFactoryLogVerbosity LogVerbosity, bool bPrintToScreen /*= true*/, bool bPrintToLog /*= true*/, float Duration /*= 2.f*/)
+void UDataFactoryBPLibrary::DF_PrintString(
+	const UObject* WorldContextObject,
+	const FString InString /*= ""*/,
+	EDataFactoryLogVerbosity LogVerbosity /*= EDataFactoryLogVerbosity::Log*/,
+	bool bPrintToScreen /*= true*/,
+	bool bPrintToLog /*= true*/,
+	float Duration /*= 2.f*/,
+	int MaxStackDataDepth  /* = 1*/)
 {
+
+#pragma region Prefix
 	UWorld* World = GEngine->GetWorldFromContextObject(WorldContextObject, EGetWorldErrorMode::ReturnNull);
 	FString Prefix;
 	if (World)
@@ -84,11 +98,11 @@ void UDataFactoryBPLibrary::DF_PrintString(const UObject* WorldContextObject, co
 				case NM_Client:
 					// GPlayInEditorID 0 is always the server, so 1 will be first client.
 					// You want to keep this logic in sync with GeneratePIEViewportWindowTitle and UpdatePlayInEditorWorldDebugString
-					Prefix = FString::Printf(TEXT("Client %d: "), GPlayInEditorID);
+					Prefix = FString::Printf(TEXT("Client %d"), GPlayInEditorID);
 					break;
 				case NM_DedicatedServer:
 				case NM_ListenServer:
-					Prefix = FString::Printf(TEXT("Server: "));
+					Prefix = FString::Printf(TEXT("Server"));
 					break;
 				case NM_Standalone:
 					break;
@@ -96,31 +110,68 @@ void UDataFactoryBPLibrary::DF_PrintString(const UObject* WorldContextObject, co
 		}
 	}
 
-	const FString FinalDisplayString = Prefix + InString;
-	FString FinalLogString = FinalDisplayString;
+
+#pragma  endregion
+
+	FString FinalLogString = Prefix + InString;
+
+#pragma region AddCallerInfo
 
 	static const FBoolConfigValueHelper DisplayPrintStringSource(TEXT("Kismet"), TEXT("bLogPrintStringSource"), GEngineIni);
 	if (DisplayPrintStringSource)
 	{
-		const FString SourceObjectPrefix = FString::Printf(TEXT("[%s] "), *GetNameSafe(WorldContextObject));
-		FinalLogString = SourceObjectPrefix + FinalLogString;
+
+#if DO_BLUEPRINT_GUARD
+		FString StackData;
+		FBlueprintContextTracker& BlueprintExceptionTracker = FBlueprintContextTracker::Get();
+		if (BlueprintExceptionTracker.GetScriptStack().Num() > 0)
+		{
+			int stackDepth = 0;
+
+			for (int i = BlueprintExceptionTracker.GetScriptStack().Num() - 1; i > -1 && stackDepth < MaxStackDataDepth; --i)
+			{
+				StackData += BlueprintExceptionTracker.GetScriptStack()[i]->GetStackDescription();
+				stackDepth += 1;
+
+				if (stackDepth != MaxStackDataDepth)
+				{
+					StackData += " <- ";
+				}
+
+			}
+
+			FinalLogString = "[" + StackData + "] " + FinalLogString;
+		}
+		else
+		{
+			//ScriptStack += TEXT("\t[Empty] (FFrame::GetScriptCallstack() called from native code)");
+			//const FString SourceObjectPrefix = FString::Printf(TEXT("[%s]"), *GetNameSafe(WorldContextObject));
+			FinalLogString = WorldContextObject->GetName() + FinalLogString;
+
+		}
+#else
+		//FString TopOfStack = TEXT("Unable to display Script Callstack. Compile with DO_BLUEPRINT_GUARD=1");
+		FinalLogString = WorldContextObject->GetName() + FinalLogString;
+
+#endif
+
 	}
+
+#pragma endregion
+
+	// Log
+#if !NO_LOGGING
 
 	if (bPrintToLog)
 	{
 		GLog->Log(DFLOG.GetCategoryName(), (ELogVerbosity::Type)(LogVerbosity), &FinalLogString[0]);
 	}
-
+#endif
 	// Also output to the screen, if possible
 	if (bPrintToScreen)
 	{
 		if (GAreScreenMessagesEnabled)
 		{
-			if (GConfig && Duration < 0)
-			{
-				GConfig->GetFloat(TEXT("Kismet"), TEXT("PrintStringDuration"), Duration, GEngineIni);
-			}
-
 
 			FColor OnScreenTextColor = FColor::White;
 
@@ -153,7 +204,7 @@ void UDataFactoryBPLibrary::DF_PrintString(const UObject* WorldContextObject, co
 			}
 
 
-			GEngine->AddOnScreenDebugMessage((uint64)-1, Duration, OnScreenTextColor, FinalDisplayString);
+			GEngine->AddOnScreenDebugMessage((uint64)-1, Duration, OnScreenTextColor, FinalLogString);
 		}
 		else
 		{
@@ -324,13 +375,13 @@ void UDataFactoryBPLibrary::SetFPropertyValueInternal(FProperty* property, void*
 
 				/********************************************
 					Data Cleaning and validation
-				******************************************** */ 
+				******************************************** */
 				FString Data = DataArray[DynamicIndex];
 				Data.TrimStartAndEndInline();
 
 				auto quote = FString("\"");
 				auto emptyStr = FString("");
-				
+
 				// if string is surrounded by quotes remove it
 				if (Data.StartsWith(quote))
 				{
@@ -972,4 +1023,64 @@ FString UDataFactoryBPLibrary::GetAppInfo(FString Separator /*= ""*/)
 
 	return str;
 }
+
+void UDataFactoryBPLibrary::GetAllActorsOfClass_Forced(const UObject* WorldContextObject, TSubclassOf<AActor> ActorClass, TArray<AActor*>& OutActors)
+{
+	OutActors.Empty();
+
+	if (!WorldContextObject->GetWorld())
+	{
+		return;
+	}
+
+	UGameplayStatics::GetAllActorsOfClass(WorldContextObject->GetWorld(), ActorClass, OutActors);
+
+	if (OutActors.Num() > 0)
+	{
+		return;
+	}
+
+	auto transform = FTransform();
+	auto SpawnedActor = WorldContextObject->GetWorld()->SpawnActor(ActorClass, &transform);
+	OutActors.Add(SpawnedActor);
+
+	return;
+
+
+}
+
+USceneComponent* UDataFactoryBPLibrary::FindFirstSceneComponentByName(const UObject* WorldContextObject, FName ComponentName)
+{
+
+	if (UWorld* World = WorldContextObject->GetWorld())
+	{
+		for (TActorIterator<AActor> It(World, AActor::StaticClass()); It; ++It)
+		{
+			AActor* Actor = *It;
+
+			if (Actor)
+			{
+				TSet<UActorComponent*> Components = Actor->GetComponents();
+
+				for (UActorComponent* Component : Components)
+				{
+					if (Component->GetFName() == ComponentName)
+					{
+						if (USceneComponent* SceneComp = Cast<USceneComponent>(Component))
+						{
+							return SceneComp;
+						}
+
+						UE_LOG(LogTemp, Warning, TEXT("ComponentName : %s found but not a scene component!"), *(ComponentName.ToString()));
+					}
+				}
+
+			}
+
+		}
+	}
+
+	return nullptr;
+}
+
 

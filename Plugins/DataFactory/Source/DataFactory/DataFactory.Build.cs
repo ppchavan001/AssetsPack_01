@@ -29,8 +29,7 @@ public class DataFactory : ModuleRules
                 "Engine",
                 "Slate",
                 "SlateCore",
-                "InputCore",
-				"EditorStyle"
+                "InputCore"
 				// ... add other public dependencies that you statically link with here ...
 			}
 			);

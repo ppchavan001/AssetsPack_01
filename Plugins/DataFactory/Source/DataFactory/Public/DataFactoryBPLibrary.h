@@ -5,8 +5,12 @@
 #include "Kismet/BlueprintFunctionLibrary.h"
 #include "InputCore/Classes/InputCoreTypes.h"
 #include "UObject/UnrealType.h"
+#include "UObject/UObjectIterator.h"
+#include "Engine/EngineBaseTypes.h"
+#include "GameFramework/Actor.h"
 
 #include "DataFactoryBPLibrary.generated.h"
+
 
 
 
@@ -52,7 +56,6 @@ enum class EDataFactoryLogVerbosity : uint8
 };
 #define GETENUMSTRING(etype, evalue) ( (FindObject(ANY_PACKAGE, TEXT(etype), true) != nullptr) ? FindObject(ANY_PACKAGE, TEXT(etype), true)->GetEnumName((int32)evalue) : FString("Invalid - are you sure enum uses UENUM() macro?") )
 
-DECLARE_LOG_CATEGORY_EXTERN(DFLOG, Log, All);
 
 UENUM(BlueprintType)
 enum class EInputBindingSupportedTypes : uint8
@@ -81,14 +84,15 @@ public:
 			EDataFactoryLogVerbosity LogVerbosity = EDataFactoryLogVerbosity::Log,
 			bool bPrintToScreen = true,
 			bool bPrintToLog = true,
-			float Duration = 2.f);
+			float Duration = 2.f,
+			int MaxStackDataDepth = 1);
 
-	UFUNCTION(BlueprintCallable, meta = (Keywords = "log print", DevelopmentOnly), Category = "DataFactory | Log")
-		static void DF_PrintClass(const UObject* WorldContextObject,
-			EDataFactoryLogVerbosity LogVerbosity = EDataFactoryLogVerbosity::Log,
-			bool bPrintToScreen = true,
-			bool bPrintToLog = true,
-			float Duration = 2.f);
+	//UFUNCTION(BlueprintCallable, meta = (Keywords = "log print", DevelopmentOnly), Category = "DataFactory | Log")
+	static void DF_PrintClass(const UObject* WorldContextObject,
+		EDataFactoryLogVerbosity LogVerbosity = EDataFactoryLogVerbosity::Log,
+		bool bPrintToScreen = true,
+		bool bPrintToLog = true,
+		float Duration = 2.f);
 
 
 	/*
@@ -162,7 +166,7 @@ public:
 	// Returns Bool : true if succeeded in binding function false otherwise
 	// 
 	/// </summary>
-	UFUNCTION(BlueprintCallable, Category = "DataFactory | Controller")
+	UFUNCTION(BlueprintCallable, Category = "DataFactory | Input")
 		static bool AddInputBinding(UObject* Object,
 			FName SourceName,
 			FName FunctionName,
@@ -184,11 +188,19 @@ public:
 	/*
 	* Only checks for first Char in char for validation
 	*/
-	UFUNCTION(BlueprintPure, meta = (Keywords = "Final all char"))
+	UFUNCTION(BlueprintPure, meta = (Keywords = "Final all char"), Category = "DataFactory | String")
 		static void GetAllIndicesOfCharInString(const FString& String, const FString& Char, TArray<int32>& ArrOfIndices);
 
-	UFUNCTION(BlueprintPure)
+	UFUNCTION(BlueprintPure, Category = "DataFactory | General")
 		static FString GetAppInfo(FString Separator = "");
 
+	// if actor doesn't exist in the world of WorldContextObject,
+	// will spawn a actor of given class and return it at index 0
+	UFUNCTION(BlueprintPure, Category = "DataFactory | General", meta = (WorldContext = "WorldContextObject", DeterminesOutputType = "ActorClass", DynamicOutputParam = "OutActors"))
+		static void GetAllActorsOfClass_Forced(const UObject* WorldContextObject, TSubclassOf<AActor> ActorClass, TArray<AActor*>& OutActors);
+
+	UFUNCTION(BlueprintPure, Category = "DataFactory | General")
+		static USceneComponent* FindFirstSceneComponentByName(const UObject* WorldContextObject, FName ComponentName);
 
 };
+

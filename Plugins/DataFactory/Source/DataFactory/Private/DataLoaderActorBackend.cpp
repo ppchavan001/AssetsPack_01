@@ -84,6 +84,30 @@ void ADataLoaderActorBackend::PostDataLoadingCallbackAsync()
 
 }
 
+void ADataLoaderActorBackend::PreMasterDataLoadingCallback()
+{
+	PreMasterDataLoadingDelegate.Broadcast();
+	if (UWorld* World = GetWorld())
+	{
+		auto lvls = World->GetLevels();
+		for (ULevel* Level : lvls)
+		{
+			if (Level)
+			{
+				auto actrs = Level->Actors;
+				for (auto Actor : actrs)
+				{
+					if (Actor && Actor->Implements<UDataLoaderInterface>())
+					{
+						IDataLoaderInterface::Execute_PreMasterDataLoadCallback(Actor);
+					}
+				}
+			}
+		}
+	}
+
+}
+
 void ADataLoaderActorBackend::GetAllObjectsWithTagCached(TArray<UObject*>& OutActors, const FName Tag, bool bForceRecache)
 {
 	if (bForceRecache || TagMapOfObjects.Num() == 0 || !TagMapOfObjects.Contains(Tag))
