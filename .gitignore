@@ -75,3 +75,4 @@ DerivedDataCache/*
 ExposeRuntimeFunctions/Intermediate
 Plugins/FileSDK
 Plugins/VaRestPlugin
+Plugins/DataFactory
