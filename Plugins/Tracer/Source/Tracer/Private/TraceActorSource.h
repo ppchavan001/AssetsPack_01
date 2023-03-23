@@ -50,8 +50,6 @@ public:
 					 const FCollisionObjectQueryParams& ObjectQueryParams,
 					 const FCollisionQueryParams& Params) const;*/
 
-	virtual void Tick(float DeltaTime) override;
-
 	UFUNCTION(BlueprintCallable, Category = Tracer)
 		void SetComponentToTrace(USceneComponent* Component)
 	{
@@ -96,11 +94,20 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Tracer, AdvancedDisplay)
 	TEnumAsByte<EDrawDebugTrace::Type> DrawDebugTrace = EDrawDebugTrace::None;
 
+	UFUNCTION(BlueprintImplementableEvent, Category = Tracer)
+	void PostTickUpdatesBP(float DeltaTime);
+	
+	virtual void PostTickUpdates(float DeltaTime){}
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
 private:
 	USceneComponent* ComponentToTrace;
+
+	// private tick
+	// Override PostTickUpdates or PostTickUpdatesBP if you need to update on tick
+	virtual void Tick(float DeltaTime) override;
 
 };

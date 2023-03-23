@@ -84,6 +84,9 @@ void ATraceActorSource::Tick(float DeltaTime)
 			LatestHits,
 			bIgnoreSelf);
 	}
+
+	PostTickUpdates(DeltaTime);
+	PostTickUpdatesBP(DeltaTime);
 }
 
 FVector ATraceActorSource::GetTraceEndLocation()
