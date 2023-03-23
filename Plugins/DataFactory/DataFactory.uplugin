@@ -12,7 +12,7 @@
 	"SupportURL": "",
 	"EngineVersion": "4.26.0",
 	"CanContainContent": true,
-	"Installed": false,
+	"Installed": true,
 	"Modules": [
 		{
 			"Name": "DataFactory",

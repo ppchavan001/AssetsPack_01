@@ -19,6 +19,8 @@
 #include <IAssetRegistry.h>
 #include <AssetRegistryModule.h>
 #include <Kismet/GameplayStatics.h>
+#include "Engine/ObjectLibrary.h"
+
 
 //DEFINE_LOG_CATEGORY(DFLOG);
 
@@ -85,6 +87,10 @@ void UDataFactoryBPLibrary::DF_PrintString(
 	float Duration /*= 2.f*/,
 	int MaxStackDataDepth  /* = 1*/)
 {
+	if (LogVerbosity == EDataFactoryLogVerbosity::NoLogging)
+	{
+		return;
+	}
 
 #pragma region Prefix
 	UWorld* World = GEngine->GetWorldFromContextObject(WorldContextObject, EGetWorldErrorMode::ReturnNull);
@@ -121,7 +127,7 @@ void UDataFactoryBPLibrary::DF_PrintString(
 	if (DisplayPrintStringSource)
 	{
 
-#if DO_BLUEPRINT_GUARD
+	#if DO_BLUEPRINT_GUARD
 		FString StackData;
 		FBlueprintContextTracker& BlueprintExceptionTracker = FBlueprintContextTracker::Get();
 		if (BlueprintExceptionTracker.GetScriptStack().Num() > 0)
@@ -149,11 +155,11 @@ void UDataFactoryBPLibrary::DF_PrintString(
 			FinalLogString = WorldContextObject->GetName() + FinalLogString;
 
 		}
-#else
+	#else
 		//FString TopOfStack = TEXT("Unable to display Script Callstack. Compile with DO_BLUEPRINT_GUARD=1");
 		FinalLogString = WorldContextObject->GetName() + FinalLogString;
 
-#endif
+	#endif
 
 	}
 
@@ -514,38 +520,38 @@ void UDataFactoryBPLibrary::SetFPropertyValueInternal(FProperty* property, void*
 
 
 			};*/
-#define AssignChannelValue(Key, Index) (ChannelData.Contains(Key) && ChannelData[Key].Len() > 0) ? \
+		#define AssignChannelValue(Key, Index) (ChannelData.Contains(Key) && ChannelData[Key].Len() > 0) ? \
 				 /* If contains valid key, return immediately */ ChannelData[Key] : \
 				/* if key is not present, if array contains valid value, return array val otherwise return default channel val. */ \
 				(CSVArray.Num() > Index && CSVArray[Index].Len() > 0 &&!(CSVArray[Index].Contains(":"))) ?  CSVArray[Index] : DefaultChannelValue
 
 
-#define ColorR	"R"
-#define ColorG 	"G"
-#define ColorB 	"B"
-#define ColorA 	"A"
+		#define ColorR	"R"
+		#define ColorG 	"G"
+		#define ColorB 	"B"
+		#define ColorA 	"A"
 
-#define LocationX "LocX"
-#define LocationY "LocY"
-#define LocationZ "LocZ"
+		#define LocationX "LocX"
+		#define LocationY "LocY"
+		#define LocationZ "LocZ"
 
 
-#define RotationX "RotX"
-#define RotationY "RotY"
-#define RotationZ "RotZ"
-#define RotationW "RotW"
+		#define RotationX "RotX"
+		#define RotationY "RotY"
+		#define RotationZ "RotZ"
+		#define RotationW "RotW"
 
-#define ScaleX "ScaleX"
-#define ScaleY "ScaleY"
-#define ScaleZ "ScaleZ"
+		#define ScaleX "ScaleX"
+		#define ScaleY "ScaleY"
+		#define ScaleZ "ScaleZ"
 
-#define ImplementLocation(LocationXIndex, LocationYIndex, LocationZIndex) \
+		#define ImplementLocation(LocationXIndex, LocationYIndex, LocationZIndex) \
 			FVector Location;\
 			Location.X = FCString::Atof(&(AssignChannelValue(LocationX, LocationXIndex))[0]);\
 			Location.Y = FCString::Atof(&(AssignChannelValue(LocationY, LocationYIndex))[0]);\
 			Location.Z = FCString::Atof(&(AssignChannelValue(LocationZ, LocationZIndex))[0]);
 
-#define ImplementRotator(RotationXIndex, RotationYIndex, RotationZIndex) \
+		#define ImplementRotator(RotationXIndex, RotationYIndex, RotationZIndex) \
 			FRotator Rotation;\
 			Rotation.Roll = FCString::Atof(&(AssignChannelValue(RotationX, 3))[0]);\
 			Rotation.Pitch = FCString::Atof(&(AssignChannelValue(RotationY, 4))[0]);\
@@ -553,14 +559,14 @@ void UDataFactoryBPLibrary::SetFPropertyValueInternal(FProperty* property, void*
 
 
 			//Reset warning for macros with multiple values
-#pragma warning (default: 4003) 
+		#pragma warning (default: 4003) 
 
-	// ---------------------
-	// Setup End
-	// ---------------------
+			// ---------------------
+			// Setup End
+			// ---------------------
 
 
-	// Vector i.e location, scale, etc
+			// Vector i.e location, scale, etc
 			if (StructTypeName == "Vector")
 			{
 				DefaultChannelValue = "0";
@@ -756,6 +762,35 @@ TSet<UObject*> UDataFactoryBPLibrary::GetObjectsWithNames(const TSet<FName>& Obj
 	}
 
 	return SetOfObjects;
+}
+
+void UDataFactoryBPLibrary::GetAllObjects(TSet<UObject*>& SetOfObjectsOut)
+{
+	SetOfObjectsOut.Empty();
+
+	for (TObjectIterator<UObject> It; It; ++It) SetOfObjectsOut.Add(*It);
+
+}
+
+bool UDataFactoryBPLibrary::GetPluginDescription(const FString PluginName,
+	FString& PluginVersion,
+	FString& AppBuildDate,
+	FString& AppBuildVersion)
+{
+
+
+	AppBuildDate = FApp::GetBuildDate();
+	AppBuildVersion = FApp::GetBuildVersion();
+
+	const TSharedPtr<IPlugin> Plugin = IPluginManager::Get().FindPlugin(PluginName);
+	if (Plugin.IsValid())
+	{
+		PluginVersion = Plugin->GetDescriptor().VersionName;
+		return true;
+		//UE_LOG(LogTemp, Log, TEXT("Plugin version: %s"), *VersionString);
+	}
+
+	return false;
 }
 
 bool UDataFactoryBPLibrary::AddInputBinding(UObject* Object,
@@ -986,6 +1021,11 @@ bool UDataFactoryBPLibrary::ReadLinesFromFile(const FString FileName, TArray<FSt
 	return FFileHelper::LoadFileToStringArray(LinesOut, &FileName[0]);
 }
 
+bool UDataFactoryBPLibrary::ReadStringFromFile(const FString FileName, FString& StringOut)
+{
+	return FFileHelper::LoadFileToString(StringOut, &FileName[0]);
+}
+
 void UDataFactoryBPLibrary::GetAllIndicesOfCharInString(const FString& String, const FString& Char, TArray<int32>& ArrOfIndices)
 {
 	ArrOfIndices.Empty();
@@ -1049,11 +1089,109 @@ void UDataFactoryBPLibrary::GetAllActorsOfClass_Forced(const UObject* WorldConte
 
 }
 
+void UDataFactoryBPLibrary::GetAllBlueprintClassesOfType(
+	TArray<UClass*>& FoundSubClasses,
+	TSubclassOf<UObject> TargetClass,
+	bool bIncludeTargetClass/* = false*/,
+	bool bSerchProjectPlugins/* = true*/,
+	bool bSearchEnginePlugins/* = true*/)
+{
+	FoundSubClasses.Empty();
+
+	TArray<FString> PluginNames;
+	GetAllEnabledPluginWithContentNames(PluginNames, bSerchProjectPlugins, bSearchEnginePlugins);
+	UObjectLibrary* ObjectLibrary = UObjectLibrary::CreateLibrary(TargetClass, true, false);
+
+	// Want to start with /Game Classes
+	PluginNames.Insert("Game", 0);
+
+	for (FString Path : PluginNames)
+	{
+		Path = "/" + Path;
+		//ObjectLibrary->LoadAssetDataFromPath(Path);
+		ObjectLibrary->LoadBlueprintAssetDataFromPath(Path);
+		TArray<FAssetData> AssetData;
+		ObjectLibrary->GetAssetDataList(AssetData);
+
+
+
+		for (FAssetData asset : AssetData)
+		{
+			UObject* LoadedAsset = asset.GetAsset();
+			UBlueprint* CastedBP = Cast<UBlueprint>(LoadedAsset);
+			if (CastedBP && CastedBP->GeneratedClass->IsChildOf(TargetClass))
+			{
+				FoundSubClasses.Add(CastedBP->GeneratedClass);
+			}
+		}
+
+	}
+	// Clean up the object library
+	ObjectLibrary->ClearLoaded();
+
+	if (!bIncludeTargetClass)
+	{
+		FoundSubClasses.Remove(TargetClass);
+	}
+}
+
+
+void UDataFactoryBPLibrary::GetAllContentDir(TArray<FString>& ContentDir)
+{
+	ContentDir.Empty();
+	TArray<TSharedRef<IPlugin>> EnabledPlugins = IPluginManager::Get().GetEnabledPluginsWithContent();
+	for (const auto& PluginEntry : EnabledPlugins)
+	{
+		ContentDir.Add(PluginEntry->GetContentDir());
+	}
+
+}
+
+void UDataFactoryBPLibrary::GetAllEnabledPluginWithContentNames(TArray<FString>& PluginNames, bool bSerchProjectPlugins/* = true*/, bool bSearchEnginePlugins/* = true*/)
+{
+	PluginNames.Empty();
+	TArray<TSharedRef<IPlugin>> EnabledPlugins = IPluginManager::Get().GetEnabledPluginsWithContent();
+	for (const auto& PluginEntry : EnabledPlugins)
+	{
+		EPluginLoadedFrom PluginLocation = PluginEntry->GetLoadedFrom();
+		if ((PluginLocation == EPluginLoadedFrom::Engine && bSearchEnginePlugins)
+			|| (PluginLocation == EPluginLoadedFrom::Project && bSerchProjectPlugins))
+		{
+			PluginNames.Add(PluginEntry->GetName());
+		}
+	}
+}
+
 USceneComponent* UDataFactoryBPLibrary::FindFirstSceneComponentByName(const UObject* WorldContextObject, FName ComponentName)
 {
 
 	if (UWorld* World = WorldContextObject->GetWorld())
 	{
+		// Check tag
+		for (TActorIterator<AActor> It(World, AActor::StaticClass()); It; ++It)
+		{
+			AActor* Actor = *It;
+
+			if (Actor)
+			{
+				// Check tag
+
+				auto Components = Actor->GetComponentsByTag(USceneComponent::StaticClass(), ComponentName);
+
+				for (UActorComponent* Component : Components)
+				{
+					if (Component)
+						if (USceneComponent* SceneComp = Cast<USceneComponent>(Component))
+						{
+							return SceneComp;
+						}
+				}
+
+			}
+
+		}
+
+		// if tag didn't match, check name
 		for (TActorIterator<AActor> It(World, AActor::StaticClass()); It; ++It)
 		{
 			AActor* Actor = *It;

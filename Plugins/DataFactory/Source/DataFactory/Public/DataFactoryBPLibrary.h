@@ -9,6 +9,8 @@
 #include "Engine/EngineBaseTypes.h"
 #include "GameFramework/Actor.h"
 
+#include <Runtime\Projects\Public\Interfaces\IPluginManager.h>
+#include <Runtime\Projects\Public\PluginDescriptor.h>
 #include "DataFactoryBPLibrary.generated.h"
 
 
@@ -17,7 +19,7 @@
 UENUM(BlueprintType)
 enum class EDataFactoryLogVerbosity : uint8
 {
-	/** Not used */
+	/** returns without logging */
 	NoLogging = 0,
 
 	/** Always prints a fatal error to console (and log file) and crashes (even if logging is disabled) */
@@ -68,7 +70,7 @@ enum class EInputBindingSupportedTypes : uint8
 
 
 UCLASS()
-class UDataFactoryBPLibrary : public UBlueprintFunctionLibrary
+class DATAFACTORY_API UDataFactoryBPLibrary : public UBlueprintFunctionLibrary
 {
 	GENERATED_UCLASS_BODY()
 
@@ -146,13 +148,16 @@ public:
 
 
 	UFUNCTION(BlueprintPure, Category = "DataFactory | General")
-		static void GetAllObjects(TSet<UObject*>& SetOfObjectsOut)
-	{
-		SetOfObjectsOut.Empty();
+		static void GetAllObjects(TSet<UObject*>& SetOfObjectsOut);
 
-		for (TObjectIterator<UObject> It; It; ++It) SetOfObjectsOut.Add(*It);
 
-	}
+	// Return true if valid data is found
+	UFUNCTION(BlueprintPure, Category = "DataFactory | General")
+		static bool GetPluginDescription(const FString PluginName, FString& PluginVersion, FString& AppBuildDate, FString& AppBuildVersion);
+
+
+
+
 
 	/// <summary>
 	// Removes existing action/axis/key bindings and binds the function to it.
@@ -179,12 +184,14 @@ public:
 	static void BindKeyInputInternal(UInputComponent* InputComponent, const FName& KeyName, UObject* Object, FName& FunctionName, EInputEvent KeyEvent);
 
 
-	UFUNCTION(BlueprintCallable, Category = "DataFactory | Import/ Export")
+	UFUNCTION(BlueprintCallable, Category = "DataFactory | Import/ Export", meta = (DisplayName = "WriteStringToFile"))
 		static bool WriteStringToFile(const FString FileName, const FString DataToWrite);
 
-	UFUNCTION(BlueprintGetter, Category = "DataFactory | Import/ Export")
+	UFUNCTION(BlueprintPure, Category = "DataFactory | Import/ Export", meta = (DisplayName = "ReadLinesFromFile"))
 		static bool ReadLinesFromFile(const FString FileName, TArray<FString>& LinesOut);
 
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "DataFactory | Import/ Export", meta = (DisplayName = "ReadStringFromFile"))
+		static bool ReadStringFromFile(const FString FileName, FString& StringOut);
 	/*
 	* Only checks for first Char in char for validation
 	*/
@@ -199,6 +206,21 @@ public:
 	UFUNCTION(BlueprintPure, Category = "DataFactory | General", meta = (WorldContext = "WorldContextObject", DeterminesOutputType = "ActorClass", DynamicOutputParam = "OutActors"))
 		static void GetAllActorsOfClass_Forced(const UObject* WorldContextObject, TSubclassOf<AActor> ActorClass, TArray<AActor*>& OutActors);
 
+	UFUNCTION(BlueprintCallable, meta = (DeterminesOutputType = "TargetClass", DynamicOutputParam = "FoundSubClasses"), Category = "DataFactory | General")
+		static void GetAllBlueprintClassesOfType(TArray<UClass*>& FoundSubClasses,
+			TSubclassOf<UObject> TargetClass /*= UObject::StaticClass()*/,
+			bool bIncludeTargetClass = false, bool bSerchProjectPlugins = true, bool bSearchEnginePlugins = true);
+
+	// Returns all content directories from all enabled plugins in the project
+	UFUNCTION(BlueprintPure, Category = "DataFactory | General")
+	static void GetAllContentDir(TArray<FString>& ContentDir);
+
+	// Returns all all enabled plugins in the project with content
+	UFUNCTION(BlueprintPure, Category = "DataFactory | General")
+	static void GetAllEnabledPluginWithContentNames(TArray<FString>& PluginNames, bool bSerchProjectPlugins = true, bool bSearchEnginePlugins = true);
+
+	// Finds first component with matching tag or name
+	// tag has higher priority
 	UFUNCTION(BlueprintPure, Category = "DataFactory | General")
 		static USceneComponent* FindFirstSceneComponentByName(const UObject* WorldContextObject, FName ComponentName);
 
