@@ -3,3 +3,10 @@
 
 #include "JSX_Javascript.h"
 
+void UJSX_Javascript::Activate(bool bReset)
+{ 
+	if (bExecuteSuperActivate)
+	{
+		Super::Activate(bReset);
+	}
+}
