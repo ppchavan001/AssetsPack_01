@@ -13,10 +13,14 @@ function main() {
   actor.TextRender.SetHorizontalAlignment("EHTA_Center");
   actor.TextRender.SetText("Hello World");
 
-  //actor.GetActorLocation();
+  let actor2 = new TextRenderActor(GWorld, { X: 100, Z: 120 }, { Yaw: 180 });
+
+  // mark dirty to update changes during debug
+  actor2.TextRender.MarkRenderStateDirty();
 
   // clean up the mess
   return function () {
+    actor2.DestroyActor();
     actor.DestroyActor();
   };
 }
