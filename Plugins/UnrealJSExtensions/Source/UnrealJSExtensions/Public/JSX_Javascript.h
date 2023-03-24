@@ -21,4 +21,10 @@ public:
 	{
 		return JavascriptContext;
 	}
+
+	UFUNCTION(BlueprintPure, Category = "UnrealJSExtensions")
+		UJavascriptIsolate* GetJSIsolate()
+	{
+		return  JavascriptIsolate;
+	}
 };
