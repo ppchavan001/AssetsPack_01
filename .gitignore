@@ -76,3 +76,5 @@ ExposeRuntimeFunctions/Intermediate
 Plugins/FileSDK
 Plugins/VaRestPlugin
 Plugins/DataFactory
+Content/Scripts/typings
+Content/Scripts/aliases.js
