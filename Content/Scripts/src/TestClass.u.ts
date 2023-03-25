@@ -29,7 +29,7 @@ function main()
 
 	// initialie its text render component
 	actor.TextRender.SetHorizontalAlignment("EHTA_Center");
-	actor.TextRender.SetText("Hello World : " + path.basename(__filename));
+	actor.TextRender.SetText("Hello World : " + (__filename));
 
 	let actor2 = new TextRenderActor(
 		GWorld,
@@ -37,10 +37,9 @@ function main()
 		Rotator.MakeRotator(0, 0, 180)
 	);
 
-	//let TSA = new TS_Actor(GWorld, { X: 100, Z: 120 }, { Yaw: 180 });
+	actor2.TextRender.SetText("@ppchavan001");
 
 	// mark dirty to update changes during debug
-	//actor2.TextRender.MarkRenderStateDirty();
 	actor2.TextRender.MarkRenderStateDirty();
 
 	// clean up the mess
@@ -51,26 +50,44 @@ function main()
 	};
 }
 
-main();
 
 import path from "path";
 // bootstrap to initiate live-reloading dev env.
 let filename = path.basename(__filename);
 filename = filename.replace(path.extname(filename), "");
+// try
+// {
+// 	module.exports = () =>
+// 	{
+// 		let cleanup: Function | null = null;
+
+// 		// wait for map to be loaded.
+// 		process.nextTick(() => (cleanup = main()));
+
+// 		// live-reloadable function should return its cleanup function
+// 		return () => (<Function>cleanup)();
+// 	};
+
+// } catch (e)
+// {
+// 	require("../bootstrap")(filename);
+// }
+
 try
 {
 	module.exports = () =>
 	{
-		let cleanup: Function | null = null;
+		let cleanup: Function;
 
 		// wait for map to be loaded.
 		process.nextTick(() => (cleanup = main()));
 
 		// live-reloadable function should return its cleanup function
-		return () => (<Function>cleanup)();
+		return () => cleanup();
 	};
-
 } catch (e)
 {
-	require("bootstrap")(filename);
+	filename = path.basename(__filename);
+	filename = filename.replace(path.extname(filename), "");
+	require("../bootstrap")('../out/TestClass.u');
 }

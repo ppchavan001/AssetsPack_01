@@ -3,7 +3,8 @@
 
 "use strict";
 
-function main() {
+function main()
+{
   //Context.CreateInspector(9222)
   // create a new actor
   // ; new ActorClass(world{World}, location{Vector}, rotation{Rotator})
@@ -14,22 +15,25 @@ function main() {
   actor.TextRender.SetText("Hello World : " + __filename);
 
   let actor2 = new TextRenderActor(GWorld, { X: 100, Z: 120 }, { Yaw: 180 });
+  actor2.TextRender.SetText("@ppchavan001");
 
-  let TSA = new TS_Actor(GWorld, { X: 100, Z: 120 }, { Yaw: 180 });
 
   // mark dirty to update changes during debug
   actor2.TextRender.MarkRenderStateDirty();
 
   // clean up the mess
-  return function () {
+  return function ()
+  {
     actor2.DestroyActor();
     actor.DestroyActor();
   };
 }
 
 // bootstrap to initiate live-reloading dev env.
-try {
-  module.exports = () => {
+try
+{
+  module.exports = () =>
+  {
     let cleanup = null;
 
     // wait for map to be loaded.
@@ -38,6 +42,7 @@ try {
     // live-reloadable function should return its cleanup function
     return () => cleanup();
   };
-} catch (e) {
+} catch (e)
+{
   require("bootstrap")("helloWorld");
 }
