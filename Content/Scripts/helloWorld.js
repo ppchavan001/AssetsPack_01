@@ -11,9 +11,11 @@ function main() {
 
   // initialie its text render component
   actor.TextRender.SetHorizontalAlignment("EHTA_Center");
-  actor.TextRender.SetText("Hello World");
+  actor.TextRender.SetText("Hello World : " + __filename);
 
   let actor2 = new TextRenderActor(GWorld, { X: 100, Z: 120 }, { Yaw: 180 });
+
+  let TSA = new TS_Actor(GWorld, { X: 100, Z: 120 }, { Yaw: 180 });
 
   // mark dirty to update changes during debug
   actor2.TextRender.MarkRenderStateDirty();

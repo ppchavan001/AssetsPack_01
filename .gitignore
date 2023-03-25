@@ -78,3 +78,5 @@ Plugins/VaRestPlugin
 Plugins/DataFactory
 Content/Scripts/typings
 Content/Scripts/aliases.js
+Content/Scripts/node_modules
+Content/Scripts/out
