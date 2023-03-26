@@ -1,4 +1,4 @@
-/// <reference path="../typings/ue.d.ts">/>
+/// <reference path="../../../Content/Scripts/typings/ue.d.ts">/>
 import path from "path";
 
 @UCLASS()
@@ -30,7 +30,7 @@ function main()
 
 	// initialie its text render component
 	actor.TextRender.SetHorizontalAlignment("EHTA_Center");
-	actor.TextRender.SetText("Hello World : " + (__filename));
+	actor.TextRender.SetText("" + (__filename));
 
 	let actor2 = new TextRenderActor(
 		GWorld,
@@ -64,10 +64,9 @@ function main()
 const __scriptPathRelative = Context.GetDir('GameContent') + 'Scripts';
 const __ScriptPathAbs = path.resolve(__scriptPathRelative);
 const CurrentFile = path.resolve(__filename);
-
+const CurrentDir = path.resolve(__dirname);
 let relativePath1 = path.relative(__ScriptPathAbs, CurrentFile);
-DataFactoryBPLibrary.DF_PrintString(undefined, "Out dir : " + relativePath1, EDataFactoryLogVerbosity.Warning, true, true, 5.0, 3);
-
+DataFactoryBPLibrary.DF_PrintString(undefined, "Out dir : " + CurrentDir, EDataFactoryLogVerbosity.Warning, true, true, 5.0, 3);
 
 
 // bootstrap to initiate live-reloading dev env.
@@ -87,7 +86,8 @@ try
 } catch (e)
 {
 
-
-	require("../bootstrap")('out/TestClass.u.js');
+	//Context.Paths.push("A:\Project\AssetsPack_01\DataFactory\UnrealJSScripts\out");
+	//require("../../../Content/Scripts/bootstrap")('../../DataFactory/UnrealJSScripts/out/TestClass.u.js');
+	require("bootstrap")('../../DataFactory/UnrealJSScripts/out/TestClass.u');
 	//require("../bootstrap.js")(relativePath1);
 }
