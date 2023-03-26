@@ -20,10 +20,10 @@
       }
     ]
   ],
-  "comments": false, // output comments in generated code
+  "comments": true, // output comments in generated code
   // "compact": true, // do not remove whitespace in generated code
   // "minified": true, // generate minified code
-  // "retainLines": false, // do not retain line numbers in generated code
+  "retainLines": true, // do not retain line numbers in generated code
   // "sourceFileName": "", // specify the filename to use for the source code
   "sourceMaps": true, // do not generate source maps
   // "sourceRoot": "", // specify the root path for the source code
