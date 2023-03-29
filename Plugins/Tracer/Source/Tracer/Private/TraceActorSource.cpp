@@ -63,11 +63,10 @@ void ATraceActorSource::Tick(float DeltaTime)
 
 	FVector EndLocation = GetTraceEndLocation();
 
-	//UpdateTrace(LatestHits, StartLocation, EndLocation, FCollisionObjectQueryParams::AllObjects, FCollisionQueryParams());
 
-	//static const FName LineTraceSingleName(TEXT("LineTraceSingle"));
-	//FCollisionQueryParams Params = ConfigureCollisionParams(LineTraceSingleName, bTraceComplex, ActorsToIgnore, bIgnoreSelf, this);
-	//FCollisionObjectQueryParams ObjectParams = ConfigureCollisionObjectParams(ObjectTypes);
+	// Update target location using exponential smoothing
+	EndLocation = EndLocationSmoothingFactor * EndLocationOnLastFrame + (1.0f - EndLocationSmoothingFactor) * EndLocation;
+
 
 	if (GetWorld())
 	{
@@ -87,6 +86,8 @@ void ATraceActorSource::Tick(float DeltaTime)
 
 	PostTickUpdates(DeltaTime);
 	PostTickUpdatesBP(DeltaTime);
+
+	EndLocationOnLastFrame = EndLocation;
 }
 
 FVector ATraceActorSource::GetTraceEndLocation()

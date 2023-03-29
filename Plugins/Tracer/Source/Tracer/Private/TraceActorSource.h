@@ -72,6 +72,15 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Tracer)
 		TArray<AActor*> ActorsToIgnore;
 
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Tracer)
+		float EndLocationSmoothingFactor = 0.0f;
+
+
+
+
+
+
 	UFUNCTION(BlueprintCallable, Category = Tracer)
 		bool UpdateComponentToTraceByName();
 
@@ -109,5 +118,7 @@ private:
 	// private tick
 	// Override PostTickUpdates or PostTickUpdatesBP if you need to update on tick
 	virtual void Tick(float DeltaTime) override;
+
+	FVector EndLocationOnLastFrame = FVector::ZeroVector;
 
 };
