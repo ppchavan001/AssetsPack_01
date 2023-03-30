@@ -17,27 +17,17 @@ class DataLoaderAsyncTask : public FNonAbandonableTask
 
 	DataLoaderAsyncTask(UObject* Object)
 		: WorldContextObject(Object)
-	{
-	}
+	{ }
 
 	void DoWork()
 	{
-		if (UWorld* World = WorldContextObject->GetWorld())
+
+		for (TObjectIterator<UObject> It; It; ++It)
 		{
-			auto lvls = World->GetLevels();
-			for (ULevel* Level : lvls)
+			UObject* Object = *It;
+			if (Object->Implements<UDataLoaderInterface>())
 			{
-				if (Level)
-				{
-					auto actrs = Level->Actors;
-					for (auto Actor : actrs)
-					{
-						if (Actor && Actor->Implements<UDataLoaderInterface>())
-						{
-							IDataLoaderInterface::Execute_PostDataLoadCallback(Actor);
-						}
-					}
-				}
+				IDataLoaderInterface::Execute_PostDataLoadCallback(Object);
 			}
 		}
 	}
@@ -63,21 +53,15 @@ void ADataLoaderActorBackend::PostDataLoadingCallbackAsync()
 	if (bUseAsync)
 		(new FAutoDeleteAsyncTask<DataLoaderAsyncTask>(this))->StartBackgroundTask();
 
-	else if (UWorld* World = GetWorld())
+	else
 	{
-		auto lvls = World->GetLevels();
-		for (ULevel* Level : lvls)
+		
+		for (TObjectIterator<UObject> It; It; ++It)
 		{
-			if (Level)
+			UObject* Object = *It;
+			if (Object->Implements<UDataLoaderInterface>())
 			{
-				auto actrs = Level->Actors;
-				for (auto Actor : actrs)
-				{
-					if (Actor && Actor->Implements<UDataLoaderInterface>())
-					{
-						IDataLoaderInterface::Execute_PostDataLoadCallback(Actor);
-					}
-				}
+				IDataLoaderInterface::Execute_PostDataLoadCallback(Object);
 			}
 		}
 	}
