@@ -83,3 +83,5 @@ Content/Scripts/out
 DataFactory/UnrealJSScripts/typings
 DataFactory/UnrealJSScripts/out/UnrealJS/aliases.js
 DataFactory/UnrealJSScripts/out/UnrealJS/aliases.js
+DataFactory/UnrealJSScripts/package-lock.json
+DataFactory/UnrealJSScripts/yarn.lock
