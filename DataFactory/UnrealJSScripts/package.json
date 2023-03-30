@@ -4,7 +4,8 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "watch": "babel src --out-dir out --copy-files --extensions .ts -w"
+    "watch": "babel src --out-dir out --copy-files --extensions .ts -w",
+    "build": "tsc"
   },
   "author": "ppchavan001",
   "license": "ISC",
