@@ -1,5 +1,7 @@
 // @ts-nocheck
 
+import inputBinding from "../../out/UnrealJS/input-binding";
+
 @UCLASS()
 class JS_Pawn_Base extends Character
 {
@@ -9,11 +11,7 @@ class JS_Pawn_Base extends Character
     @UPROPERTY(EditAnywhere)
     FollowCamera;
 
-    /**
-     * The way to get started is to quit talking and begin doing.
-     *
-     * MyCharacter's Constructor
-     */
+
     constructor(GWorld: World, Location: Vector)
     {
         super(GWorld, Location);
@@ -23,7 +21,7 @@ class JS_Pawn_Base extends Character
 
 
         this.CapsuleComponent.SetCapsuleSize(42, 96, false);
-
+        this.CapsuleComponent.SetHiddenInGame(true);
         this.bUseControllerRotationPitch = false;
         this.bUseControllerRotationRoll = false;
         this.bUseControllerRotationYaw = false;
@@ -45,17 +43,57 @@ class JS_Pawn_Base extends Character
 
         this.Mesh.K2_SetWorldLocation(Vector.MakeVector(0, 0, -97), false);
         this.Mesh.K2_SetWorldRotation(Rotator.MakeRotator(0, 0, 270), false);
+
+        this.bindInputs();
     }
 
+
+    public bindInputs(): void
+    {
+
+        // Axis name, Function name Bindings
+        let AxisBindings = new Map<string, string>();
+
+        AxisBindings.set("LookRight_InputAxis", "LookRight");
+        AxisBindings.set("LookUp_InputAxis", "LookUp");
+        AxisBindings.set("MoveForward_InputAxis", "MoveForward");
+        AxisBindings.set("MoveRight_InputAxis", "MoveRight");
+        AxisBindings.set("MoveUp_InputAxis", "MoveUp");
+
+        /** add new bindings here
+         * 
+         * before for loop
+         */
+
+
+
+
+
+        for (const [key, value] of AxisBindings.entries())
+        {
+            this.SetAxisBinding(key, value);
+        }
+
+    }
+    private SetAxisBinding(AxisName: string, FunctionName: string)
+    {
+        DataFactoryBPLibrary.AddInputBinding(this,
+            AxisName, FunctionName,
+            EInputBindingSupportedTypes.AxisBinding,
+            EInputEvent.IE_Axis);
+
+    }
 
     ReceiveBeginPlay()
     {
         super.ReceiveBeginPlay();
     }
 
+
     @KEYBIND(BindAxis, "LookRight_InputAxis")
-    Turn(value: float)
+    LookRight(value: float)
     {
+
         if (value !== 0)
         {
             this.AddControllerYawInput(value);
@@ -66,10 +104,9 @@ class JS_Pawn_Base extends Character
     LookUp(value: float)
     {
 
-        console.log(value);
         if (value !== 0)
         {
-            this.AddControllerPitchInput(value);
+            this.AddControllerPitchInput(value * -1);
         }
     }
 
@@ -87,6 +124,22 @@ class JS_Pawn_Base extends Character
             this.AddMovementInput(forwardVector, value, false);
         }
     }
+
+    @KEYBIND(BindAxis, "MoveUp_InputAxis")
+    MoveUp(value: float)
+    {
+        if (value !== 0)
+        {
+            const rotation = this.GetControlRotation();
+            rotation.Pitch = 0;
+            rotation.Roll = 0;
+
+            const forwardVector = rotation.GetForwardVector();
+
+            this.AddMovementInput(forwardVector, value, false);
+        }
+    }
+
 
     @KEYBIND(BindAxis, "MoveRight_InputAxis")
     MoveRight(value: float)
@@ -120,6 +173,6 @@ class JS_Pawn_Base extends Character
     }
 }
 
-new JS_Pawn_Base(GWorld);
-
 export default JS_Pawn_Base;
+
+
