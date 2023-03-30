@@ -1,10 +1,15 @@
+import JS_Pawn_Char from "../Classes/JS_Pawn_Base.u";
+
 function main(): Function
 {
 
     // Do stuff
-
-
     DataFactoryBPLibrary.DF_PrintString(undefined, "Hola from : " + __filename, EDataFactoryLogVerbosity.Warning, true, true, 5.0, 3);
+
+
+    let char = new JS_Pawn_Char(GWorld, GWorld.GetPlayerPawn(0).GetActorLocation());
+
+    GWorld.GetPlayerController(0).Possess(char);
 
 
     // clean up the mess
