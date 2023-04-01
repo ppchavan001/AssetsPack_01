@@ -1,8 +1,7 @@
 /// <reference path="../../typings/_part_3_ue.d.ts">/>
 
-
 @UCLASS()
-class JS_Pawn_Base extends Character
+class JS_FreeChar_Base extends Character
 {
     @UPROPERTY(EditAnywhere)
     CameraBoom: SpringArmComponent;
@@ -25,16 +24,10 @@ class JS_Pawn_Base extends Character
         this.bUseControllerRotationRoll = false;
         this.bUseControllerRotationYaw = false;
 
-        this.CharacterMovement.bOrientRotationToMovement = true;
-        this.CharacterMovement.RotationRate = Rotator.MakeRotator(0, 0, 540);
-        this.CharacterMovement.JumpZVelocity = 600;
-        this.CharacterMovement.AirControl = 0.2;
-        this.CharacterMovement.MaxAcceleration = 2048;
-
         this.CameraBoom = new SpringArmComponent("CameraBoom");
         this.CameraBoom.AttachParent = this.CapsuleComponent;
         this.CameraBoom.TargetArmLength = 300;
-        this.CameraBoom.bUsePawnControlRotation = true;
+        this.CameraBoom.bUsePawnControlRotation = false;
 
         this.FollowCamera = new CameraComponent("FollowCamera");
         this.FollowCamera.bUsePawnControlRotation = false;
@@ -172,6 +165,6 @@ class JS_Pawn_Base extends Character
     }
 }
 
-export default JS_Pawn_Base;
+export default JS_FreeChar_Base;
 
 
