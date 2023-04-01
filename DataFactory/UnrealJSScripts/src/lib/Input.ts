@@ -8,3 +8,13 @@ export function SetAxisBinding(obj: UObject, AxisName: string, FunctionName: str
         EInputEvent.IE_Axis, null);
 
 }
+
+export function SetAxisBindings(obj: UObject, AxisBindings: Map<string, string>)
+{
+
+    for (const [key, value] of AxisBindings.entries())
+    {
+        SetAxisBinding(obj, key, value);
+    }
+
+}

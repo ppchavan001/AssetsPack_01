@@ -1,6 +1,6 @@
 /// <reference path="../../typings/_part_3_ue.d.ts">/>
 
-import { SetAxisBinding } from "../lib/Input";
+import { SetAxisBinding, SetAxisBindings } from "../lib/Input";
 
 
 @UCLASS()
@@ -53,19 +53,8 @@ class JS_Pawn_Base extends Character
         AxisBindings.set("MoveRight_InputAxis", "MoveRight");
         AxisBindings.set("MoveUp_InputAxis", "MoveUp");
 
-        /** add new bindings here
-         * 
-         * before for loop
-         */
 
-
-
-
-
-        for (const [key, value] of AxisBindings.entries())
-        {
-            SetAxisBinding(this, key, value);
-        }
+        SetAxisBindings(this, AxisBindings);
 
     }
 
