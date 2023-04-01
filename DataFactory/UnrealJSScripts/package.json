@@ -5,8 +5,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "watch": "babel src --out-dir dist --copy-files --extensions .ts -w",
-    "build_shipping": "babel src --out-dir dist --copy-files --extensions .ts",
-    "build_debug": "babel src --out-dir dist --copy-files --extensions .ts --retain-lines --source-maps"
+    "build_shipping": "babel src --out-dir dist --copy-files --extensions .ts --config-file ./shipping.babelrc",
+    "build_debug": "babel src --out-dir dist --copy-files --extensions .ts --config-file ./debug.babelrc"
   },
   "author": "ppchavan001",
   "license": "ISC",
