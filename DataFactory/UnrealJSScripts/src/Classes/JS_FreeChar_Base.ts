@@ -3,10 +3,8 @@
 @UCLASS()
 class JS_FreeChar_Base extends Character
 {
-    @UPROPERTY(EditAnywhere)
     CameraBoom: SpringArmComponent;
 
-    @UPROPERTY(EditAnywhere)
     FollowCamera;
 
 
@@ -19,17 +17,17 @@ class JS_FreeChar_Base extends Character
 
 
         this.CapsuleComponent.SetCapsuleSize(42, 96, false);
-        this.CapsuleComponent.SetHiddenInGame(true);
+        this.CapsuleComponent.SetHiddenInGame(true, false);
         this.bUseControllerRotationPitch = false;
         this.bUseControllerRotationRoll = false;
         this.bUseControllerRotationYaw = false;
 
-        this.CameraBoom = new SpringArmComponent("CameraBoom");
+        this.CameraBoom = new SpringArmComponent();
         this.CameraBoom.AttachParent = this.CapsuleComponent;
         this.CameraBoom.TargetArmLength = 300;
         this.CameraBoom.bUsePawnControlRotation = false;
 
-        this.FollowCamera = new CameraComponent("FollowCamera");
+        this.FollowCamera = new CameraComponent();
         this.FollowCamera.bUsePawnControlRotation = false;
         this.FollowCamera.AttachParent = this.CameraBoom;
 
@@ -72,7 +70,7 @@ class JS_FreeChar_Base extends Character
         DataFactoryBPLibrary.AddInputBinding(this,
             AxisName, FunctionName,
             EInputBindingSupportedTypes.AxisBinding,
-            EInputEvent.IE_Axis);
+            EInputEvent.IE_Axis, null);
 
     }
 
@@ -82,8 +80,8 @@ class JS_FreeChar_Base extends Character
     }
 
 
-    @KEYBIND(BindAxis, "LookRight_InputAxis")
-    LookRight(value: float)
+    @UFUNCTION()
+    LookRight(value: number)
     {
 
         if (value !== 0)
@@ -92,8 +90,8 @@ class JS_FreeChar_Base extends Character
         }
     }
 
-    @KEYBIND(BindAxis, "LookUp_InputAxis")
-    LookUp(value: float)
+    @UFUNCTION()
+    LookUp(value: number)
     {
 
         if (value !== 0)
@@ -102,8 +100,24 @@ class JS_FreeChar_Base extends Character
         }
     }
 
-    @KEYBIND(BindAxis, "MoveForward_InputAxis")
-    MoveForward(value: float)
+    @UFUNCTION()
+    MoveForward(value: number)
+    {
+
+        if (value !== 0)
+        {
+            const rotation = this.GetControlRotation();
+            rotation.Pitch = 0;
+            rotation.Roll = 0;
+
+            const forwardVector = rotation.GetForwardVector();
+
+            this.AddMovementInput(forwardVector, value, false);
+        }
+    }
+
+    @UFUNCTION()
+    MoveUp(value: number)
     {
         if (value !== 0)
         {
@@ -117,24 +131,9 @@ class JS_FreeChar_Base extends Character
         }
     }
 
-    @KEYBIND(BindAxis, "MoveUp_InputAxis")
-    MoveUp(value: float)
-    {
-        if (value !== 0)
-        {
-            const rotation = this.GetControlRotation();
-            rotation.Pitch = 0;
-            rotation.Roll = 0;
 
-            const forwardVector = rotation.GetForwardVector();
-
-            this.AddMovementInput(forwardVector, value, false);
-        }
-    }
-
-
-    @KEYBIND(BindAxis, "MoveRight_InputAxis")
-    MoveRight(value: float)
+    @UFUNCTION()
+    MoveRight(value: number)
     {
         if (value !== 0)
         {
@@ -148,21 +147,6 @@ class JS_FreeChar_Base extends Character
         }
     }
 
-    @UFUNCTION(Server, Unreliable)
-    Server_Attack()
-    {
-        this.Attack();
-    }
-
-    @KEYBIND(BindAction, "Attack", IE_RELEASED)
-    Attack()
-    {
-        if (!this.HasAuthority())
-        {
-            this.Server_Attack();
-            return;
-        }
-    }
 }
 
 export default JS_FreeChar_Base;
