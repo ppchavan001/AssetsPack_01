@@ -87,3 +87,4 @@ DataFactory/UnrealJSScripts/package-lock.json
 DataFactory/UnrealJSScripts/yarn.lock
 *.map
 DataFactory/UnrealJSScripts/dist
+DataFactory/UnrealJSScripts/src/UnrealJS/typings
