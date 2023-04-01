@@ -4,8 +4,9 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "watch": "babel src --out-dir out --copy-files --extensions .ts -w",
-    "build": "tsc"
+    "watch": "babel src --out-dir dist --copy-files --extensions .ts -w",
+    "build_shipping": "babel src --out-dir dist --copy-files --extensions .ts",
+    "build_debug": "babel src --out-dir dist --copy-files --extensions .ts --retain-lines --source-maps"
   },
   "author": "ppchavan001",
   "license": "ISC",
@@ -13,10 +14,10 @@
   "dependencies": {
     "@aidaspa/babel-plugin-uts": "^1.0.3",
     "@babel/cli": "^7.21.0",
-    "@babel/core": "^7.21.3",
+    "@babel/core": "^7.21.4",
     "@babel/plugin-proposal-decorators": "^7.21.0",
-    "@babel/preset-env": "^7.20.2",
-    "@babel/preset-typescript": "^7.21.0",
+    "@babel/preset-env": "^7.21.4",
+    "@babel/preset-typescript": "^7.21.4",
     "@types/node": "^18.15.11"
   }
 }
