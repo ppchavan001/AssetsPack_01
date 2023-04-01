@@ -1,13 +1,13 @@
 @echo off
 
-REM cd to project home directory
+REM Execute InitProject.bat before building
 
 REM cd to project home directory
 cd ../
 cd ./UnrealJSScripts
 
 REM InitProject.bat will cd to project home dir. So building project there.
-call yarn run builddebug
+call yarn run build_debug
 pause
 
 
