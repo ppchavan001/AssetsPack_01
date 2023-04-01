@@ -29,4 +29,7 @@
   // "sourceRoot": "", // specify the root path for the source code
   // "auxiliaryCommentBefore": "", // add a comment to the top of the generated code
   // "auxiliaryCommentAfter": "" // add a comment to the bottom of the generated code
+  "ignore": [
+    "**/*.d.ts"
+  ]
 }
