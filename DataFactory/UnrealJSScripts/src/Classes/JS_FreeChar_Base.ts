@@ -1,5 +1,7 @@
 /// <reference path="../../typings/_part_3_ue.d.ts">/>
 
+import { SetAxisBinding } from "../lib/Input";
+
 @UCLASS()
 class JS_FreeChar_Base extends Character
 {
@@ -61,16 +63,8 @@ class JS_FreeChar_Base extends Character
 
         for (const [key, value] of AxisBindings.entries())
         {
-            this.SetAxisBinding(key, value);
+            SetAxisBinding(this, key, value);
         }
-
-    }
-    private SetAxisBinding(AxisName: string, FunctionName: string)
-    {
-        DataFactoryBPLibrary.AddInputBinding(this,
-            AxisName, FunctionName,
-            EInputBindingSupportedTypes.AxisBinding,
-            EInputEvent.IE_Axis, null);
 
     }
 
