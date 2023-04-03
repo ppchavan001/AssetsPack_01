@@ -1,4 +1,3 @@
-import JS_FreeChar_Base from "../Classes/JS_FreeChar_Base";
 import JS_Pawn_Base from "../Classes/JS_Pawn_Base.u";
 
 function main(): Function
@@ -7,12 +6,7 @@ function main(): Function
     // Do stuff
     //DataFactoryBPLibrary.DF_PrintString(undefined, "Hola from : " + __filename, EDataFactoryLogVerbosity.Warning, true, true, 5.0, 3);
 
-    let oldPawn = GWorld.GetPlayerPawn(0);
-    let char = new JS_FreeChar_Base(GWorld, oldPawn.GetActorLocation());
-
-    GWorld.GetPlayerController(0).Possess(char);
-
-    oldPawn.DestroyActor();
+    let fc = GWorld.GetPlayerPawn(0);
 
 
     // clean up the mess
