@@ -88,3 +88,4 @@ DataFactory/UnrealJSScripts/yarn.lock
 *.map
 DataFactory/UnrealJSScripts/dist
 DataFactory/UnrealJSScripts/src/UnrealJS/typings
+DataFactory/UnrealJSScripts/src/UnrealJS/aliases.js
