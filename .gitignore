@@ -89,3 +89,7 @@ DataFactory/UnrealJSScripts/yarn.lock
 DataFactory/UnrealJSScripts/dist
 DataFactory/UnrealJSScripts/src/UnrealJS/typings
 DataFactory/UnrealJSScripts/src/UnrealJS/aliases.js
+Config/SteamVRBindings
+Config/steamvr_ue_editor_app.json
+DataFactory/TestParam2.ini
+DataFactory/TestParam1.ini
