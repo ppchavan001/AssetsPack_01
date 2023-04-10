@@ -1,6 +1,6 @@
 {
 	"FileVersion": 3,
-	"EngineAssociation": "{961FF81E-42D2-D372-C199-C9895FF5331C}",
+	"EngineAssociation": "{83CEA8E9-4C86-DD18-800F-7896724DD334}",
 	"Category": "",
 	"Description": "",
 	"Modules": [
@@ -8,6 +8,12 @@
 			"Name": "AssetsPack_01",
 			"Type": "Runtime",
 			"LoadingPhase": "Default"
+		}
+	],
+	"Plugins": [
+		{
+			"Name": "EnhancedInput",
+			"Enabled": true
 		}
 	]
 }
