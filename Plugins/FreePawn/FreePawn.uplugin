@@ -3,7 +3,7 @@
 	"Version": 1,
 	"VersionName": "2.0",
 	"FriendlyName": "FreePawn",
-	"Description": "Pawn with free camera rotations. Can be easily controlled by UDP and other data sources.",
+	"Description": "Pawn with free camera rotations. Can be easily controlled by UDP and other data sources. With SVR haptics.",
 	"Category": "Other",
 	"CreatedBy": "ppchavan001",
 	"CreatedByURL": "ppchavan001.github.io",
@@ -12,8 +12,6 @@
 	"SupportURL": "",
 	"EngineVersion": "4.26.0",
 	"CanContainContent": true,
-	"IsBetaVersion": false,
-	"IsExperimentalVersion": false,
 	"Installed": true,
 	"Modules": [
 		{
