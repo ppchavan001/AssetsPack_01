@@ -18,8 +18,8 @@ import path from "path"
         // Context.WriteAliases(path.join(__dirname, '/aliases.js'));
 
         // in src
-        // Context.WriteDTS(path.join(__dirname, '../../src/UnrealJS/typings/ue.d.ts'), true);
-        // Context.WriteAliases(path.join(__dirname, '../../src/UnrealJS/aliases.js'));
+        Context.WriteDTS(path.join(__dirname, '../../src/UnrealJS/typings/ue.d.ts'), true);
+        Context.WriteAliases(path.join(__dirname, '../../src/UnrealJS/aliases.js'));
 
         Context.RunFile('aliases.js')
         Context.RunFile('polyfill/unrealengine.js')

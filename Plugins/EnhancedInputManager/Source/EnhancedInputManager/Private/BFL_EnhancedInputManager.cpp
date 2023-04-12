@@ -5,6 +5,8 @@
 #include <EnhancedInputSubsystems.h>
 #include <EnhancedInputComponent.h>
 #include <InputMappingContext.h>
+#include <EnhancedPlayerInput.h>
+#include <DataFactoryBPLibrary.h>
 
 void UBFL_EnhancedInputManager::BindActionOnEnhancedInputComponent(
 	UEnhancedInputComponent* InputComponent,
@@ -20,6 +22,7 @@ void UBFL_EnhancedInputManager::BindActionOnEnhancedInputComponent(
 void UBFL_EnhancedInputManager::AddNewInputMappingContext(const UObject* WorldContextObject, const UInputMappingContext* MappingContext, int32 Priority)
 {
 	if (UWorld* World = WorldContextObject->GetWorld())
+	{
 		if (APlayerController* PC = World->GetFirstPlayerController())
 		{
 			// Get the Enhanced Input Local Player Subsystem from the Local Player related to our Player Controller.
@@ -31,6 +34,11 @@ void UBFL_EnhancedInputManager::AddNewInputMappingContext(const UObject* WorldCo
 				// Add each mapping context, along with their priority values. Higher values outprioritize lower values.
 				Subsystem->AddMappingContext(MappingContext, 0);
 
+
 			}
 		}
+	}
 }
+
+
+

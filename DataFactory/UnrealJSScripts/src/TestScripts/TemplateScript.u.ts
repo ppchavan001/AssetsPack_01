@@ -1,10 +1,12 @@
+import { DFLOG } from "../lib/Log";
+
 function main(): Function
 {
 
     // Do stuff
 
 
-    DataFactoryBPLibrary.DF_PrintString(undefined, "Hola from : " + __filename, EDataFactoryLogVerbosity.Warning, true, true, 5.0, 3);
+    DFLOG("Hola from : " + __filename, EDataFactoryLogVerbosity.Warning, true, true, 5.0, 3);
 
 
     // clean up the mess

@@ -20,7 +20,7 @@ class ENHANCEDINPUTMANAGER_API UBFL_EnhancedInputManager : public UBlueprintFunc
 public:
 
 
-	UFUNCTION(BlueprintCallable, Category = "EnhancedInputManager|EnhancedInput")
+	UFUNCTION(BlueprintCallable, Category = "EnhancedInputManager|InputAction")
 		static void BindActionOnEnhancedInputComponent(
 			UEnhancedInputComponent* InputComponent,
 			const UInputAction* Action,
@@ -28,7 +28,8 @@ public:
 			UObject* Object,
 			FName FunctionName);
 
-	UFUNCTION(BlueprintCallable, Category = "EnhancedInputManager|EnhancedInput")
+	UFUNCTION(BlueprintCallable, Category = "EnhancedInputManager|MappingContext")
 		static void AddNewInputMappingContext(const UObject* WorldContextObject, const UInputMappingContext* MappingContext, int32 Priority);
 
+	
 };

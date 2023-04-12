@@ -26,7 +26,8 @@ public class EnhancedInputManager : ModuleRules
 			new string[]
 			{
 				"Core",
-				"EnhancedInput"
+				"EnhancedInput",
+				"DataFactory"
 				// ... add other public dependencies that you statically link with here ...
 			}
 			);
