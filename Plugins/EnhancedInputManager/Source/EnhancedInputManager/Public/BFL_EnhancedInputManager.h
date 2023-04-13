@@ -31,5 +31,11 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "EnhancedInputManager|MappingContext")
 		static void AddNewInputMappingContext(const UObject* WorldContextObject, const UInputMappingContext* MappingContext, int32 Priority);
 
-	
+
+	UFUNCTION(BlueprintCallable, Category = "EnhancedInputManager|Memory")
+	static UObject* NewUObjectOfClass(UObject* Outer, const UClass* Class);
+
+	UFUNCTION(BlueprintCallable, Category = "EnhancedInputManager|Memory")
+		static void SetKeyOnInputAction(UInputAction* ia);
+
 };

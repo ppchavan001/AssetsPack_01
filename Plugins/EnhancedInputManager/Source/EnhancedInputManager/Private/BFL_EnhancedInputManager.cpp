@@ -7,6 +7,7 @@
 #include <InputMappingContext.h>
 #include <EnhancedPlayerInput.h>
 #include <DataFactoryBPLibrary.h>
+#include "UObject/UObjectGlobals.h"
 
 void UBFL_EnhancedInputManager::BindActionOnEnhancedInputComponent(
 	UEnhancedInputComponent* InputComponent,
@@ -34,11 +35,26 @@ void UBFL_EnhancedInputManager::AddNewInputMappingContext(const UObject* WorldCo
 				// Add each mapping context, along with their priority values. Higher values outprioritize lower values.
 				Subsystem->AddMappingContext(MappingContext, 0);
 
-
 			}
 		}
 	}
 }
+
+UObject* UBFL_EnhancedInputManager::NewUObjectOfClass(UObject* Outer, const UClass* Class)
+{
+	if (Class)
+	{
+		return NewObject<UObject>(Outer, Class);
+	}
+	return nullptr;
+}
+
+void UBFL_EnhancedInputManager::SetKeyOnInputAction(UInputAction* ia)
+{ 
+
+}
+
+
 
 
 
