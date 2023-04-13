@@ -38,9 +38,21 @@ function main(): Function
 
             let map2 = new EnhancedActionKeyMapping();
             map2.Action = ia2;
-            map2.Key = DataFactoryBPLibrary.GetKeyFromName('S');
+            map2.Key = DataFactoryBPLibrary.GetKeyFromName('Vive_Left_Trackpad_Y');
             map2.Modifiers = mods;
             oldmapps.push(map2);
+
+            let map3 = new EnhancedActionKeyMapping();
+            map3.Action = ia2;
+            map3.Key = DataFactoryBPLibrary.GetKeyFromName('Vive_Right_Trackpad_Y');
+            oldmapps.push(map3);
+
+
+            let map4 = new EnhancedActionKeyMapping();
+            map4.Action = ia2;
+            map4.Key = DataFactoryBPLibrary.GetKeyFromName('S');
+            map4.Modifiers = mods;
+            oldmapps.push(map4);
 
             mappingcontext.Mappings = oldmapps;
             //DFLOG_ToScreen("Oldmaps :" + oldmapps.length.toString());
