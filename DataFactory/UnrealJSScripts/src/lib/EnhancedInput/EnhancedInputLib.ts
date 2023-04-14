@@ -1,10 +1,18 @@
 import { DFLOG, DFLOG_Error, DFLOG_ToConsole, DFLOG_ToScreen } from "../Log";
 
 /**
- * Just a Data structure to hold data for 
+ * Just a Data structure to hold data for EI_JS_Mapping
  */
 export class KeyMapType
 {
+    /***
+     * Holds key
+     * information and triggers/ modifiers for the associated key
+     * (Check EKeys:: in UnrealEngine for all keys)[A, J, NumPadZero, LeftMouseButton]
+     * 
+     * Key : Triggers, Mods 
+     * can be different depending on the contexts
+     */
     constructor(
         readonly KeyName: string,
         readonly InputTriggers: InputTrigger[] = [],
@@ -22,19 +30,16 @@ class KeyMapType_COMPILED extends KeyMapType { }
  */
 export class EI_JS_Mapping
 {
-    /** Object that contains the following function. 
-    _FunctionObject: Object;
-     Function name on target object. Need to be UFUNCTION 
-    _FunctionName: string = "";
-    
-    * if true will call AddMappingDataToContext() from construct
-    * if false will not call AddMappingDataToContext() from construct
-        readonly bAddMappingDataToContextOnConstruct: boolean = true
-    * 
-
-    TriggerEvent: ETriggerEvent = ETriggerEvent.Triggered 
-
-    */
+    /**
+     * Maps the "_FunctionName" from the "_FunctionObject" to the InputAction with given KeyMaps
+     * 
+     * 
+     * _FunctionObject Object that contains the following function. 
+     * _FunctionName = Function name on target object. Needs to be UFUNCTION
+     * if "bAddMappingDataToContextOnConstruct" is true will call ProcessMappingData() from construct
+     * if false will not call ProcessMappingData() at all, needs to be executed by caller.
+     *
+     * */
     constructor(
         private readonly MappingContext: InputMappingContext,
         private readonly FunctionObject: Object,
