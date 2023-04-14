@@ -1,6 +1,8 @@
-import { KeyMapType, MappingData } from "../lib/EnhancedInputLib";
+import { KeyMapType, EI_JS_Mapping } from "../lib/EnhancedInput/EnhancedInputLib";
+import IM_DeadZoneAbsolute from "../lib/EnhancedInput/InputModifiers/IM_DeadZoneAbsolute.u";
 import { DFLOG, DFLOG_Error, DFLOG_ToConsole, DFLOG_ToScreen } from "../lib/Log";
 
+//import { IM_DeadZoneAbsolute_COMPILED } from "../lib/EnhancedInput/InputModifiers/IM_DeadZoneAbsolute.u";
 
 
 function main(): Function
@@ -17,14 +19,13 @@ function main(): Function
 
         if (ia2 instanceof InputAction)
         {
-            let ViveTrackpadDeadZone = new InputModifierDeadZone();
-
-            ViveTrackpadDeadZone.LowerThreshold = 0.1;
-            ViveTrackpadDeadZone.UpperThreshold = 0.9;
+            let ViveTrackpadDeadZone = new IM_DeadZoneAbsolute(mappingcontext);
+            ViveTrackpadDeadZone.LowerThreshold = -0.5;
+            ViveTrackpadDeadZone.UpperThreshold = 0.5;
 
             let ViveTrackpadMods: InputModifier[] = [ViveTrackpadDeadZone];
 
-            let MoveForwardMapping = new MappingData(
+            let MoveForwardMapping = new EI_JS_Mapping(
                 mappingcontext,
                 GWorld.GetPlayerPawn(0) /** Player pawn should be a FreePawn */,
                 "SetMoveForwardAxisValue",
@@ -36,56 +37,10 @@ function main(): Function
                     new KeyMapType("Vive_Right_Trackpad_Y", [], ViveTrackpadMods)
                 ],
                 ETriggerEvent.Triggered,
+                false,
                 false);
 
             MoveForwardMapping.ProcessMappingData();
-
-
-
-            // let oldmapps = mappingcontext.Mappings;
-
-            // let map1 = new EnhancedActionKeyMapping();
-            // map1.Action = ia2;
-            // map1.Key = DataFactoryBPLibrary.GetKeyFromName('W');
-            // oldmapps.push(map1);
-
-            // let map2 = new EnhancedActionKeyMapping();
-            // map2.Action = ia2;
-            // map2.Key = DataFactoryBPLibrary.GetKeyFromName('Vive_Left_Trackpad_Y');
-            // map2.Modifiers = ViveTrackpadMods;
-            // oldmapps.push(map2);
-
-            // let map3 = new EnhancedActionKeyMapping();
-            // map3.Action = ia2;
-            // map3.Key = DataFactoryBPLibrary.GetKeyFromName('Vive_Right_Trackpad_Y');
-            // oldmapps.push(map3);
-
-
-            // let map4 = new EnhancedActionKeyMapping();
-            // map4.Action = ia2;
-            // map4.Key = DataFactoryBPLibrary.GetKeyFromName('S');
-            // map4.Modifiers = [new InputModifierNegate];
-            // oldmapps.push(map4);
-
-            // mappingcontext.Mappings = oldmapps;
-
-
-            // let eic = pc.GetComponentByClass(EnhancedInputComponent)
-            // if (eic != null && eic instanceof EnhancedInputComponent)
-            // {
-
-            //     BFL_EnhancedInputManager.BindActionOnEnhancedInputComponent(
-            //         eic,
-            //         ia2,
-            //         ETriggerEvent.Triggered,
-            //         GWorld.GetPlayerPawn(0),
-            //         "SetMoveForwardAxisValue");
-            // }
-            // else
-            // {
-            //     DFLOG("EnhancedInputComponent on player controller 0 is invalid!" + eic, EDataFactoryLogVerbosity.Error, true, true, 5.0, 3);
-            // }
-
 
         }
 

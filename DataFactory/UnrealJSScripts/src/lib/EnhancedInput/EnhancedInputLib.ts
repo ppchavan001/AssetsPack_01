@@ -1,6 +1,8 @@
-import { DFLOG, DFLOG_Error, DFLOG_ToConsole, DFLOG_ToScreen } from "../lib/Log";
+import { DFLOG, DFLOG_Error, DFLOG_ToConsole, DFLOG_ToScreen } from "../Log";
 
-
+/**
+ * Just a Data structure to hold data for 
+ */
 export class KeyMapType
 {
     constructor(
@@ -14,7 +16,11 @@ export class KeyMapType
 class KeyMapType_COMPILED extends KeyMapType { }
 
 
-export class MappingData
+/** 
+ * Enhanced Input JS Mapping object
+ * Helps with action, key bindings
+ */
+export class EI_JS_Mapping
 {
     /** Object that contains the following function. 
     _FunctionObject: Object;
@@ -36,8 +42,8 @@ export class MappingData
         private readonly ia: InputAction,
         private readonly KeyMaps: KeyMapType[],
         private readonly TriggerEvent: ETriggerEvent = ETriggerEvent.Triggered,
-        private readonly bAddMappingDataToContextOnConstruct: boolean = true
-
+        private readonly bAddMappingDataToContextOnConstruct: boolean = true,
+        private readonly bRebuildMappingsOnContext: boolean = true
     )
     {
 
@@ -77,25 +83,28 @@ export class MappingData
     public ProcessMappingData(): void
     {
 
+        /**
+         * Build new EnhancedActionKeyMapping for provided keys
+         */
         let oldmapps = this.MappingContext.Mappings;
-
         for (const KeyMap of this.KeyMaps)
         {
             let NewKeyMap = new EnhancedActionKeyMapping();
             NewKeyMap.Action = this.ia;
-
             NewKeyMap.Key = DataFactoryBPLibrary.GetKeyFromName(KeyMap.KeyName);
             NewKeyMap.Triggers = KeyMap.InputTriggers;
             NewKeyMap.Modifiers = KeyMap.InputModifiers;
             oldmapps.push(NewKeyMap);
 
         }
-
-
-        DFLOG_ToConsole("Adding new action mapping for key : [" + this.GetAllKeysFromKeyMap() + "] To Context : " + this.MappingContext.GetName());
         this.MappingContext.Mappings = oldmapps;
+        DFLOG_ToConsole("Added new action mapping for keys : [" + this.GetAllKeysFromKeyMap() + "] To Context : " + this.MappingContext.GetName());
 
 
+        /** 
+         * Bind mappings to the function
+         *  
+         **/
         let pc = GWorld.GetPlayerController(0);
         let eic = pc.GetComponentByClass(EnhancedInputComponent)
         if (eic != null && eic instanceof EnhancedInputComponent)
@@ -123,8 +132,20 @@ export class MappingData
             DFLOG_Error("EnhancedInputComponent on player controller 0 is invalid!" + eic);
         }
 
+
+        /**
+         * Inform context about the mapping changes,
+         * only if, this is not handled by the caller 
+         */
+        if (this.bRebuildMappingsOnContext)
+        {
+            /** rebuild changes */
+            EnhancedInputLibrary.RequestRebuildControlMappingsUsingContext(this.MappingContext, true);
+        }
+
     }
 
 }
-class MappingData_COMPILED extends MappingData { };
+
+class MappingData_COMPILED extends EI_JS_Mapping { };
 
