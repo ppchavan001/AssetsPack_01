@@ -31,7 +31,7 @@ class KeyMapType_COMPILED extends KeyMapType { }
 export class EI_JS_Mapping
 {
 
-    private readonly NewInputActionForThisMapping: InputAction;
+    //private readonly NewInputActionForThisMapping: InputAction;
 
     /**
      * Maps the "_FunctionName" from the "_FunctionObject" to the InputAction with given KeyMaps
@@ -50,15 +50,10 @@ export class EI_JS_Mapping
         private readonly KeyMaps: KeyMapType[],
         private readonly TriggerEvent: ETriggerEvent = ETriggerEvent.Triggered,
         private readonly bAddMappingDataToContextOnConstruct: boolean = true,
-        private readonly bRebuildMappingsOnContext: boolean = true
+        private readonly bRebuildMappingsOnContext: boolean = true,
+        private readonly InputActionForThisMapping = new InputAction
     )
     {
-        let TempAction = BFL_EnhancedInputManager.NewUObjectOfClass(this.MappingContext, InputAction);
-        if (TempAction instanceof InputAction)
-        {
-            this.NewInputActionForThisMapping = TempAction;
-        }
-
         if (bAddMappingDataToContextOnConstruct)
         {
             this.ProcessMappingData();
@@ -102,7 +97,7 @@ export class EI_JS_Mapping
         for (const KeyMap of this.KeyMaps)
         {
             let NewKeyMap = new EnhancedActionKeyMapping();
-            NewKeyMap.Action = this.NewInputActionForThisMapping;
+            NewKeyMap.Action = this.InputActionForThisMapping;
             NewKeyMap.Key = DataFactoryBPLibrary.GetKeyFromName(KeyMap.KeyName);
             NewKeyMap.Triggers = KeyMap.InputTriggers;
             NewKeyMap.Modifiers = KeyMap.InputModifiers;
@@ -126,7 +121,7 @@ export class EI_JS_Mapping
                 DFLOG_ToConsole("Binding keys [" + this.GetAllKeysFromKeyMap() + "] to function : " + this.FunctionName);
                 BFL_EnhancedInputManager.BindActionOnEnhancedInputComponent(
                     eic,
-                    this.NewInputActionForThisMapping,
+                    this.InputActionForThisMapping,
                     this.TriggerEvent,
                     this.FunctionObject,
                     this.FunctionName);
