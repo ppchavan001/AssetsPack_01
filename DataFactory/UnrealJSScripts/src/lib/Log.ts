@@ -26,3 +26,14 @@ export function DFLOG_ToConsole(StringToLog: string,
     DataFactoryBPLibrary.DF_PrintString(undefined, StringToLog, LogVerbosity, bPrintToScreen, bPrintToLog, Duration, MaxStackDataDepth);
 
 }
+
+export function DFLOG_Error(StringToLog: string,
+    LogVerbosity: EDataFactoryLogVerbosity = EDataFactoryLogVerbosity.Error,
+    bPrintToScreen: boolean = true,
+    bPrintToLog: boolean = true,
+    Duration: number = 5,
+    MaxStackDataDepth: number = 5): void
+{
+    DataFactoryBPLibrary.DF_PrintString(undefined, StringToLog, LogVerbosity, bPrintToScreen, bPrintToLog, Duration, MaxStackDataDepth);
+
+}

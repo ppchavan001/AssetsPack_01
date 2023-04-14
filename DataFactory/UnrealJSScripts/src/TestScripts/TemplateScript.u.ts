@@ -6,7 +6,7 @@ function main(): Function
     // Do stuff
 
 
-    DFLOG("Hola from : " + __filename, EDataFactoryLogVerbosity.Warning, true, true, 5.0, 3);
+    DFLOG("JS Executing : " + __filename, EDataFactoryLogVerbosity.Warning, true, true, 5.0, 3);
 
 
     // clean up the mess
