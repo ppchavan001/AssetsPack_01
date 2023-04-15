@@ -1,6 +1,6 @@
 {
-	"version": "0.1.0",	
-	"configurations": [		
+	"version": "0.1.0",
+	"configurations": [
 		{
 			"name": "Attach",
 			"type": "node",
@@ -8,8 +8,8 @@
 			"port": 5858,
 			"address": "localhost",
 			"restart": false,
-			"sourceMaps": false,
-			"outDir": null,
+			"sourceMaps": true,
+			"outDir": "${workspaceRoot}/../DataFactory/UnrealJSScripts/dist/",
 			"localRoot": "${workspaceRoot}",
 			"remoteRoot": null
 		}
