@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Kismet/BlueprintFunctionLibrary.h"
+#include "InputAction.h"
 #include "BFL_EnhancedInputManager.generated.h"
 
 class UEnhancedInputComponent;
@@ -37,5 +38,31 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "EnhancedInputManager|Memory")
 		static void SetKeyOnInputAction(UInputAction* ia);
+
+
+	UFUNCTION(BlueprintPure, Category = "EnhancedInputManager|InputAction")
+		static FVector GetVectorFromIAInstance(const FInputActionInstance& Instance)
+	{
+		return Instance.GetValue().Get<FVector>();
+	}
+
+	UFUNCTION(BlueprintPure, Category = "EnhancedInputManager|InputAction")
+		static FVector2D GetVector2DFromIAInstance(const FInputActionInstance& Instance)
+	{
+		return Instance.GetValue().Get<FVector2D>();
+	}
+
+	UFUNCTION(BlueprintPure, Category = "EnhancedInputManager|InputAction")
+		static float GetFloatFromIAInstance(const FInputActionInstance& Instance)
+	{
+		return Instance.GetValue().Get<float>();
+		bool BoolValue = Instance.GetValue().Get<bool>();
+	}
+
+	UFUNCTION(BlueprintPure, Category = "EnhancedInputManager|InputAction")
+		static bool GetBoolFromIAInstance(const FInputActionInstance& Instance)
+	{
+		return Instance.GetValue().Get<bool>();
+	}
 
 };
