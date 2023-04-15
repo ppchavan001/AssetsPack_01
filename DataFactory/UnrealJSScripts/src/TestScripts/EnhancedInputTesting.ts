@@ -109,6 +109,7 @@ function main(): Function
 
     for (const [KeyName, KeyMaps] of TriggeredKeyMap.entries())
     {
+
         let NewMapping = new EI_JS_Mapping(
             FreePawnMappingContext,
             GWorld.GetPlayerPawn(0) /** Expecting the Player pawn to be a FreePawn */,
@@ -116,16 +117,15 @@ function main(): Function
             KeyMaps,
             ETriggerEvent.Triggered,
             true,
-            false);
+            false
+        );
 
         //MoveForwardMapping.ProcessMappingData();
     }
 
     for (const [KeyName, KeyMaps] of ToggledKeyMap.entries())
     {
-        let ia = new InputAction();
-        ia.ValueType = EInputActionValueType.Axis1D;
-        vb: InputActionValue;
+
 
         let NewMapping = new EI_JS_Mapping(
             FreePawnMappingContext,
@@ -134,9 +134,8 @@ function main(): Function
             KeyMaps,
             ETriggerEvent.Started,
             true,
-            false,
-            ia);
-
+            false
+        );
 
 
         let NewMapping2 = new EI_JS_Mapping(
@@ -146,8 +145,8 @@ function main(): Function
             KeyMaps,
             ETriggerEvent.Completed,
             true,
-            false,
-            ia);
+            false
+        );
 
         //MoveForwardMapping.ProcessMappingData();
     }
@@ -155,12 +154,42 @@ function main(): Function
     //#endregion
 
 
+    //#region  debug
+    // let mdeb = FreePawnMappingContext.Mappings;
+
+    // for (const map of mdeb)
+    // {
+    //     if (map.Modifiers.length > 1 || map.Action.Modifiers.length > 1)
+    //     {
+    //         console.log(map);
+
+    //     }
+    //     for (const iterator of map.Modifiers)
+    //     {
+    //         if (iterator instanceof InputModifierScalar)
+    //         {
+    //             console.log(map);
+    //         }
+    //     }
+
+    //     for (const iterator of map.Action.Modifiers)
+    //     {
+    //         if (iterator instanceof InputModifierScalar)
+    //         {
+    //             console.log(map);
+    //         }
+    //     }
+
+
+
+    // }
+    //#endregion
+
+
+
     /** rebuild changes */
     EnhancedInputLibrary.RequestRebuildControlMappingsUsingContext(FreePawnMappingContext, true);
-
     BFL_EnhancedInputManager.AddNewInputMappingContext(pc, FreePawnMappingContext, 0);
-
-
 
 
     // clean up the mess
@@ -188,5 +217,5 @@ try
 } catch (e)
 {
 
-    require("./UnrealJS/bootstrap")('./TestScripts/EnhancedInputTesting');
+    require("./UnrealJS/bootstrap")('EnhancedInputTesting');
 }

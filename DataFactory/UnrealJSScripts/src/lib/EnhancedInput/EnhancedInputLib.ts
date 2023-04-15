@@ -41,7 +41,9 @@ export class EI_JS_Mapping
      * _FunctionName = Function name on target object. Needs to be UFUNCTION
      * if "bAddMappingDataToContextOnConstruct" is true will call ProcessMappingData() from construct
      * if false will not call ProcessMappingData() at all, needs to be executed by caller.
-     *
+     *  
+     * if inputAction is not provided,
+     * new input action with EInputActionValueType.Axis1D will be used as default.
      * */
     constructor(
         private readonly MappingContext: InputMappingContext,
@@ -51,9 +53,11 @@ export class EI_JS_Mapping
         private readonly TriggerEvent: ETriggerEvent = ETriggerEvent.Triggered,
         private readonly bAddMappingDataToContextOnConstruct: boolean = true,
         private readonly bRebuildMappingsOnContext: boolean = true,
-        private readonly InputActionForThisMapping = new InputAction
+        private readonly InputActionValueType: EInputActionValueType = EInputActionValueType.Axis1D,
+        private readonly InputActionForThisMapping: InputAction = new InputAction()
     )
     {
+        this.InputActionForThisMapping.ValueType = InputActionValueType;
         if (bAddMappingDataToContextOnConstruct)
         {
             this.ProcessMappingData();
