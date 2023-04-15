@@ -1,5 +1,6 @@
-import { DFLOG_ToConsole, DFLOG_ToScreen } from "./Log";
-
+import { CreateObject } from "../Generics";
+import { DFLOG_ToConsole, DFLOG_ToScreen } from "../Log";
+import { HapticsOnMovementStarted } from "./Curves/HapticsOnMovementStarted";
 
 class UJS_Haptics extends UObject
 {
@@ -16,6 +17,9 @@ class UJS_Haptics extends UObject
     }
 
 }
+class UJS_Haptics_COMPILED extends UJS_Haptics { }
+
+
 /**
  * Dont need to spawn this actor unless trying to bind the UFUNCTION to InputAction,
  * call UJSHaptics.PlayHaptics directly if not binding UFUNCTION.
@@ -23,59 +27,60 @@ class UJS_Haptics extends UObject
 @UCLASS()
 class UJS_HapticsObject extends Actor
 {
-    public HapticEffect: HapticFeedbackEffect_Curve;
+    private HapticEffect: HapticFeedbackEffect_Base;
     public hand: EControllerHand = EControllerHand.Right;
     public Scale: number = 1;
     public bLoop: boolean = false;
 
-
+    private HapticEffectClass: typeof HapticFeedbackEffect_Base;
 
 
     /** Specify hand associated with this haptics object */
     constructor(GWorld: World, Location: Vector)
     {
         super(GWorld, Location);
-        this.RebuildHapticCurve();
+        /** 
+         * Do not build in ctor
+         * 
+         * class variable is not set here.
+         */
+        //this.RebuildHapticCurve();
     }
 
-    ReceiveBeginPlay()
-    {
-        super.ReceiveBeginPlay();
-        this.RebuildHapticCurve();
+    // ReceiveBeginPlay()
+    // {
+    //     super.ReceiveBeginPlay();
+    //     this.RebuildHapticCurve();
 
-    }
+    // }
 
     ReceiveDestroyed(): void
     {
-        DFLOG_ToConsole("JS Haptics binding actor destroyed for  : " + this.hand);
+        DFLOG_ToConsole("JS Haptics binding actor destroyed for  : " + this.hand + " " + this.GetName());
         super.ReceiveDestroyed();
+    }
+
+    SetHapticEffectClass(HapticClass: typeof HapticFeedbackEffect_Base)
+    {
+        this.HapticEffectClass = HapticClass;
+        this.RebuildHapticCurve();
     }
 
     RebuildHapticCurve(): void
     {
-
-        this.HapticEffect = new HapticFeedbackEffect_Curve();
-
-        const richCurve = new RichCurve();
-
-        let k1 = new RichCurveKey();
-        k1.Time = 0;
-        k1.Value = 0.1;
-
-        let k2 = new RichCurveKey();
-        k2.Time = 0.3;
-        k2.Value = 0;
-
-        // Add some keyframes to the RichCurve
-        richCurve.Keys = [k1, k2];
-
-        // Create a new RuntimeFloatCurve using the RichCurve
-        const runtimeFloatCurve = new RuntimeFloatCurve();
-        runtimeFloatCurve.EditorCurveData = richCurve;
-
-        this.HapticEffect.HapticDetails.Frequency = runtimeFloatCurve;
-        this.HapticEffect.HapticDetails.Amplitude = runtimeFloatCurve;
+        let obj = CreateObject(this.HapticEffectClass);
+        if (obj != null)
+        {
+            this.HapticEffect = obj;
+        }
+        else
+        {
+            /** TODO : figure out why this.HapticEffectClass == undefined after a while. and remove hardcoded class.*/
+            this.HapticEffect = new HapticsOnMovementStarted();
+        }
     }
+
+
 
     @UFUNCTION()
     PlayHaptics(Axis: number): void

@@ -34,10 +34,7 @@ public:
 
 
 	UFUNCTION(BlueprintCallable, Category = "EnhancedInputManager|Memory")
-	static UObject* NewUObjectOfClass(UObject* Outer, const UClass* Class);
-
-	UFUNCTION(BlueprintCallable, Category = "EnhancedInputManager|Memory")
-		static void SetKeyOnInputAction(UInputAction* ia);
+		static UObject* NewUObjectOfClass(UObject* Outer, const UClass* Class);
 
 
 	UFUNCTION(BlueprintPure, Category = "EnhancedInputManager|InputAction")
@@ -64,5 +61,14 @@ public:
 	{
 		return Instance.GetValue().Get<bool>();
 	}
+
+
+	UFUNCTION(BlueprintCallable, Category = "EnhancedInputManager|General")
+		static AActor* SpawnActor(
+			const UObject* WorldContextObject,
+			UClass* InClass,
+			FVector const Location = FVector::ZeroVector,
+			FRotator const Rotation = FRotator::ZeroRotator
+		);
 
 };

@@ -49,9 +49,20 @@ UObject* UBFL_EnhancedInputManager::NewUObjectOfClass(UObject* Outer, const UCla
 	return nullptr;
 }
 
-void UBFL_EnhancedInputManager::SetKeyOnInputAction(UInputAction* ia)
-{ 
 
+AActor* UBFL_EnhancedInputManager::SpawnActor(
+	const UObject* WorldContextObject,
+	UClass* InClass,
+	FVector  Location,
+	FRotator  Rotation)
+{
+	if (WorldContextObject && WorldContextObject->GetWorld())
+	{
+		const FActorSpawnParameters& SpawnParameters = FActorSpawnParameters();
+		return WorldContextObject->GetWorld()->SpawnActor(InClass, &Location, &Rotation, SpawnParameters);
+	}
+
+	return NULL;
 }
 
 

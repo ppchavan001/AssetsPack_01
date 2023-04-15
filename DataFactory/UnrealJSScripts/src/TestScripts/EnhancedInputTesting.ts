@@ -1,6 +1,7 @@
 import { KeyMapType, EI_JS_Mapping } from "../lib/EnhancedInput/EnhancedInputLib";
 import IM_DeadZoneAbsolute from "../lib/EnhancedInput/InputModifiers/IM_DeadZoneAbsolute.u";
-import UJS_HapticsObject from "../lib/Haptics.u";
+import { HapticsOnMovementStarted } from "../lib/Haptics/Curves/HapticsOnMovementStarted";
+import UJS_HapticsObject from "../lib/Haptics/Haptics.u";
 import { DFLOG, DFLOG_Error, DFLOG_ToConsole, DFLOG_ToScreen } from "../lib/Log";
 
 
@@ -105,34 +106,50 @@ function main(): Function
     //#endregion
 
 
+
+
     //#region Haptics 
-    let HapticsObjLeft = new UJS_HapticsObject(GWorld, Vector.Vector_Zero());
-    let HapticsObjRight = new UJS_HapticsObject(GWorld, Vector.Vector_Zero());
+    // let HapticsObjLeft = new UJS_HapticsObject(GWorld, Vector.Vector_Zero());
+    // let HapticsObjRight = new UJS_HapticsObject(GWorld, Vector.Vector_Zero());
+    let rot = new Rotator();
+    rot.Yaw = rot.Pitch = rot.Roll = 0.0;
 
-    HapticsObjLeft.hand = EControllerHand.Right;
-    HapticsObjRight.hand = EControllerHand.Right;
+    let t1 = new Transform();
 
-    let HapticsMappingLeft = new EI_JS_Mapping(
-        FreePawnMappingContext,
-        HapticsObjLeft,
-        "PlayHaptics",
-        [new KeyMapType(LeftTrackPadClick, [], [])],
-        ETriggerEvent.Started,
-        true,
-        false
-    );
-
-    let HapticsMappingRight = new EI_JS_Mapping(
-        FreePawnMappingContext,
-        HapticsObjRight,
-        "PlayHaptics",
-        [new KeyMapType(RightTrackPadClick, [], [])],
-        ETriggerEvent.Started,
-        true,
-        false
-    );
+    let HapticsObjLeft = BFL_EnhancedInputManager.SpawnActor(GWorld, UJS_HapticsObject, Vector.Vector_Zero(), rot);
+    let HapticsObjRight = BFL_EnhancedInputManager.SpawnActor(GWorld, UJS_HapticsObject, Vector.Vector_Zero(), rot);
 
 
+    if (HapticsObjLeft instanceof UJS_HapticsObject && HapticsObjRight instanceof UJS_HapticsObject)
+    {
+        HapticsObjLeft.hand = bSwapLeftRightControllers ? EControllerHand.Left : EControllerHand.Right;
+        HapticsObjRight.hand = bSwapLeftRightControllers ? EControllerHand.Right : EControllerHand.Left;
+
+        HapticsObjLeft.SetHapticEffectClass(HapticsOnMovementStarted);
+        HapticsObjRight.SetHapticEffectClass(HapticsOnMovementStarted);
+
+
+        let HapticsMappingLeft = new EI_JS_Mapping(
+            FreePawnMappingContext,
+            HapticsObjLeft,
+            "PlayHaptics",
+            [new KeyMapType(LeftTrackPadClick, [], [])],
+            ETriggerEvent.Started,
+            true,
+            false
+        );
+
+        let HapticsMappingRight = new EI_JS_Mapping(
+            FreePawnMappingContext,
+            HapticsObjRight,
+            "PlayHaptics",
+            [new KeyMapType(RightTrackPadClick, [], [])],
+            ETriggerEvent.Started,
+            true,
+            false
+        );
+
+    }
     //#endregion
 
     //#region Generate EI_JS_Mappings from data 
