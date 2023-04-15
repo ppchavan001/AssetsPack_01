@@ -1,5 +1,6 @@
 import { KeyMapType, EI_JS_Mapping } from "../lib/EnhancedInput/EnhancedInputLib";
 import IM_DeadZoneAbsolute from "../lib/EnhancedInput/InputModifiers/IM_DeadZoneAbsolute.u";
+import UJS_HapticsObject from "../lib/Haptics.u";
 import { DFLOG, DFLOG_Error, DFLOG_ToConsole, DFLOG_ToScreen } from "../lib/Log";
 
 
@@ -29,7 +30,7 @@ function main(): Function
     let ToggledKeyMap = new Map<string, KeyMapType[]>();
 
 
-    let bSwapLeftRightControllers = true;
+    let bSwapLeftRightControllers = false;
 
     let LeftTrackPadX = (bSwapLeftRightControllers ? 'Vive_Left_Trackpad_X' : 'Vive_Right_Trackpad_X');
     let LeftTrackPadY = (bSwapLeftRightControllers ? 'Vive_Left_Trackpad_Y' : 'Vive_Right_Trackpad_Y');
@@ -63,7 +64,7 @@ function main(): Function
         ]);
     //#endregion
 
-    //#region Rotation
+    //#region Rotation triggers
 
     TriggeredKeyMap.set("SetLookRightAxisValue",
         [
@@ -86,7 +87,7 @@ function main(): Function
     ToggledKeyMap.set("SetbTranslateOnAxisChange",
         [
             //new KeyMapType("MouseY"),
-            new KeyMapType("C", [], []),
+            //new KeyMapType("C", [], []),
             new KeyMapType(LeftTrackPadClick, [], []),
             new KeyMapType(RightTrackPadClick, [], [])
 
@@ -100,13 +101,41 @@ function main(): Function
         ]);
 
 
-    //////////////////////////////////////////////////////////////////
-    /** TODO : Bind same actions to a @UCLASS in TS to Play Haptics */
-    //////////////////////////////////////////////////////////////////
+
+    //#endregion
+
+
+    //#region Haptics 
+    let HapticsObjLeft = new UJS_HapticsObject(GWorld, Vector.Vector_Zero());
+    let HapticsObjRight = new UJS_HapticsObject(GWorld, Vector.Vector_Zero());
+
+    HapticsObjLeft.hand = EControllerHand.Right;
+    HapticsObjRight.hand = EControllerHand.Right;
+
+    let HapticsMappingLeft = new EI_JS_Mapping(
+        FreePawnMappingContext,
+        HapticsObjLeft,
+        "PlayHaptics",
+        [new KeyMapType(LeftTrackPadClick, [], [])],
+        ETriggerEvent.Started,
+        true,
+        false
+    );
+
+    let HapticsMappingRight = new EI_JS_Mapping(
+        FreePawnMappingContext,
+        HapticsObjRight,
+        "PlayHaptics",
+        [new KeyMapType(RightTrackPadClick, [], [])],
+        ETriggerEvent.Started,
+        true,
+        false
+    );
 
 
     //#endregion
 
+    //#region Generate EI_JS_Mappings from data 
     for (const [KeyName, KeyMaps] of TriggeredKeyMap.entries())
     {
 
@@ -150,6 +179,8 @@ function main(): Function
 
         //MoveForwardMapping.ProcessMappingData();
     }
+
+    //#endregion
 
     //#endregion
 
