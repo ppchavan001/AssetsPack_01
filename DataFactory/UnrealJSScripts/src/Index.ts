@@ -1,4 +1,5 @@
-import { DFLOG, DFLOG_ToConsole } from "../lib/Log";
+import { DFLOG } from "../lib/Log";
+import { DFLOG_ToConsole } from "./lib/Log";
 
 function main(): Function
 {
@@ -8,6 +9,12 @@ function main(): Function
 
     DFLOG_ToConsole("JS Executing : " + __filename);
 
+
+    let CurrentMapName = GWorld.GetDisplayName();
+    CurrentMapName += ".js";
+
+    DFLOG_ToConsole("JS Index trying to execute : " + CurrentMapName);
+    Context.RunFile("./MapEntryPoints/" + CurrentMapName);
 
     // clean up the mess
     return function ()
@@ -34,5 +41,5 @@ try
 } catch (e)
 {
 
-    require("./UnrealJS/bootstrap")('./TestScripts/TemplateScript.u');
+    require("./UnrealJS/bootstrap")('./Index');
 }

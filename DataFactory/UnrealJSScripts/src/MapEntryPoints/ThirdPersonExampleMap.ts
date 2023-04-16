@@ -8,6 +8,7 @@ function main(): Function
 
     DFLOG_ToConsole("JS Executing : " + __filename);
 
+    Context.RunFile("./TestScripts/EnhancedInputTesting.js");
 
     // clean up the mess
     return function ()
@@ -34,5 +35,5 @@ try
 } catch (e)
 {
 
-    require("./UnrealJS/bootstrap")('./TestScripts/TemplateScript.u');
+    require("./UnrealJS/bootstrap")('./MapEntryPoints/ThirdPersonExampleMap');
 }

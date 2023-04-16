@@ -57,5 +57,8 @@
 			"Name": "EnhancedInput",
 			"Enabled": true
 		}
+	],
+	"TargetPlatforms": [
+		"WindowsNoEditor"
 	]
 }

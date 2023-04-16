@@ -264,5 +264,5 @@ try
 } catch (e)
 {
 
-    require("./UnrealJS/bootstrap")('EnhancedInputTesting');
+    require("./UnrealJS/bootstrap")('./TestScripts/EnhancedInputTesting');
 }
