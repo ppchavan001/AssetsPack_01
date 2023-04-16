@@ -19,5 +19,8 @@
     "@babel/preset-env": "^7.21.4",
     "@babel/preset-typescript": "^7.21.4",
     "@types/node": "^18.15.11"
+  },
+  "devDependencies": {
+    "babel-plugin-preprocessor": "^0.0.5"
   }
 }

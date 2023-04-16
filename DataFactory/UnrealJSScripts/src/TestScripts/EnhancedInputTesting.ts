@@ -133,7 +133,12 @@ function main(): Function
             FreePawnMappingContext,
             HapticsObjLeft,
             "PlayHaptics",
-            [new KeyMapType(LeftTrackPadClick, [], [])],
+            [
+                new KeyMapType(LeftTrackPadClick, [], []),
+                //#if DEBUG
+                new KeyMapType("C", [], [])
+                //#endif
+            ],
             ETriggerEvent.Started,
             true,
             false
@@ -143,7 +148,12 @@ function main(): Function
             FreePawnMappingContext,
             HapticsObjRight,
             "PlayHaptics",
-            [new KeyMapType(RightTrackPadClick, [], [])],
+            [
+                new KeyMapType(RightTrackPadClick, [], []),
+                //#if DEBUG
+                new KeyMapType("V", [], [])
+                //#endif
+            ],
             ETriggerEvent.Started,
             true,
             false

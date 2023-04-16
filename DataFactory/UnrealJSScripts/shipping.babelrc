@@ -18,6 +18,18 @@
       {
         "legacy": true
       }
+    ],
+    [
+      "preprocessor",
+      {
+        "symbols": {
+          "DEBUG": false,
+          "Shipping": true
+        },
+        "directives": {
+          //"DEBUG": true  //directives only affect one line
+        }
+      }
     ]
   ],
   "comments": false, // output comments in generated code
