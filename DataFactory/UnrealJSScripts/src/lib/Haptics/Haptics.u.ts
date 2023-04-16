@@ -1,6 +1,5 @@
-import { CreateObject } from "../Generics";
+import { CreateNewObject, CreateObject, bool } from '../Generics';
 import { DFLOG_ToConsole, DFLOG_ToScreen } from "../Log";
-import { HapticsOnMovementStarted } from "./Curves/HapticsOnMovementStarted";
 
 class UJS_Haptics extends UObject
 {
@@ -23,60 +22,39 @@ class UJS_Haptics_COMPILED extends UJS_Haptics { }
 /**
  * Dont need to spawn this actor unless trying to bind the UFUNCTION to InputAction,
  * call UJSHaptics.PlayHaptics directly if not binding UFUNCTION.
+ * 
+ * Using generics because the members of this class objects are being reset to undefined, probably some issue with GC,
+ * bLoop = true might not work properly.
  */
 @UCLASS()
-class UJS_HapticsObject extends Actor
+class UJS_HapticsObject<HapticClassType extends HapticFeedbackEffect_Base> extends Actor
 {
-    private HapticEffect: HapticFeedbackEffect_Base;
-    public hand: EControllerHand = EControllerHand.Right;
+    @UPROPERTY(EditAnywhere, VisibleAnywhere)
+    public HapticEffect: HapticFeedbackEffect_Base;
+
+    @UPROPERTY(EditAnywhere, VisibleAnywhere)
+    public hand: EControllerHand = EControllerHand.AnyHand;
+
+    @UPROPERTY(EditAnywhere, VisibleAnywhere)
     public Scale: number = 1;
-    public bLoop: boolean = false;
-
-    private HapticEffectClass: typeof HapticFeedbackEffect_Base;
 
 
-    /** Specify hand associated with this haptics object */
-    constructor(GWorld: World, Location: Vector)
+    @UPROPERTY(EditAnywhere, VisibleAnywhere)
+    public bLoop: bool = false;
+
+
+    /** Set this.hand for VR before playing haptics. */
+    constructor(InWorld: World, Location: Vector = Vector.Vector_Zero(), Rotation: Rotator | undefined = undefined)
     {
-        super(GWorld, Location);
-        /** 
-         * Do not build in ctor
-         * 
-         * class variable is not set here.
-         */
-        //this.RebuildHapticCurve();
-    }
-
-    // ReceiveBeginPlay()
-    // {
-    //     super.ReceiveBeginPlay();
-    //     this.RebuildHapticCurve();
-
-    // }
-
-    ReceiveDestroyed(): void
-    {
-        DFLOG_ToConsole("JS Haptics binding actor destroyed for  : " + this.hand + " " + this.GetName());
-        super.ReceiveDestroyed();
-    }
-
-    SetHapticEffectClass(HapticClass: typeof HapticFeedbackEffect_Base)
-    {
-        this.HapticEffectClass = HapticClass;
-        this.RebuildHapticCurve();
+        super(InWorld, Location, Rotation);
     }
 
     RebuildHapticCurve(): void
     {
-        let obj = CreateObject(this.HapticEffectClass);
-        if (obj != null)
+        let obj = CreateNewObject<HapticClassType>();
+        if (obj != null && obj instanceof HapticFeedbackEffect_Base)
         {
             this.HapticEffect = obj;
-        }
-        else
-        {
-            /** TODO : figure out why this.HapticEffectClass == undefined after a while. and remove hardcoded class.*/
-            this.HapticEffect = new HapticsOnMovementStarted();
         }
     }
 
@@ -90,6 +68,7 @@ class UJS_HapticsObject extends Actor
             this.RebuildHapticCurve();
         }
         UJS_Haptics.PlayHapticFeedback(this.HapticEffect, this.hand, this.Scale, this.bLoop);
+
     }
 
 

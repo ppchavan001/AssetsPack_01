@@ -9,6 +9,8 @@
 
 import { DFLOG, DFLOG_Error, DFLOG_ToConsole } from "./Log";
 
+export type bool = boolean;
+
 export function CreateObject<T>(clazz: new () => T): T | null
 {
 
@@ -20,4 +22,10 @@ export function CreateObject<T>(clazz: new () => T): T | null
     DFLOG_Error("JS : Tried to create object of undefined type! " + clazz);
 
     return null;
+}
+
+export function CreateNewObject<T>(): T
+{
+    const newObj: T = new (Object.getPrototypeOf(new Object()) as any).constructor();
+    return newObj;
 }
