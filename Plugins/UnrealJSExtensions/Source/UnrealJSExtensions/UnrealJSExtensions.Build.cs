@@ -26,6 +26,8 @@ public class UnrealJSExtensions : ModuleRules
 			new string[]
 			{
 				"Core",
+				"Engine",
+				"InputCore",
 				// ... add other public dependencies that you statically link with here ...
 				"V8"
 			}

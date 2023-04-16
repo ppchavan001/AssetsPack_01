@@ -110,16 +110,12 @@ function main(): Function
 
     //#region Haptics 
 
-    let HapticsObjLeft = new UJS_HapticsObject<HapticsOnMovementStarted>(GWorld);
-    let HapticsObjRight = new UJS_HapticsObject<HapticsOnMovementStarted>(GWorld);
+    let HapticsObjLeft = new HapticsBindingActor(GWorld);
+    let HapticsObjRight = new HapticsBindingActor(GWorld);
 
 
-    HapticsObjLeft.hand = bUseDefaultHandConfiguration ? EControllerHand.Left : EControllerHand.Right;
-    HapticsObjRight.hand = bUseDefaultHandConfiguration ? EControllerHand.Right : EControllerHand.Left;
-
-
-    HapticsObjLeft.HapticEffect = new HapticsOnMovementStarted();
-    HapticsObjRight.HapticEffect = new HapticsOnMovementStarted();
+    HapticsObjLeft.SetupHapticEffect(new HapticsOnMovementStarted(), bUseDefaultHandConfiguration ? EControllerHand.Left : EControllerHand.Right, 1.0, false);
+    HapticsObjRight.SetupHapticEffect(new HapticsOnMovementStarted(), bUseDefaultHandConfiguration ? EControllerHand.Right : EControllerHand.Left, 1.0, false);
 
 
     let HapticsMappingLeft = new EI_JS_Mapping(
