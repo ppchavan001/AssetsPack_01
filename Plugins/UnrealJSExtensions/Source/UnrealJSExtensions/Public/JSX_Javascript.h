@@ -29,6 +29,10 @@ public:
 	}
 
 
+	virtual void BeginDestroy() override;
+
+	UFUNCTION(BlueprintCallable)
+	void DestroyContextAndIsolate();
 	/*
 	*  if true will call activate on super which will try to execute the specified script
 	* 
