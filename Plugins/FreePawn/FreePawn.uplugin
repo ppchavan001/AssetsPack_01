@@ -1,9 +1,9 @@
 {
 	"FileVersion": 3,
 	"Version": 1,
-	"VersionName": "2.0",
+	"VersionName": "2.1",
 	"FriendlyName": "FreePawn",
-	"Description": "Pawn with free camera rotations. Can be easily controlled by UDP and other data sources. With SVR haptics.",
+	"Description": "Pawn with free camera rotations. Can be easily controlled by UDP and other data sources. With SVR haptics. Fixed issues at low fps.",
 	"Category": "Other",
 	"CreatedBy": "ppchavan001",
 	"CreatedByURL": "ppchavan001.github.io",
