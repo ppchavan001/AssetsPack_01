@@ -4,6 +4,7 @@
 #include "SnapToSequencerCameraActor.h"
 #include "Camera/CameraComponent.h"
 #include "Misc/EngineVersionComparison.h"
+#include "LevelSequencePlayer.h"
 
 #if UE_VERSION_NEWER_THAN(4, 27, 2)
 
