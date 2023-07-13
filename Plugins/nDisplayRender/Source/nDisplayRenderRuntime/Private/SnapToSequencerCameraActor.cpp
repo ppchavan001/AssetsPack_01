@@ -65,7 +65,7 @@ void ASnapToSequencerCameraActor::Tick(float DeltaTime)
 
 				if (SeqActor->SequencePlayer->IsPlaying()) SequenceToFollow = SeqActor;
 				if (GEngine)
-					GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Yellow, TEXT("Following New Sequence actor %s"));
+					GEngine->AddOnScreenDebugMessage(-1, GWorld->DeltaTimeSeconds, FColor::Yellow, TEXT("Following New Sequence actor %s"));
 			}
 		}
 	

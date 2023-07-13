@@ -7,7 +7,7 @@
 #include <Runtime/LevelSequence/Public/LevelSequenceActor.h>
 #include "SnapToSequencerCameraActor.generated.h"
 
-UCLASS()
+UCLASS(Blueprintable, BlueprintType, Placeable)
 class ASnapToSequencerCameraActor : public AActor
 {
 	GENERATED_BODY()
