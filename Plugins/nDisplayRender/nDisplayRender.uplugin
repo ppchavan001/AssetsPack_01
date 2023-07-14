@@ -1,7 +1,7 @@
 {
 	"FileVersion": 3,
-	"Version": 2,
-	"VersionName": "1.1",
+	"Version": 7,
+	"VersionName": "7.0",
 	"FriendlyName": "nDisplayRender",
 	"Description": "Helps with rendering NDisplay viewports.",
 	"Category": "Other",
@@ -36,7 +36,8 @@
 		},
 		{
 			"Name": "Switchboard",
-			"Enabled": true
+			"Enabled": true,
+			"Optional": true
 		},
 		{
 			"Name": "SequencerScripting",
@@ -45,6 +46,11 @@
 		{
 			"Name": "BlueprintFileUtils",
 			"Enabled": true
+		},
+		{
+			"Name": "DisplayClusterLaunch",
+			"Enabled": true,
+			"Optional": true
 		}
 	]
 }
